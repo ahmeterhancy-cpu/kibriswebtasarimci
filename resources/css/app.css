@@ -1,0 +1,1011 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+/* ==========================================================================
+   TASARIM JETONLARI
+   Kooba dili: açık krem zemin, neredeyse siyah metin, tek vurgu rengi.
+   ========================================================================== */
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --color-ink: #0f0f0f;
+    --color-paper: #f1f1ef;
+    --color-paper-2: #f4f4f2;
+    --color-brand: #e30613;
+    --color-brand-dark: #c00511;
+    --color-line: rgba(15, 15, 15, 0.1);
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-quint: cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+/* ==========================================================================
+   TEMEL
+   ========================================================================== */
+
+html {
+    scroll-behavior: smooth;
+    /* Sağ taşma sigortası — dev yazılar ve kayan şeritler için.
+       `hidden` DEĞİL `clip`: `overflow:hidden` html/body'yi kaydırma kabı yapar
+       ve içerideki tüm `position:sticky` öğeleri sessizce bozar. `clip` kırpar
+       ama kaydırma kabı oluşturmaz. */
+    overflow-x: clip;
+}
+
+body {
+    background: #fff;
+    color: #0f0f0f;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+}
+
+::selection {
+    background: #e30613;
+    color: #fff;
+}
+
+/* Klavyeyle gezinen kullanıcı için görünür odak — imleç gizliyken şart. */
+:focus-visible {
+    outline: 2px solid #e30613;
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* ==========================================================================
+   TİPOGRAFİ
+   ========================================================================== */
+
+.k-display {
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+    font-size: clamp(2.75rem, min(9vw, 12svh), 8.5rem);
+}
+
+.k-display-sm {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-size: clamp(2.1rem, 5vw, 4.5rem);
+}
+
+.k-display-xs {
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 1.04;
+    font-size: clamp(1.6rem, 3vw, 2.6rem);
+}
+
+.k-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.k-lead {
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    line-height: 1.6;
+    color: rgba(15, 15, 15, 0.7);
+}
+
+/* Vurgu şeridi — kelimenin altına kalemle çekilmiş brand bant.
+   background-size ile soldan sağa çizilir; box-decoration-break sayesinde
+   satır sonlarında da doğru davranır. */
+.k-hl {
+    background-image: linear-gradient(to top, #e30613 0%, #e30613 26%, transparent 26%);
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    padding: 0 0.08em;
+    margin: 0 -0.08em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-size 0.9s var(--ease-in-out-quint) 0.35s;
+}
+
+.is-in .k-hl,
+.k-hl.is-in {
+    background-size: 100% 100%;
+}
+
+/* ==========================================================================
+   METİN BÖLME MASKESİ  (motion.js → splitText)
+   Her kelime/karakter kendi maskesinde aşağıdan yükselir.
+   Dolgu + negatif kenar boşluğu: Türkçe alt/üst uzantılar (ğ ş ç İ) kırpılmasın.
+   ========================================================================== */
+
+.k-nowrap {
+    white-space: nowrap;
+}
+
+.k-split .k-w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding: 0.1em 0 0.24em;
+    margin: -0.1em 0 -0.24em;
+}
+
+.k-split .k-wi {
+    display: inline-block;
+    transform: translateY(140%);
+    transition: transform 1.05s var(--ease-out-expo);
+    will-change: transform;
+}
+
+.k-split.is-in .k-wi {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   REVEAL
+   ========================================================================== */
+
+.k-reveal,
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(34px);
+    transition:
+        opacity 0.9s var(--ease-out-expo),
+        transform 0.9s var(--ease-out-expo);
+}
+
+[data-reveal='fade'] {
+    transform: none;
+}
+[data-reveal='left'] {
+    transform: translateX(-40px);
+}
+[data-reveal='right'] {
+    transform: translateX(40px);
+}
+[data-reveal='scale'] {
+    transform: scale(0.94);
+}
+
+.k-reveal.is-in,
+[data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+}
+
+/* Gecikmeler yalnızca burada tanımlı değerlerle çalışır — 100'ün katları. */
+[data-delay='100'].is-in {
+    transition-delay: 0.1s;
+}
+[data-delay='200'].is-in {
+    transition-delay: 0.2s;
+}
+[data-delay='300'].is-in {
+    transition-delay: 0.3s;
+}
+[data-delay='400'].is-in {
+    transition-delay: 0.4s;
+}
+[data-delay='500'].is-in {
+    transition-delay: 0.5s;
+}
+[data-delay='600'].is-in {
+    transition-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .k-split .k-wi {
+        transform: none !important;
+        transition: none !important;
+    }
+    .k-reveal,
+    [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* ==========================================================================
+   ÖZEL İMLEÇ
+   Yalnızca hassas işaretçili cihazlarda; dokunmatikte hiç oluşmaz.
+   `html.k-ready` koşulu: JS çalışmazsa imleç asla kaybolmaz.
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+    html.k-ready * {
+        cursor: none !important;
+    }
+}
+
+.k-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(15, 15, 15, 0.35);
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    display: grid;
+    place-items: center;
+    transition:
+        width 0.4s var(--ease-out-expo),
+        height 0.4s var(--ease-out-expo),
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.k-cursor.is-live {
+    opacity: 1;
+}
+
+.k-cursor__dot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: #0f0f0f;
+    transition: opacity 0.3s ease;
+}
+
+.k-cursor__label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ffffff;
+    opacity: 0;
+    transform: scale(0.7);
+    transition:
+        opacity 0.3s ease,
+        transform 0.4s var(--ease-out-expo);
+    white-space: nowrap;
+}
+
+.k-cursor.is-hover {
+    width: 62px;
+    height: 62px;
+    border-color: rgba(15, 15, 15, 0.5);
+    background: rgba(15, 15, 15, 0.05);
+}
+
+.k-cursor.is-hover .k-cursor__dot {
+    opacity: 0;
+}
+
+.k-cursor.is-cta,
+.k-cursor.is-drag {
+    width: 96px;
+    height: 96px;
+    background: #e30613;
+    border-color: #e30613;
+}
+
+.k-cursor.is-cta .k-cursor__dot,
+.k-cursor.is-drag .k-cursor__dot {
+    opacity: 0;
+}
+
+.k-cursor.has-label .k-cursor__label {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ==========================================================================
+   SAYFA GEÇİŞ PERDESİ
+   ========================================================================== */
+
+.k-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: #0f0f0f;
+    pointer-events: none;
+    transform: translateY(101%);
+}
+
+.k-curtain__mark {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.18s;
+}
+
+.k-curtain.is-cover {
+    animation: k-curtain-in 0.46s var(--ease-in-out-quint) forwards;
+}
+
+.k-curtain.is-cover .k-curtain__mark {
+    opacity: 1;
+}
+
+@keyframes k-curtain-in {
+    from {
+        transform: translateY(101%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   SCROLL İLERLEME ÇUBUĞU
+   ========================================================================== */
+
+.k-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: #e30613;
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 9997;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.k-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    transition:
+        transform 0.5s var(--ease-in-out-quint),
+        background-color 0.4s ease,
+        border-color 0.4s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.k-header.is-solid {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border-bottom-color: rgba(15, 15, 15, 0.08);
+}
+
+.k-header.is-up {
+    transform: translateY(-105%);
+}
+
+/* Menü açıkken header gizlenir — koyu perdenin üstünde koyu logo okunmaz.
+   Açık renkli marka ve kapatma düğmesi menünün kendi üst çubuğunda. */
+.k-header[data-menu-open='1'] {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Mobil menü perdesi */
+.k-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 899;
+    background: #0f0f0f;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.7s var(--ease-in-out-quint);
+    pointer-events: none;
+    overflow-y: auto;
+}
+
+.k-menu.is-open {
+    clip-path: inset(0 0 0 0);
+    pointer-events: auto;
+}
+
+.k-menu__item {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+        opacity 0.6s var(--ease-out-expo),
+        transform 0.6s var(--ease-out-expo);
+}
+
+.k-menu.is-open .k-menu__item {
+    opacity: 1;
+    transform: none;
+}
+
+.k-menu.is-open .k-menu__item:nth-child(1) {
+    transition-delay: 0.18s;
+}
+.k-menu.is-open .k-menu__item:nth-child(2) {
+    transition-delay: 0.24s;
+}
+.k-menu.is-open .k-menu__item:nth-child(3) {
+    transition-delay: 0.3s;
+}
+.k-menu.is-open .k-menu__item:nth-child(4) {
+    transition-delay: 0.36s;
+}
+.k-menu.is-open .k-menu__item:nth-child(5) {
+    transition-delay: 0.42s;
+}
+.k-menu.is-open .k-menu__item:nth-child(6) {
+    transition-delay: 0.48s;
+}
+.k-menu.is-open .k-menu__item:nth-child(7) {
+    transition-delay: 0.54s;
+}
+
+/* Hamburger */
+.k-burger span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+    transition:
+        transform 0.4s var(--ease-in-out-quint),
+        opacity 0.2s ease;
+}
+
+.k-burger span + span {
+    margin-top: 6px;
+}
+
+.k-burger.is-open span:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+}
+.k-burger.is-open span:nth-child(2) {
+    opacity: 0;
+}
+.k-burger.is-open span:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* ==========================================================================
+   BAĞLANTI ALT ÇİZGİSİ
+   ========================================================================== */
+
+.k-link {
+    position: relative;
+    display: inline-block;
+    line-height: 1.2;
+    padding-bottom: 3px;
+}
+
+.k-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(1);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-in-out-quint);
+}
+
+.k-link:hover::after {
+    animation: k-link-sweep 0.75s var(--ease-in-out-quint) forwards;
+}
+
+@keyframes k-link-sweep {
+    0% {
+        transform: scaleX(1);
+        transform-origin: right;
+    }
+    49% {
+        transform: scaleX(0);
+        transform-origin: right;
+    }
+    50% {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+    100% {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+}
+
+/* Alttan çizilen bağlantı — başlangıçta çizgisiz. */
+.k-link-in::after {
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.k-link-in:hover::after {
+    transform: scaleX(1);
+    animation: none;
+}
+
+/* ==========================================================================
+   BUTONLAR
+   ========================================================================== */
+
+.k-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.05rem 2rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.4s ease;
+}
+
+/* Dolgu aşağıdan yukarı akar — hover'da renk devrilir. */
+.k-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-in-out-quint);
+}
+
+.k-btn:hover::before {
+    transform: translateY(0);
+}
+
+.k-btn--brand {
+    background: #e30613;
+    color: #ffffff;
+}
+.k-btn--brand::before {
+    background: #0f0f0f;
+}
+
+.k-btn--ink {
+    background: #0f0f0f;
+    color: #ffffff;
+}
+.k-btn--ink::before {
+    background: #e30613;
+}
+
+.k-btn--ghost {
+    border: 1.5px solid rgba(15, 15, 15, 0.2);
+    color: #0f0f0f;
+}
+.k-btn--ghost::before {
+    background: #0f0f0f;
+}
+.k-btn--ghost:hover {
+    color: #ffffff;
+    border-color: #0f0f0f;
+}
+
+.k-btn--light {
+    background: #ffffff;
+    color: #0f0f0f;
+}
+.k-btn--light::before {
+    background: #e30613;
+}
+.k-btn--light:hover {
+    color: #ffffff;
+}
+
+.k-btn__arrow {
+    transition: transform 0.45s var(--ease-out-expo);
+}
+
+.k-btn:hover .k-btn__arrow {
+    transform: translateX(5px);
+}
+
+/* ==========================================================================
+   ETİKET
+   ========================================================================== */
+
+.k-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #e30613;
+    background: rgba(227, 6, 19, 0.08);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+}
+
+/* ==========================================================================
+   MARQUEE
+   ========================================================================== */
+
+.k-marquee {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    width: 100%;
+}
+
+.k-marquee__rail {
+    display: flex;
+    flex-shrink: 0;
+    will-change: transform;
+}
+
+/* ==========================================================================
+   GÖRSEL DAVRANIŞLARI
+   ========================================================================== */
+
+.k-img-hover {
+    overflow: hidden;
+}
+
+.k-img-hover img {
+    transition: transform 1.2s var(--ease-out-expo);
+}
+
+.k-img-hover:hover img {
+    transform: scale(1.07);
+}
+
+[data-unmask] {
+    overflow: hidden;
+    clip-path: inset(50% 0 0 0);
+}
+
+[data-unmask] img,
+[data-unmask] [data-unmask-inner] {
+    will-change: transform;
+}
+
+/* ==========================================================================
+   HERO GÖRSEL İZİ
+   ========================================================================== */
+
+.k-trail-img {
+    position: absolute;
+    width: clamp(140px, 13vw, 220px);
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7) rotate(var(--rot, 0deg));
+    transition:
+        opacity 0.5s var(--ease-out-expo),
+        transform 0.7s var(--ease-out-expo);
+}
+
+.k-trail-img.is-in {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--rot, 0deg));
+}
+
+/* ==========================================================================
+   İMLECİ TAKİP EDEN ÖNİZLEME KARTI
+   ========================================================================== */
+
+.k-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: clamp(220px, 22vw, 330px);
+    aspect-ratio: 4 / 3;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    transition: opacity 0.45s var(--ease-out-expo);
+}
+
+.k-follower.is-on {
+    opacity: 1;
+}
+
+.k-follower__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.1);
+    transition:
+        opacity 0.45s var(--ease-out-expo),
+        transform 0.7s var(--ease-out-expo);
+}
+
+.k-follower__slide.is-on {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.k-follower__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Satır hover: ok belirir. */
+.k-row {
+    transition: color 0.4s ease;
+}
+
+.k-row__arrow {
+    opacity: 0;
+    transform: translateX(-14px);
+    transition:
+        opacity 0.45s var(--ease-out-expo),
+        transform 0.45s var(--ease-out-expo);
+}
+
+.k-row:hover .k-row__arrow {
+    opacity: 1;
+    transform: none;
+}
+
+/* ==========================================================================
+   YATAY KAYDIRMA
+   ========================================================================== */
+
+.k-noscroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.k-noscroll::-webkit-scrollbar {
+    display: none;
+}
+
+[data-hscroll-rail] {
+    will-change: transform;
+}
+
+/* ==========================================================================
+   FORM
+   ========================================================================== */
+
+.k-field {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1.5px solid rgba(15, 15, 15, 0.16);
+    padding: 0.85rem 0;
+    font-size: 1rem;
+    color: #0f0f0f;
+    transition: border-color 0.35s ease;
+    border-radius: 0;
+}
+
+.k-field::placeholder {
+    color: rgba(15, 15, 15, 0.35);
+}
+
+.k-field:focus {
+    outline: none;
+    border-bottom-color: #e30613;
+}
+
+.k-field-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(15, 15, 15, 0.5);
+}
+
+/* Seçim kartı (teklif sihirbazı) */
+.k-choice {
+    position: relative;
+    border: 1.5px solid rgba(15, 15, 15, 0.12);
+    border-radius: 14px;
+    padding: 1.15rem 1.25rem;
+    text-align: left;
+    transition:
+        border-color 0.3s ease,
+        background-color 0.3s ease,
+        transform 0.3s var(--ease-out-expo);
+}
+
+.k-choice:hover {
+    border-color: rgba(15, 15, 15, 0.35);
+    transform: translateY(-2px);
+}
+
+.k-choice.is-picked {
+    border-color: #e30613;
+    background: rgba(227, 6, 19, 0.05);
+}
+
+.k-choice__check {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(15, 15, 15, 0.2);
+    display: grid;
+    place-items: center;
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.k-choice.is-picked .k-choice__check {
+    background: #e30613;
+    border-color: #e30613;
+}
+
+.k-choice__check svg {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.k-choice.is-picked .k-choice__check svg {
+    opacity: 1;
+}
+
+/* Sihirbaz adımı */
+.k-step {
+    display: none;
+}
+
+.k-step.is-active {
+    display: block;
+    animation: k-step-in 0.55s var(--ease-out-expo);
+}
+
+@keyframes k-step-in {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   SSS AKORDİYON
+   ========================================================================== */
+
+.k-acc__body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s var(--ease-in-out-quint);
+}
+
+.k-acc__body > div {
+    overflow: hidden;
+}
+
+.k-acc.is-open .k-acc__body {
+    grid-template-rows: 1fr;
+}
+
+.k-acc__sign {
+    transition: transform 0.45s var(--ease-in-out-quint);
+}
+
+.k-acc.is-open .k-acc__sign {
+    transform: rotate(135deg);
+}
+
+/* ==========================================================================
+   MAKALE TİPOGRAFİSİ (.k-article)
+   CMS'ten gelen ham HTML için — @tailwindcss/typography bilerek yok.
+   ========================================================================== */
+
+.k-article {
+    font-size: 1.09rem;
+    line-height: 1.78;
+    color: rgba(15, 15, 15, 0.75);
+}
+
+.k-article > p:first-child {
+    font-size: 1.22em;
+    line-height: 1.6;
+    color: rgba(15, 15, 15, 0.88);
+}
+
+.k-article p {
+    margin: 0 0 1.4rem;
+}
+
+.k-article h2 {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: #0f0f0f;
+    font-size: clamp(1.65rem, 3vw, 2.4rem);
+    margin: 3.25rem 0 1.15rem;
+}
+
+.k-article h3 {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #0f0f0f;
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    margin: 2.5rem 0 0.8rem;
+}
+
+.k-article ul,
+.k-article ol {
+    margin: 0 0 1.5rem;
+    padding-left: 1.35em;
+}
+
+.k-article ul {
+    list-style: disc;
+}
+
+.k-article ol {
+    list-style: decimal;
+}
+
+.k-article li {
+    margin-bottom: 0.6rem;
+}
+
+.k-article li::marker {
+    color: #e30613;
+    font-weight: 700;
+}
+
+.k-article a {
+    color: #e30613;
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(227, 6, 19, 0.35);
+}
+
+.k-article a:hover {
+    border-bottom-color: #e30613;
+}
+
+.k-article strong {
+    color: #0f0f0f;
+    font-weight: 700;
+}
+
+.k-article blockquote {
+    border-left: 4px solid #e30613;
+    padding-left: 1.5rem;
+    margin: 2.5rem 0;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    line-height: 1.35;
+    color: #0f0f0f;
+}
+
+.k-article img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 2.25rem 0;
+}
+
+.k-article hr {
+    border: 0;
+    border-top: 1px solid rgba(15, 15, 15, 0.12);
+    margin: 3rem 0;
+}
+
+/* ==========================================================================
+   YARDIMCILAR
+   ========================================================================== */
+
+.k-rule {
+    height: 1px;
+    background: rgba(15, 15, 15, 0.1);
+}
+
+.k-dark .k-rule {
+    background: rgba(255, 255, 255, 0.14);
+}
