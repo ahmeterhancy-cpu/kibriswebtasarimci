@@ -11,16 +11,48 @@
         ['key' => 'yenileme', 'label' => $isEn ? 'Redesign an existing site' : 'Mevcut siteyi yenileme',   'note' => $isEn ? 'You have a site; it needs rebuilding.' : 'Siteniz var; yeniden kurulması gerekiyor.'],
     ];
 
-    /* Ek modüller — fiyatlar ₺, KDV hariç. */
+    /* Ek modüller. `types` modülün hangi proje türlerinde anlamlı olduğunu söyler;
+       3. adım buna göre süzülür (mobil uygulama projesinde "katalog modülü" ya da
+       "iOS + Android uygulama" göstermek saçma olurdu).
+       `price` null olanlar liste fiyatı olmayan türlere aittir: seçilebilir ama
+       tutara girmez, kapsamı anlatmaya yarar. Fiyatlar ₺ ve KDV hariçtir. */
     $extras = [
-        ['key' => 'katalog',   'label' => $isEn ? 'Catalogue module (WhatsApp orders)' : 'Katalog modülü (WhatsApp sipariş)', 'price' => 5000],
-        ['key' => 'dil',       'label' => $isEn ? 'Second language (TR / EN)' : 'İkinci dil (TR / EN)',                        'price' => 4000],
-        ['key' => 'blog',      'label' => $isEn ? 'Blog / news module' : 'Blog / haber modülü',                                'price' => 3500],
-        ['key' => 'rezervasyon', 'label' => $isEn ? 'Booking / appointment system' : 'Rezervasyon / randevu sistemi',          'price' => 12000],
-        ['key' => 'uyelik',    'label' => $isEn ? 'Membership / customer portal' : 'Üyelik / müşteri portalı',                 'price' => 15000],
-        ['key' => 'seo',       'label' => $isEn ? 'SEO content package (5 pages)' : 'SEO içerik paketi (5 sayfa)',             'price' => 6000],
-        ['key' => 'kimlik',    'label' => $isEn ? 'Logo and brand identity' : 'Logo ve marka kimliği',                         'price' => 9000],
-        ['key' => 'mobilapp',  'label' => $isEn ? 'iOS + Android app' : 'iOS + Android uygulama',                              'price' => 65000],
+        ['key' => 'katalog',     'price' => 5000,  'types' => ['tanitim', 'kurumsal', 'yenileme'],
+            'label' => $isEn ? 'Catalogue module (WhatsApp orders)' : 'Katalog modülü (WhatsApp sipariş)'],
+        ['key' => 'dil',         'price' => 4000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'Second language (TR / EN)' : 'İkinci dil (TR / EN)'],
+        ['key' => 'blog',        'price' => 3500,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'Blog / news module' : 'Blog / haber modülü'],
+        ['key' => 'rezervasyon', 'price' => 12000, 'types' => ['kurumsal', 'yenileme'],
+            'label' => $isEn ? 'Booking / appointment system' : 'Rezervasyon / randevu sistemi'],
+        ['key' => 'uyelik',      'price' => 15000, 'types' => ['kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'Membership / customer portal' : 'Üyelik / müşteri portalı'],
+        ['key' => 'seo',         'price' => 6000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'SEO content package (5 pages)' : 'SEO içerik paketi (5 sayfa)'],
+        ['key' => 'kimlik',      'price' => 9000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'Logo and brand identity' : 'Logo ve marka kimliği'],
+        ['key' => 'mobilapp',    'price' => 65000, 'types' => ['kurumsal', 'eticaret', 'yenileme'],
+            'label' => $isEn ? 'iOS + Android app' : 'iOS + Android uygulama'],
+
+        /* Mobil uygulama projeleri — fiyatsız kapsam maddeleri. */
+        ['key' => 'push',        'price' => null, 'types' => ['mobil'],
+            'label' => $isEn ? 'Push notifications' : 'Push bildirim'],
+        ['key' => 'uygulama-uyelik', 'price' => null, 'types' => ['mobil'],
+            'label' => $isEn ? 'Login and user accounts' : 'Giriş ve üyelik'],
+        ['key' => 'magaza-yayin', 'price' => null, 'types' => ['mobil'],
+            'label' => $isEn ? 'App Store + Google Play submission' : 'App Store + Google Play yayını'],
+        ['key' => 'uygulama-odeme', 'price' => null, 'types' => ['mobil'],
+            'label' => $isEn ? 'In-app payment' : 'Uygulama içi ödeme'],
+
+        /* Özel yazılım projeleri — fiyatsız kapsam maddeleri. */
+        ['key' => 'rol-yetki',   'price' => null, 'types' => ['yazilim'],
+            'label' => $isEn ? 'Role-based permissions' : 'Rol bazlı yetkilendirme'],
+        ['key' => 'raporlama',   'price' => null, 'types' => ['yazilim'],
+            'label' => $isEn ? 'Reporting screens' : 'Raporlama ekranları'],
+        ['key' => 'entegrasyon', 'price' => null, 'types' => ['yazilim', 'mobil'],
+            'label' => $isEn ? 'Integration with an existing system' : 'Mevcut sisteme entegrasyon'],
+        ['key' => 'api',         'price' => null, 'types' => ['yazilim'],
+            'label' => $isEn ? 'API for third parties' : 'Dışarıya API'],
     ];
 
     /* Süre yalnızca planlama bilgisidir; fiyata etki etmez. Liste fiyatları sabit,
@@ -59,13 +91,65 @@
             : 'Bu tür için liste fiyatı yok. Kapsamı görüşmede netleştirip 24 saat içinde sabit fiyatlı teklif gönderiyoruz.',
     ];
 
-    $typePackages = [
-        'tanitim' => ['hizli-baslangic', 'basic-onepage'],
-        'kurumsal' => ['basic-onepage', 'kurumsal'],
-        'eticaret' => ['e-ticaret-baslangic', 'e-ticaret-pro'],
-        'yenileme' => ['basic-onepage', 'kurumsal', 'e-ticaret-baslangic'],
-        'mobil' => [],
-        'yazilim' => [],
+    /* 2. ve 3. adımın içeriği 1. adımdaki seçime göre değişir.
+       `packages` liste fiyatı olan paketleri, `options` ise liste fiyatı olmayan
+       türlerde (mobil uygulama, özel yazılım) kapsam sorusunun şıklarını taşır.
+       Böylece hiçbir türde adım boş kalmıyor. */
+    $typeSteps = [
+        'tanitim' => [
+            'step2' => $isEn ? 'Which package?' : 'Hangi paket?',
+            'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
+            'packages' => ['hizli-baslangic', 'basic-onepage'],
+            'options' => [],
+        ],
+        'kurumsal' => [
+            'step2' => $isEn ? 'Which package?' : 'Hangi paket?',
+            'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
+            'packages' => ['basic-onepage', 'kurumsal'],
+            'options' => [],
+        ],
+        'eticaret' => [
+            'step2' => $isEn ? 'Which store package?' : 'Hangi mağaza paketi?',
+            'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
+            'packages' => ['e-ticaret-baslangic', 'e-ticaret-pro'],
+            'options' => [],
+        ],
+        'yenileme' => [
+            'step2' => $isEn ? 'What scale is the new site?' : 'Yenilenen site hangi ölçekte olacak?',
+            'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
+            'packages' => ['basic-onepage', 'kurumsal', 'e-ticaret-baslangic'],
+            'options' => [],
+        ],
+        'mobil' => [
+            'step2' => $isEn ? 'What will the app do?' : 'Uygulama ne yapacak?',
+            'step3' => $isEn ? 'What should it include?' : 'Neler olsun?',
+            'packages' => [],
+            'options' => [
+                ['key' => 'mobil-vitrin', 'label' => $isEn ? 'Showcase / catalogue app' : 'Tanıtım / katalog uygulaması',
+                    'note' => $isEn ? 'Shows content, takes no orders.' : 'İçerik gösterir, sipariş almaz.'],
+                ['key' => 'mobil-siparis', 'label' => $isEn ? 'Ordering / booking app' : 'Sipariş / rezervasyon uygulaması',
+                    'note' => $isEn ? 'Users transact inside the app.' : 'Kullanıcı uygulamadan işlem yapar.'],
+                ['key' => 'mobil-uyelik', 'label' => $isEn ? 'Membership app' : 'Üyelik uygulaması',
+                    'note' => $isEn ? 'Login, profile, notifications.' : 'Giriş, profil, bildirim.'],
+                ['key' => 'mobil-entegrasyon', 'label' => $isEn ? 'Connects to our existing system' : 'Mevcut sistemimize bağlanacak',
+                    'note' => $isEn ? 'You already have a site or panel.' : 'Sitemiz ya da panelimiz var.'],
+            ],
+        ],
+        'yazilim' => [
+            'step2' => $isEn ? 'What kind of system?' : 'Ne tür bir sistem?',
+            'step3' => $isEn ? 'What should it include?' : 'Neler olsun?',
+            'packages' => [],
+            'options' => [
+                ['key' => 'yazilim-rezervasyon', 'label' => $isEn ? 'Booking / appointment system' : 'Rezervasyon / randevu sistemi',
+                    'note' => $isEn ? 'Calendar, slots, confirmations.' : 'Takvim, slot, onay akışı.'],
+                ['key' => 'yazilim-portal', 'label' => $isEn ? 'Dealer / customer portal' : 'Bayi / müşteri portalı',
+                    'note' => $isEn ? 'Outside users log in and self-serve.' : 'Dışarıdaki kullanıcılar giriş yapar.'],
+                ['key' => 'yazilim-operasyon', 'label' => $isEn ? 'Internal operations panel' : 'İç operasyon paneli',
+                    'note' => $isEn ? 'Your team runs daily work on it.' : 'Ekibiniz günlük işi buradan yürütür.'],
+                ['key' => 'yazilim-api', 'label' => $isEn ? 'API for an existing system' : 'Mevcut sisteme API bağlantısı',
+                    'note' => $isEn ? 'Two systems need to talk.' : 'İki sistem birbiriyle konuşacak.'],
+            ],
+        ],
     ];
 
     /* Paket verisi JS'e — tür eşlemesi ve fiyat. */
@@ -152,31 +236,37 @@
                         <input type="hidden" name="project_type" data-field="project_type">
                     </fieldset>
 
-                    {{-- 2 · Paket --}}
+                    {{-- 2 · Paket / kapsam — içerik 1. adımdaki türe göre kurulur --}}
                     <fieldset class="k-step" data-step="2">
-                        <legend class="k-display-xs mb-7">{{ __('site.quote.step2') }}</legend>
+                        <legend class="k-display-xs mb-7" data-step2-title>{{ __('site.quote.step2') }}</legend>
                         <div class="grid grid-cols-1 gap-3" data-package-list></div>
                         <input type="hidden" name="package" data-field="package">
                     </fieldset>
 
-                    {{-- 3 · Ek modüller --}}
+                    {{-- 3 · Ek modüller — türe uymayanlar gizlenir --}}
                     <fieldset class="k-step" data-step="3">
-                        <legend class="k-display-xs mb-2">{{ __('site.quote.step3') }}</legend>
+                        <legend class="k-display-xs mb-2" data-step3-title>{{ __('site.quote.step3') }}</legend>
                         <p class="mb-7 text-sm text-[#0F0F0F]/55">
                             {{ $isEn ? 'Optional — pick any that apply.' : 'İsteğe bağlı — uygun olanları işaretleyin.' }}
                         </p>
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             @foreach ($extras as $extra)
                                 <button type="button" class="k-choice" data-toggle="extras" data-value="{{ $extra['key'] }}"
-                                        data-price="{{ $extra['price'] }}" data-label="{{ $extra['label'] }}">
+                                        data-types="{{ implode(',', $extra['types']) }}"
+                                        data-price="{{ $extra['price'] ?? '' }}" data-label="{{ $extra['label'] }}" hidden>
                                     <span class="block pr-7 font-bold tracking-tight">{{ $extra['label'] }}</span>
-                                    <span class="mt-1 block text-sm text-[#E30613]">+{{ number_format($extra['price'], 0, ',', '.') }} ₺</span>
+                                    @if ($extra['price'])
+                                        <span class="mt-1 block text-sm text-[#E30613]">+{{ number_format($extra['price'], 0, ',', '.') }} ₺</span>
+                                    @endif
                                     <span class="k-choice__check" aria-hidden="true">
                                         <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </span>
                                 </button>
                             @endforeach
                         </div>
+                        <p class="mt-5 text-sm text-[#0F0F0F]/45" data-extras-empty hidden>
+                            {{ $isEn ? 'Nothing to add for this type — continue.' : 'Bu tür için ek modül yok, devam edebilirsiniz.' }}
+                        </p>
                         <div data-extras-inputs></div>
                     </fieldset>
 
@@ -330,7 +420,7 @@
             const PACKAGES = @json($packageData);
             const STEP_TITLES = @json($stepTitles);
             const L = @json($wizardLabels);
-            const TYPE_PACKAGES = @json($typePackages);
+            const TYPE_STEPS = @json($typeSteps);
 
             const steps = Array.from(form.querySelectorAll('[data-step]'));
             const bar = form.querySelector('[data-step-bar]');
@@ -342,6 +432,10 @@
             const btnSubmit = form.querySelector('[data-nav="submit"]');
             const packageList = form.querySelector('[data-package-list]');
             const extrasInputs = form.querySelector('[data-extras-inputs]');
+            const extraButtons = Array.from(form.querySelectorAll('[data-toggle="extras"]'));
+            const extrasEmptyEl = form.querySelector('[data-extras-empty]');
+            const step2TitleEl = form.querySelector('[data-step2-title]');
+            const step3TitleEl = form.querySelector('[data-step3-title]');
             const totalEl = form.querySelector('[data-total]');
             const totalVatEl = form.querySelector('[data-total-vat]');
             const totalNoteEl = form.querySelector('[data-total-note]');
@@ -365,12 +459,21 @@
             const money = (n) => new Intl.NumberFormat('tr-TR').format(n) + ' ₺';
 
             /* ── Adım gösterimi ──────────────────────────────────────── */
+
+            /** İlerleme çubuğundaki etiket, 2. ve 3. adımda türe göre değişir. */
+            function stepLabel(n) {
+                const cfg = TYPE_STEPS[state.project_type];
+                if (cfg && n === 2 && cfg.step2) return cfg.step2;
+                if (cfg && n === 3 && cfg.step3) return cfg.step3;
+                return STEP_TITLES[n - 1];
+            }
+
             function showStep(n) {
                 state.step = Math.min(Math.max(n, 1), steps.length);
                 steps.forEach((s) => s.classList.toggle('is-active', Number(s.dataset.step) === state.step));
                 bar.style.width = (state.step / steps.length * 100) + '%';
                 stepCurrent.textContent = state.step;
-                stepTitle.textContent = STEP_TITLES[state.step - 1];
+                stepTitle.textContent = stepLabel(state.step);
                 btnPrev.hidden = state.step === 1;
                 btnNext.hidden = state.step === steps.length;
                 btnSubmit.hidden = state.step !== steps.length;
@@ -380,11 +483,33 @@
                 if (box.top < 0) window.scrollTo({ top: window.scrollY + box.top - 110, behavior: 'smooth' });
             }
 
-            /* ── Paket listesini türe göre kur ───────────────────────── */
-            function buildPackages() {
-                const allowed = TYPE_PACKAGES[state.project_type] || [];
-                const list = PACKAGES.filter((p) => allowed.includes(p.slug));
+            /* ── 2. adımı seçilen türe göre kur ─────────────────────────
+               Liste fiyatı olan türlerde paketler, olmayanlarda (mobil uygulama,
+               özel yazılım) fiyatsız kapsam şıkları gösterilir. */
+            function buildStep2() {
+                const cfg = TYPE_STEPS[state.project_type] || { packages: [], options: [] };
+                const list = PACKAGES.filter((p) => cfg.packages.includes(p.slug));
                 packageList.innerHTML = '';
+
+                if (cfg.step2) step2TitleEl.textContent = cfg.step2;
+                if (cfg.step3) step3TitleEl.textContent = cfg.step3;
+
+                // Fiyatsız kapsam şıkları (mobil / özel yazılım)
+                (cfg.options || []).forEach((o) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'k-choice';
+                    btn.dataset.pick = 'package';
+                    btn.dataset.value = o.key;
+                    btn.dataset.label = o.label;
+                    btn.innerHTML = `
+                        <span class="block pr-7 font-bold tracking-tight">${escape(o.label)}</span>
+                        <span class="mt-1 block text-sm text-[#0F0F0F]/55">${escape(o.note || '')}</span>
+                        <span class="k-choice__check" aria-hidden="true">
+                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>`;
+                    packageList.appendChild(btn);
+                });
 
                 list.forEach((p) => {
                     const hasPanel = !!p.pricePanel;
@@ -408,21 +533,47 @@
                     packageList.appendChild(card);
                 });
 
-                // "Emin değilim" seçeneği her zaman var.
+                // "Emin değilim" her türde geçerli bir cevap.
                 const unsure = document.createElement('button');
                 unsure.type = 'button';
                 unsure.className = 'k-choice';
                 unsure.dataset.pick = 'package';
-                unsure.dataset.value = '';
-                unsure.dataset.price = '0';
+                unsure.dataset.value = 'belirsiz';
                 unsure.dataset.label = L.noPackage;
                 unsure.innerHTML = `
-                    <span class="block pr-7 font-bold tracking-tight">${L.noPackage}</span>
-                    <span class="mt-1 block text-sm text-[#0F0F0F]/55">${L.noPackageNote}</span>
+                    <span class="block pr-7 font-bold tracking-tight">${escape(L.noPackage)}</span>
+                    <span class="mt-1 block text-sm text-[#0F0F0F]/55">${escape(L.noPackageNote)}</span>
                     <span class="k-choice__check" aria-hidden="true">
                         <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>`;
                 packageList.appendChild(unsure);
+            }
+
+            /* ── 3. adımı türe göre süz ─────────────────────────────── */
+            function buildExtras() {
+                let visible = 0;
+
+                extraButtons.forEach((btn) => {
+                    const types = (btn.dataset.types || '').split(',');
+                    const show = types.includes(state.project_type);
+                    btn.hidden = !show;
+                    if (show) {
+                        visible++;
+                    } else if (btn.classList.contains('is-picked')) {
+                        // Tür değişince artık geçerli olmayan modülleri seçimden düşür.
+                        btn.classList.remove('is-picked');
+                        const i = state.extras.findIndex((x) => x.key === btn.dataset.value);
+                        if (i >= 0) state.extras.splice(i, 1);
+                    }
+                });
+
+                extrasEmptyEl.hidden = visible > 0;
+                syncExtrasInputs();
+            }
+
+            function syncExtrasInputs() {
+                extrasInputs.innerHTML = state.extras
+                    .map((x) => `<input type="hidden" name="extras[]" value="${escape(x.key)}">`).join('');
             }
 
             /* ── Toplam ve özet ─────────────────────────────────────── */
@@ -470,16 +621,18 @@
                     totalInput.value = total;
                 }
 
-                /* Özet: önce tutarı olan kalemler, sonra bilgi amaçlı seçimler. */
+                /* Özet: önce tutarı olan kalemler, sonra bilgi amaçlı seçimler.
+                   Fiyatsız kapsam maddeleri "0 ₺" olarak değil, soluk satır olarak. */
                 const priced = [];
                 if (base !== null) {
                     priced.push(row(state.packageLabel + (state.panel ? ' — ' + L.withPanel : ''), base));
                 }
-                state.extras.forEach((e) => priced.push(row(e.label, e.price)));
+                state.extras.filter((e) => e.price > 0).forEach((e) => priced.push(row(e.label, e.price)));
 
                 const context = [];
                 if (state.projectTypeLabel) context.push(row(state.projectTypeLabel, null, true));
                 if (base === null && state.packageLabel) context.push(row(state.packageLabel, null, true));
+                state.extras.filter((e) => !e.price).forEach((e) => context.push(row(e.label, null, true)));
                 if (state.timelineLabel) context.push(row(state.timelineLabel, null, true));
                 if (state.budgetLabel) context.push(row(state.budgetLabel, null, true));
 
@@ -506,8 +659,11 @@
                     if (group === 'project_type') {
                         state.project_type = pick.dataset.value;
                         state.projectTypeLabel = pick.querySelector('span').textContent.trim();
+                        // Tür değişti: 2. adım baştan kurulur, 3. adım yeniden süzülür.
                         state.package = ''; state.packageLabel = ''; state.panel = false;
-                        buildPackages();
+                        form.querySelector('[data-field="package"]').value = '';
+                        buildStep2();
+                        buildExtras();
                     } else if (group === 'package') {
                         state.package = pick.dataset.value || '';
                         state.packageLabel = pick.dataset.label || '';
@@ -533,11 +689,15 @@
                         state.extras.splice(idx, 1);
                         toggle.classList.remove('is-picked');
                     } else {
-                        state.extras.push({ key, label: toggle.dataset.label, price: Number(toggle.dataset.price) });
+                        // Fiyatsız kapsam maddelerinde data-price boştur → 0, tutara girmez.
+                        state.extras.push({
+                            key,
+                            label: toggle.dataset.label,
+                            price: Number(toggle.dataset.price) || 0,
+                        });
                         toggle.classList.add('is-picked');
                     }
-                    extrasInputs.innerHTML = state.extras
-                        .map((x) => `<input type="hidden" name="extras[]" value="${x.key}">`).join('');
+                    syncExtrasInputs();
                     recalc();
                 }
             });
@@ -558,6 +718,7 @@
             /* ── Gezinme + doğrulama ────────────────────────────────── */
             function validate(step) {
                 if (step === 1 && !state.project_type) return L.required;
+                if (step === 2 && !state.package) return L.required;
                 if (step === 4 && !state.timeline) return L.required;
                 return null;
             }
@@ -565,7 +726,6 @@
             btnNext.addEventListener('click', () => {
                 const problem = validate(state.step);
                 if (problem) { errorEl.textContent = problem; errorEl.hidden = false; return; }
-                if (state.step === 1) buildPackages();
                 showStep(state.step + 1);
             });
 
@@ -589,14 +749,14 @@
                 if (pkg) {
                     const type = pkg.ecommerce ? 'eticaret' : (preset === 'kurumsal' ? 'kurumsal' : 'tanitim');
                     const typeBtn = form.querySelector(`[data-pick="project_type"][data-value="${type}"]`);
-                    if (typeBtn) typeBtn.click();
-                    buildPackages();
+                    if (typeBtn) typeBtn.click();   // buildStep2 + buildExtras'ı da tetikler
                     const pkgBtn = form.querySelector(`[data-pick="package"][data-value="${preset}"]`);
                     if (pkgBtn) pkgBtn.click();
                     showStep(2);
                 }
             }
 
+            buildExtras();   // tür seçilmeden hiçbir modül görünmesin
             recalc();
         })();
         </script>

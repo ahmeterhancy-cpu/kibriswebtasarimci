@@ -63,7 +63,9 @@ class QuoteRequestResource extends Resource
                     TextInput::make('phone')->label('Telefon')->disabled(),
                     TextInput::make('company')->label('Şirket')->disabled(),
                     TextInput::make('project_type')->label('Proje türü')->disabled(),
-                    TextInput::make('package')->label('Seçilen paket')->disabled(),
+                    // Liste fiyatı olan türlerde paket slug'ı, olmayanlarda
+                    // (mobil uygulama, özel yazılım) 2. adımda seçilen kapsam anahtarı.
+                    TextInput::make('package')->label('Seçilen paket / kapsam')->disabled(),
                     TextInput::make('timeline')->label('Süre beklentisi')->disabled(),
                     TextInput::make('budget')->label('Bütçe aralığı')->disabled(),
                     TextInput::make('quote_total')
@@ -95,7 +97,7 @@ class QuoteRequestResource extends Resource
                 TextColumn::make('name')->label('Kişi')->searchable()->weight('bold')
                     ->description(fn ($record) => $record->email),
                 TextColumn::make('project_type')->label('Tür')->badge()->toggleable(),
-                TextColumn::make('package')->label('Paket')->toggleable()->placeholder('—'),
+                TextColumn::make('package')->label('Paket / kapsam')->toggleable()->placeholder('—'),
                 TextColumn::make('quote_total')->label('Tutar')->numeric(0, ',', '.')->suffix(' ₺')->placeholder('—'),
                 TextColumn::make('status')->label('Durum')->badge()
                     ->formatStateUsing(fn (string $state) => QuoteRequest::STATUSES[$state] ?? $state)
