@@ -63,8 +63,8 @@ return [
         'step3' => 'Ek modüller',
         'step4' => 'Süre ve bütçe',
         'step5' => 'İletişim',
-        'estimate' => 'Tahmini bütçe',
-        'estimate_note' => 'Bu tahmin seçimlerinize göre anlık hesaplanır; nihai fiyat görüşme sonrası netleşir.',
+        'total' => 'Toplam',
+        'total_note_open' => 'Seçim yaptıkça liste fiyatları buraya toplanır.',
         'summary' => 'Seçimleriniz',
     ],
 ];

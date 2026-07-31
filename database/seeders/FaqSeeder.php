@@ -42,9 +42,9 @@ class FaqSeeder extends Seeder
             ['quote', 'Teklif ücretli mi?', 'Is the quote free?',
                 'Hayır. Formu doldurmanız yeterli; 24 saat içinde kapsamı netleştiren bir teklif gönderiyoruz.',
                 'No. Fill in the form and we send a scoped proposal within 24 hours.'],
-            ['quote', 'Formdaki tahmini bütçe bağlayıcı mı?', 'Is the estimated budget binding?',
-                'Hayır, tahmin seçimlerinize göre anlık hesaplanan bir aralıktır. Nihai fiyat görüşme sonrası netleşir.',
-                'No — it is a live range calculated from your selections. The final price is agreed after we talk.'],
+            ['quote', 'Formda çıkan toplam kesin fiyat mı?', 'Is the total shown in the form the final price?',
+                'Toplam, seçtiğiniz paketin ve ek modüllerin liste fiyatlarının aynen toplamıdır — KDV hariç. Kapsamı görüşmede teyit ediyoruz; siz bir şey eklemedikçe fiyat değişmez. Liste fiyatı olmayan işlerde (mobil uygulama, özel yazılım) tutar yerine "görüşme sonrası netleşir" yazar.',
+                'The total is the exact sum of the listed prices for your package and add-ons, VAT excluded. We confirm the scope on a call; the price does not change unless you add something. For work without a list price (mobile apps, custom software) it says "scoped after a call" instead of a figure.'],
         ];
 
         foreach ($items as $i => [$page, $q, $qEn, $a, $aEn]) {

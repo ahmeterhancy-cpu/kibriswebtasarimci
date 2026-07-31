@@ -74,6 +74,9 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
    Direktifin argüman ayrıştırıcısı parantez sayarak kapanış arar ve derleme
    hatası verir. Değerleri `@php` bloğunda hazırlayıp değişken geçirin.
    Aynı sebeple JS yorumlarında da `@json(` yazmayın.
+5. **Bileşen attribute'u içinde düz `"` kullanmayın.** `:lead="… \"tırnak\" …"`
+   attribute'u erken kapatır; hata çok uzakta (`unexpected token endif`) patlar.
+   Tipografik `“…”` kullanın.
 5. **Yeni Tailwind sınıfı eklediyseniz `npm run build` + `public/build` commit şart.**
    Deploy öncesi `npm run build` çalıştırıp `git status`'un temiz olduğuna bakın.
 6. **PowerShell ile UTF-8 dosya düzenlemeyin.** PS 5.1 `Get-Content -Raw`

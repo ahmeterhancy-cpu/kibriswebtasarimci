@@ -34,8 +34,7 @@ class QuoteController extends Controller
             'extras.*' => ['string', 'max:120'],
             'budget' => ['nullable', 'string', 'max:60'],
             'timeline' => ['nullable', 'string', 'max:60'],
-            'estimate_min' => ['nullable', 'integer', 'min:0', 'max:100000000'],
-            'estimate_max' => ['nullable', 'integer', 'min:0', 'max:100000000'],
+            'quote_total' => ['nullable', 'integer', 'min:0', 'max:100000000'],
             'message' => ['nullable', 'string', 'max:5000'],
             'website' => ['prohibited'],
         ], [], [

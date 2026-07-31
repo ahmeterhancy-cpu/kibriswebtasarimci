@@ -63,8 +63,8 @@ return [
         'step3' => 'Add-on modules',
         'step4' => 'Timeline and budget',
         'step5' => 'Contact',
-        'estimate' => 'Estimated budget',
-        'estimate_note' => 'Calculated live from your choices; the final price is set after we talk.',
+        'total' => 'Total',
+        'total_note_open' => 'List prices add up here as you choose.',
         'summary' => 'Your selection',
     ],
 ];

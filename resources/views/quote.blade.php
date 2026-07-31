@@ -23,10 +23,12 @@
         ['key' => 'mobilapp',  'label' => $isEn ? 'iOS + Android app' : 'iOS + Android uygulama',                              'price' => 65000],
     ];
 
+    /* Süre yalnızca planlama bilgisidir; fiyata etki etmez. Liste fiyatları sabit,
+       uydurma bir "hızlandırma farkı" çarpanı toplamı belirsizleştirirdi. */
     $timelines = [
-        ['key' => 'acil',   'label' => $isEn ? 'As soon as possible' : 'En kısa sürede',      'factor' => 1.2, 'note' => $isEn ? 'Rush surcharge applies.' : 'Hızlandırma farkı uygulanır.'],
-        ['key' => 'normal', 'label' => $isEn ? 'Within 1 month' : '1 ay içinde',              'factor' => 1.0, 'note' => ''],
-        ['key' => 'esnek',  'label' => $isEn ? 'Flexible' : 'Esnek',                          'factor' => 0.95, 'note' => $isEn ? 'Small discount for flexibility.' : 'Esneklik indirimi.'],
+        ['key' => 'acil',   'label' => $isEn ? 'As soon as possible' : 'En kısa sürede', 'note' => $isEn ? 'We check capacity for you.' : 'Takvimde yer var mı bakarız.'],
+        ['key' => 'normal', 'label' => $isEn ? 'Within 1 month' : '1 ay içinde',         'note' => ''],
+        ['key' => 'esnek',  'label' => $isEn ? 'Flexible' : 'Esnek',                     'note' => $isEn ? 'No date pressure.' : 'Tarih baskısı yok.'],
     ];
 
     $budgets = $isEn
@@ -49,6 +51,12 @@
         'required' => $isEn ? 'Please make a selection to continue.' : 'Devam etmek için bir seçim yapın.',
         'fields' => $isEn ? 'Please fill the required fields.' : 'Zorunlu alanları doldurun.',
         'onRequest' => $isEn ? 'Scoped after a call' : 'Görüşme sonrası netleşir',
+        'noteFixed' => $isEn
+            ? 'Sum of listed campaign prices, VAT excluded. Hosting, domain and SSL are included for the first year.'
+            : 'Kampanya liste fiyatlarının toplamıdır, KDV hariç. Hosting, domain ve SSL ilk yıl dahildir.',
+        'noteOpen' => $isEn
+            ? 'This type has no list price. We scope it on a call and send a fixed proposal within 24 hours.'
+            : 'Bu tür için liste fiyatı yok. Kapsamı görüşmede netleştirip 24 saat içinde sabit fiyatlı teklif gönderiyoruz.',
     ];
 
     $typePackages = [
@@ -74,13 +82,15 @@
 <x-app-layout
     :seo-title="__('site.nav.quote')"
     :seo-description="$isEn
-        ? 'Answer five short questions and get a live budget estimate. We send a scoped proposal within 24 hours.'
-        : 'Beş kısa soruyu yanıtlayın, anlık bütçe tahmini alın. Kapsamı netleştiren teklifi 24 saat içinde gönderiyoruz.'">
+        ? 'Answer five short questions and see the exact total from our listed prices. We send a scoped proposal within 24 hours.'
+        : 'Beş kısa soruyu yanıtlayın, liste fiyatlarından kesin toplamı görün. Kapsamı netleştiren teklifi 24 saat içinde gönderiyoruz.'">
 
+    {{-- Dikkat: bileşen attribute'u çift tırnakla sınırlıdır; metin içinde düz "
+         kullanma, attribute'u erken kapatıp tüm sayfayı bozar. Tipografik “…” güvenli. --}}
     <x-page-hero :eyebrow="__('site.nav.quote')"
                  :lead="$isEn
-                    ? 'Five short steps. The estimate updates live as you choose — nothing is binding, it just saves us both a call.'
-                    : 'Beş kısa adım. Seçtikçe tahmini bütçe anlık güncellenir — bağlayıcı değil, sadece ikimizin de vaktini kazandırır.'">
+                    ? 'Five short steps. Every package and module has a listed price, so the total adds up as you choose — no guesswork, no “contact us for pricing”.'
+                    : 'Beş kısa adım. Her paketin ve modülün fiyatı listede yazılı; seçtikçe toplam kendiliğinden çıkıyor — tahmin yok, “fiyat için arayın” yok.'">
         {{ $isEn ? 'Let\'s scope' : 'Projeyi' }} <span class="k-hl">{{ $isEn ? 'it.' : 'kurgulayalım.' }}</span>
     </x-page-hero>
 
@@ -178,7 +188,7 @@
                         <div class="mb-9 grid grid-cols-1 gap-3 sm:grid-cols-3">
                             @foreach ($timelines as $timeline)
                                 <button type="button" class="k-choice" data-pick="timeline"
-                                        data-value="{{ $timeline['key'] }}" data-factor="{{ $timeline['factor'] }}">
+                                        data-value="{{ $timeline['key'] }}">
                                     <span class="block pr-7 font-bold tracking-tight">{{ $timeline['label'] }}</span>
                                     @if ($timeline['note'])
                                         <span class="mt-1 block text-sm text-[#0F0F0F]/55">{{ $timeline['note'] }}</span>
@@ -238,8 +248,7 @@
                             </div>
                         </div>
 
-                        <input type="hidden" name="estimate_min" data-field="estimate_min">
-                        <input type="hidden" name="estimate_max" data-field="estimate_max">
+                        <input type="hidden" name="quote_total" data-field="quote_total">
                     </fieldset>
 
                     {{-- Gezinme --}}
@@ -260,22 +269,26 @@
                     </div>
                 </div>
 
-                {{-- ── Canlı özet ──────────────────────────────────────── --}}
+                {{-- ── Canlı özet — kalem kalem tutar, altında kesin toplam ── --}}
                 <aside class="lg:col-span-4 lg:col-start-9">
                     <div class="sticky top-28 rounded-2xl border border-[#0F0F0F]/10 bg-[#F4F4F2] p-7">
-                        <p class="k-eyebrow mb-5 text-[#0F0F0F]/45">{{ __('site.quote.estimate') }}</p>
+                        <p class="k-eyebrow mb-5 text-[#0F0F0F]/45">{{ __('site.quote.summary') }}</p>
 
-                        <p class="text-3xl font-black leading-none tracking-tight" data-estimate>—</p>
-                        <p class="mt-2 text-xs text-[#0F0F0F]/45">+ KDV</p>
-
-                        <div class="k-rule my-6"></div>
-
-                        <p class="k-eyebrow mb-4 text-[#0F0F0F]/45">{{ __('site.quote.summary') }}</p>
-                        <ul class="space-y-2.5 text-sm" data-summary>
+                        <ul class="space-y-3 text-sm" data-summary>
                             <li class="text-[#0F0F0F]/40">{{ $isEn ? 'Nothing selected yet.' : 'Henüz seçim yapılmadı.' }}</li>
                         </ul>
 
-                        <p class="mt-6 text-xs leading-relaxed text-[#0F0F0F]/50">{{ __('site.quote.estimate_note') }}</p>
+                        <div class="k-rule my-6"></div>
+
+                        <div class="flex items-baseline justify-between gap-4">
+                            <p class="k-eyebrow text-[#0F0F0F]/45">{{ __('site.quote.total') }}</p>
+                            <p class="text-right text-2xl font-black leading-none tracking-tight" data-total>—</p>
+                        </div>
+                        <p class="mt-1.5 text-right text-xs text-[#0F0F0F]/45" data-total-vat hidden>+ KDV</p>
+
+                        <p class="mt-6 text-xs leading-relaxed text-[#0F0F0F]/50" data-total-note>
+                            {{ __('site.quote.total_note_open') }}
+                        </p>
                     </div>
                 </aside>
             </form>
@@ -329,24 +342,27 @@
             const btnSubmit = form.querySelector('[data-nav="submit"]');
             const packageList = form.querySelector('[data-package-list]');
             const extrasInputs = form.querySelector('[data-extras-inputs]');
-            const estimateEl = form.querySelector('[data-estimate]');
+            const totalEl = form.querySelector('[data-total]');
+            const totalVatEl = form.querySelector('[data-total-vat]');
+            const totalNoteEl = form.querySelector('[data-total-note]');
             const summaryEl = form.querySelector('[data-summary]');
 
             const state = {
                 step: 1,
                 project_type: '',
+                projectTypeLabel: '',
                 package: '',
                 packageLabel: '',
                 panel: false,
                 extras: [],          // [{key, label, price}]
                 timeline: '',
                 timelineLabel: '',
-                factor: 1,
                 budget: '',
                 budgetLabel: '',
             };
 
-            const money = (n) => new Intl.NumberFormat('tr-TR').format(Math.round(n / 500) * 500) + ' ₺';
+            // Liste fiyatları sabit — yuvarlama YOK, gösterilen tutar birebir toplam.
+            const money = (n) => new Intl.NumberFormat('tr-TR').format(n) + ' ₺';
 
             /* ── Adım gösterimi ──────────────────────────────────────── */
             function showStep(n) {
@@ -409,48 +425,66 @@
                 packageList.appendChild(unsure);
             }
 
-            /* ── Tahmin ve özet ─────────────────────────────────────── */
-            function basePrice() {
-                if (!state.package) return 0;
+            /* ── Toplam ve özet ─────────────────────────────────────── */
+
+            /** Seçili paketin liste fiyatı (panelli seçildiyse panelli tutar). */
+            function packagePrice() {
                 const p = PACKAGES.find((x) => x.slug === state.package);
-                if (!p) return 0;
+                if (!p) return null;
                 return state.panel && p.pricePanel ? p.pricePanel : p.price;
             }
 
+            const escape = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+            function row(label, amount, muted = false) {
+                const right = amount === null
+                    ? ''
+                    : `<span class="shrink-0 whitespace-nowrap font-semibold">${escape(money(amount))}</span>`;
+                return `<li class="flex items-baseline justify-between gap-4 ${muted ? 'text-[#0F0F0F]/45' : 'text-[#0F0F0F]/80'}">
+                    <span>${escape(label)}</span>${right}
+                </li>`;
+            }
+
             function recalc() {
-                const base = basePrice();
+                const base = packagePrice();
                 const extrasSum = state.extras.reduce((sum, e) => sum + e.price, 0);
-                const total = (base + extrasSum) * state.factor;
+                const totalInput = form.querySelector('[data-field="quote_total"]');
 
-                const minInput = form.querySelector('[data-field="estimate_min"]');
-                const maxInput = form.querySelector('[data-field="estimate_max"]');
-
-                if (total > 0) {
-                    const min = total * 0.9;
-                    const max = total * 1.15;
-                    estimateEl.textContent = money(min) + ' – ' + money(max);
-                    minInput.value = Math.round(min);
-                    maxInput.value = Math.round(max);
+                /* Paket seçilmediyse (ya da "emin değilim" / mobil / özel yazılım gibi
+                   liste fiyatı olmayan bir tür seçildiyse) tutar yazılmaz. Yalnız ek
+                   modülleri toplayıp fiyat vermek yanıltıcı olurdu. */
+                if (base === null) {
+                    totalEl.textContent = L.onRequest;
+                    totalEl.classList.remove('text-2xl');
+                    totalEl.classList.add('text-lg');
+                    totalVatEl.hidden = true;
+                    totalNoteEl.textContent = L.noteOpen;
+                    totalInput.value = '';
                 } else {
-                    estimateEl.textContent = L.onRequest;
-                    minInput.value = '';
-                    maxInput.value = '';
+                    const total = base + extrasSum;
+                    totalEl.textContent = money(total);
+                    totalEl.classList.remove('text-lg');
+                    totalEl.classList.add('text-2xl');
+                    totalVatEl.hidden = false;
+                    totalNoteEl.textContent = L.noteFixed;
+                    totalInput.value = total;
                 }
 
-                // Özet listesi
-                const rows = [];
-                if (state.project_type) {
-                    const btn = form.querySelector(`[data-pick="project_type"][data-value="${state.project_type}"]`);
-                    if (btn) rows.push(btn.querySelector('span').textContent.trim());
+                /* Özet: önce tutarı olan kalemler, sonra bilgi amaçlı seçimler. */
+                const priced = [];
+                if (base !== null) {
+                    priced.push(row(state.packageLabel + (state.panel ? ' — ' + L.withPanel : ''), base));
                 }
-                if (state.packageLabel) rows.push(state.packageLabel + (state.panel ? ' (' + L.withPanel + ')' : ''));
-                state.extras.forEach((e) => rows.push('+ ' + e.label));
-                if (state.timelineLabel) rows.push(state.timelineLabel);
-                if (state.budgetLabel) rows.push(state.budgetLabel);
+                state.extras.forEach((e) => priced.push(row(e.label, e.price)));
 
-                summaryEl.innerHTML = rows.length
-                    ? rows.map((r) => `<li class="flex gap-2.5 text-[#0F0F0F]/75"><span class="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]"></span><span>${r}</span></li>`).join('')
-                    : `<li class="text-[#0F0F0F]/40">${L.empty}</li>`;
+                const context = [];
+                if (state.projectTypeLabel) context.push(row(state.projectTypeLabel, null, true));
+                if (base === null && state.packageLabel) context.push(row(state.packageLabel, null, true));
+                if (state.timelineLabel) context.push(row(state.timelineLabel, null, true));
+                if (state.budgetLabel) context.push(row(state.budgetLabel, null, true));
+
+                const all = [...priced, ...context];
+                summaryEl.innerHTML = all.length ? all.join('') : `<li class="text-[#0F0F0F]/40">${L.empty}</li>`;
             }
 
             /* ── Tek seçim ──────────────────────────────────────────── */
@@ -471,17 +505,17 @@
 
                     if (group === 'project_type') {
                         state.project_type = pick.dataset.value;
+                        state.projectTypeLabel = pick.querySelector('span').textContent.trim();
                         state.package = ''; state.packageLabel = ''; state.panel = false;
                         buildPackages();
                     } else if (group === 'package') {
                         state.package = pick.dataset.value || '';
-                        state.packageLabel = state.package ? pick.dataset.label : '';
+                        state.packageLabel = pick.dataset.label || '';
                         state.panel = false;
                         form.querySelectorAll('[data-panel-for]').forEach((cb) => { cb.checked = false; });
                     } else if (group === 'timeline') {
                         state.timeline = pick.dataset.value;
                         state.timelineLabel = pick.querySelector('span').textContent.trim();
-                        state.factor = parseFloat(pick.dataset.factor) || 1;
                     } else if (group === 'budget') {
                         state.budget = pick.dataset.value;
                         state.budgetLabel = pick.querySelector('span').textContent.trim();

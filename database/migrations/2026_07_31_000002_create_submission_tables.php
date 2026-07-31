@@ -20,8 +20,9 @@ return new class extends Migration
             $table->json('extras')->nullable();           // ek modüller
             $table->string('budget')->nullable();
             $table->string('timeline')->nullable();
-            $table->unsignedInteger('estimate_min')->nullable();
-            $table->unsignedInteger('estimate_max')->nullable();
+            // Sihirbazda seçilen liste fiyatlarının kesin toplamı (KDV hariç).
+            // Liste fiyatı olmayan türlerde (mobil uygulama, özel yazılım) boş kalır.
+            $table->unsignedInteger('quote_total')->nullable();
             $table->text('message')->nullable();
             $table->string('locale', 5)->default('tr');
             $table->string('status')->default('new');     // new | contacted | quoted | won | lost

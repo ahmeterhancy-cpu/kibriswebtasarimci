@@ -66,8 +66,12 @@ class QuoteRequestResource extends Resource
                     TextInput::make('package')->label('Seçilen paket')->disabled(),
                     TextInput::make('timeline')->label('Süre beklentisi')->disabled(),
                     TextInput::make('budget')->label('Bütçe aralığı')->disabled(),
-                    TextInput::make('estimate_min')->label('Tahmin (alt)')->disabled()->suffix('₺'),
-                    TextInput::make('estimate_max')->label('Tahmin (üst)')->disabled()->suffix('₺'),
+                    TextInput::make('quote_total')
+                        ->label('Seçim toplamı')
+                        ->disabled()
+                        ->suffix('₺')
+                        ->helperText('Sihirbazda seçilen liste fiyatlarının toplamı, KDV hariç. Liste fiyatı olmayan türlerde boştur.')
+                        ->columnSpanFull(),
                     Textarea::make('message')->label('Mesaj')->disabled()->rows(4)->columnSpanFull(),
                 ])->columns(2),
 
@@ -92,7 +96,7 @@ class QuoteRequestResource extends Resource
                     ->description(fn ($record) => $record->email),
                 TextColumn::make('project_type')->label('Tür')->badge()->toggleable(),
                 TextColumn::make('package')->label('Paket')->toggleable()->placeholder('—'),
-                TextColumn::make('estimate_max')->label('Tahmin')->numeric(0, ',', '.')->suffix(' ₺')->placeholder('—'),
+                TextColumn::make('quote_total')->label('Tutar')->numeric(0, ',', '.')->suffix(' ₺')->placeholder('—'),
                 TextColumn::make('status')->label('Durum')->badge()
                     ->formatStateUsing(fn (string $state) => QuoteRequest::STATUSES[$state] ?? $state)
                     ->color(fn (string $state) => match ($state) {
