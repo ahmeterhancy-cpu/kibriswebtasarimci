@@ -24,8 +24,8 @@
     {{-- Eyebrow "Paketler" değil "Fiyat listesi": başlıkta zaten "Paket" geçiyor. --}}
     <x-page-hero :eyebrow="$isEn ? 'Price list' : 'Fiyat listesi'"
                  :lead="$isEn
-                    ? 'Every package, what it includes and what it costs — written down. Prices exclude VAT.'
-                    : 'Her paketin kapsamı ve fiyatı burada yazıyor. Fiyatlara KDV dahil değildir.'">
+                    ? 'Hosting, domain and SSL are included for the first year, and the first month of care is on us. Prices exclude VAT.'
+                    : 'Hosting, domain ve SSL ilk yıl her pakete dahil; ilk ay bakım bizden. Fiyatlara KDV dahil değildir.'">
         {{ $isEn ? 'Package' : 'Paket' }} <span class="k-hl">{{ $isEn ? 'Prices' : 'Fiyatlar' }}</span>
     </x-page-hero>
 
