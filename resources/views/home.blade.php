@@ -32,6 +32,7 @@
          01 · HERO — dev tipografi + imleç izinde açılan iş görselleri
          ══════════════════════════════════════════════════════════════ --}}
     <section class="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-[#F1F1EF] px-6 pb-8 pt-32 lg:px-12"
+             data-dots
              @if ($trailWorks->isNotEmpty()) data-trail data-trail-gap="170" @endif>
 
         {{-- İz için kaynak görseller (görünmez klonlanır) --}}
