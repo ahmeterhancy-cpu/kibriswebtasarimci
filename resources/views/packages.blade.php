@@ -34,8 +34,8 @@
         {{ $isEn ? 'Prices,' : 'Fiyatlar' }} <span class="k-hl">{{ $isEn ? 'in the open.' : 'açıkça yazılı.' }}</span>
     </x-page-hero>
 
-    {{-- ── Tanıtım / kurumsal paketler ─────────────────────────────────── --}}
-    @if ($showcase->isNotEmpty())
+    {{-- ── Tüm paketler tek ızgarada ───────────────────────────────────── --}}
+    @if ($packages->isNotEmpty())
         <section class="bg-white px-6 py-14 lg:px-12 lg:py-20">
             <div class="mx-auto max-w-[1280px]">
 
@@ -58,8 +58,18 @@
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                    @foreach ($showcase as $i => $package)
+                {{-- Sınıflar LİTERAL — Tailwind kaynağı tarar, birleştirilmiş
+                     sınıf adı üretmez. --}}
+                @php
+                    $cols = match (true) {
+                        $packages->count() >= 4 => 'md:grid-cols-2 xl:grid-cols-4',
+                        $packages->count() === 3 => 'md:grid-cols-3',
+                        $packages->count() === 2 => 'md:grid-cols-2',
+                        default => 'max-w-md',
+                    };
+                @endphp
+                <div class="grid grid-cols-1 gap-5 {{ $cols }}">
+                    @foreach ($packages as $i => $package)
                         <article class="k-reveal relative flex flex-col rounded-2xl border-2 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_44px_rgba(0,0,0,0.07)] lg:p-8 {{ $package->is_popular ? 'border-[#E30613]' : 'border-[#0F0F0F]/10 hover:border-[#0F0F0F]/25' }}"
                                  data-delay="{{ min(($i + 1) * 100, 300) }}">
                             @if ($package->is_popular)
@@ -83,6 +93,13 @@
                                     </span>
                                     <span class="text-xs text-[#0F0F0F]/45">+ KDV</span>
                                 </div>
+                                {{-- E-ticarette panel zaten standart; panelsiz/panelli
+                                     seçicisi bu kartta fiyatı değiştirmiyor, sebebini yaz. --}}
+                                @if ($package->is_ecommerce && ! $package->price_with_panel)
+                                    <p class="mt-1.5 text-xs text-[#0F0F0F]/50">
+                                        {{ $isEn ? 'Admin panel included as standard' : 'Yönetim paneli standart olarak dahil' }}
+                                    </p>
+                                @endif
                                 @if ($package->t('delivery'))
                                     <p class="mt-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#E30613]">{{ $package->t('delivery') }}</p>
                                 @endif
@@ -96,10 +113,12 @@
                                             <span>{{ $feature }}</span>
                                         </li>
                                     @endforeach
-                                    <li class="flex gap-2.5 text-sm text-[#0F0F0F]/70" data-panel-only hidden>
-                                        <span class="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]" aria-hidden="true"></span>
-                                        <span><strong>{{ $isEn ? 'Admin panel + training' : 'Yönetim paneli + eğitim' }}</strong></span>
-                                    </li>
+                                    @if ($package->price_with_panel)
+                                        <li class="flex gap-2.5 text-sm text-[#0F0F0F]/70" data-panel-only hidden>
+                                            <span class="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]" aria-hidden="true"></span>
+                                            <span><strong>{{ $isEn ? 'Admin panel + training' : 'Yönetim paneli + eğitim' }}</strong></span>
+                                        </li>
+                                    @endif
                                 </ul>
                             @endif
 
@@ -131,68 +150,30 @@
         </section>
     @endif
 
-    {{-- ── E-Ticaret ───────────────────────────────────────────────────── --}}
-    @if ($ecommerce->isNotEmpty())
-        <section class="k-dark bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-24">
-            <div class="mx-auto max-w-[1280px]">
-                <div class="mb-10 max-w-2xl">
+    {{-- ── E-Ticaret açıklama bandı ────────────────────────────────────────
+         Paket kartı yukarıdaki ortak ızgarada; burası yalnızca "panel neden
+         dahil" mesajını taşır. Kart burada tekrarlanmaz — ayrı bölüme alınınca
+         sayfanın altında kalıp bulunamıyordu. --}}
+    @if ($hasEcommerce)
+        <section class="k-dark bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-20">
+            <div class="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end">
+                <div class="lg:col-span-7">
                     <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.4);">E-Ticaret</p>
                     <h2 class="k-display-sm" style="color:#ffffff;" data-split data-split-step="0.05">
                         {{ $isEn ? 'Panel always' : 'Panel her zaman' }} {{ $isEn ? 'included.' : 'dahil.' }}
                     </h2>
-                    <p class="k-reveal mt-5" style="color:rgba(255,255,255,0.6);" data-delay="200">
+                    <p class="k-reveal mt-5 max-w-xl" style="color:rgba(255,255,255,0.6);" data-delay="200">
                         {{ $isEn
-                            ? 'You manage products, prices, stock and orders yourself instead of emailing us for every change.'
-                            : 'Ürünü, fiyatı, stoğu ve siparişi kendiniz yönetirsiniz; her değişiklik için bize dönmek zorunda kalmazsınız.' }}
+                            ? 'You manage products, prices, stock and orders yourself instead of emailing us for every change. No tiers to upgrade to — everything is in the one package above.'
+                            : 'Ürünü, fiyatı, stoğu ve siparişi kendiniz yönetirsiniz; her değişiklik için bize dönmek zorunda kalmazsınız. Kademeli paket yok — her şey yukarıdaki tek pakette.' }}
                     </p>
                 </div>
 
-                {{-- Tek paket kaldığında yarım genişlikte asılı kalmasın. --}}
-                <div class="grid grid-cols-1 gap-5 {{ $ecommerce->count() > 1 ? 'md:grid-cols-2' : 'max-w-2xl' }}">
-                    @foreach ($ecommerce as $i => $package)
-                        <article class="k-reveal flex flex-col rounded-2xl border p-7 lg:p-9 {{ $package->is_popular ? 'border-[#E30613] bg-[#161010]' : 'border-white/12 bg-[#141414]' }}"
-                                 data-delay="{{ ($i + 1) * 100 }}">
-                            <h3 class="text-2xl font-black tracking-tight" style="color:#ffffff;">{{ $package->t('name') }}</h3>
-                            <p class="mt-2.5 text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">{{ $package->t('tagline') }}</p>
-
-                            <div class="mt-7 border-t border-white/12 pt-6">
-                                @if ($package->price_regular)
-                                    <span class="text-sm line-through" style="color:rgba(255,255,255,0.35);">{{ $package->formatPrice($package->price_regular) }}</span>
-                                @endif
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-4xl font-black tracking-tight" style="color:#ffffff;">{{ $package->formatPrice($package->price) }}</span>
-                                    <span class="text-xs" style="color:rgba(255,255,255,0.45);">+ KDV</span>
-                                </div>
-                                {{-- Panelli fiyatı olan bir paket admin'den e-ticarete taşınırsa
-                                     bu satır olmadan panelli tutarı sessizce kaybolurdu. --}}
-                                @if ($package->price_with_panel)
-                                    <p class="mt-1.5 text-xs" style="color:rgba(255,255,255,0.5);">
-                                        {{ $isEn ? 'With admin panel' : 'Panelli' }}:
-                                        <strong style="color:rgba(255,255,255,0.8);">{{ $package->formatPrice($package->price_with_panel) }}</strong>
-                                    </p>
-                                @endif
-                                @if ($package->t('delivery'))
-                                    <p class="mt-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#E30613]">{{ $package->t('delivery') }}</p>
-                                @endif
-                            </div>
-
-                            @if (filled($package->t('features')))
-                                <ul class="mt-6 flex-1 space-y-2.5">
-                                    @foreach ((array) $package->t('features') as $feature)
-                                        <li class="flex gap-2.5 text-sm" style="color:rgba(255,255,255,0.72);">
-                                            <span class="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]" aria-hidden="true"></span>
-                                            <span>{{ $feature }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-
-                            <a href="{{ $r('quote') }}?paket={{ $package->slug }}"
-                               class="k-btn {{ $package->is_popular ? 'k-btn--brand' : 'k-btn--light' }} mt-8 justify-center">
-                                <span style="color:inherit;">{{ __('site.nav.quote') }}</span>
-                            </a>
-                        </article>
-                    @endforeach
+                <div class="k-reveal lg:col-span-4 lg:col-start-9 lg:text-right" data-delay="300">
+                    <a href="{{ $r('services.show', ['service' => 'e-ticaret']) }}" class="k-btn k-btn--light">
+                        <span style="color:inherit;">{{ $isEn ? 'How it works' : 'Nasıl çalışıyor' }}</span>
+                        <span class="k-btn__arrow" aria-hidden="true">→</span>
+                    </a>
                 </div>
             </div>
         </section>

@@ -13,8 +13,10 @@ class PackageController extends Controller
         $packages = Package::active()->get();
 
         return view('packages', [
-            'showcase' => $packages->where('is_ecommerce', false)->values(),
-            'ecommerce' => $packages->where('is_ecommerce', true)->values(),
+            // Tek ızgara: e-ticaret paketi ayrı bir bölüme sürgün edildiğinde
+            // sayfanın çok altında kalıyor ve bulunamıyordu.
+            'packages' => $packages,
+            'hasEcommerce' => $packages->contains(fn ($p) => $p->is_ecommerce),
             'faqs' => FaqItem::active()->forPage('packages')->get(),
         ]);
     }
