@@ -49,15 +49,15 @@
             </p>
 
             <h1 class="k-display text-[#0F0F0F]" data-split data-split-step="0.06">
-                {{ $isEn ? 'Websites that' : 'Sadece güzel' }}<br>
-                {{ $isEn ? 'do the' : 'değil,' }} <span class="k-hl">{{ $isEn ? 'selling.' : 'satan siteler.' }}</span>
+                {{ $isEn ? 'Corporate web and' : 'Kurumsal web ve' }}<br>
+                {{ $isEn ? 'e-commerce' : 'e-ticaret' }} <span class="k-hl">{{ $isEn ? 'solutions.' : 'çözümleri.' }}</span>
             </h1>
 
             <div class="mt-10 grid grid-cols-1 gap-8 lg:mt-14 lg:grid-cols-12">
                 <p class="k-lead k-reveal max-w-xl lg:col-span-5" data-delay="300">
                     {{ $isEn
-                        ? 'Corporate sites, e-commerce and custom web software — designed from scratch, written by hand, live in days rather than months.'
-                        : 'Kurumsal site, e-ticaret ve özel web yazılımı. Şablonla değil sıfırdan tasarlanır, elle yazılır; aylarla değil günlerle ölçülen sürede yayına girer.' }}
+                        ? 'Corporate websites, online stores, custom web software and mobile apps. No templates: every project is designed from a blank page and written by hand.'
+                        : 'Kurumsal web sitesi, e-ticaret, özel web yazılımı ve mobil uygulama. Şablon yok: her proje sıfırdan tasarlanır, elle yazılır.' }}
                 </p>
 
                 <div class="k-reveal flex flex-wrap items-start gap-4 lg:col-span-4 lg:col-start-9 lg:justify-end" data-delay="400">
