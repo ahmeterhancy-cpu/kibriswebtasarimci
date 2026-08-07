@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             ServiceSeeder::class,
             PackageSeeder::class,
+            AddonSeeder::class,
             BlogSeeder::class,
             FaqSeeder::class,
         ]);

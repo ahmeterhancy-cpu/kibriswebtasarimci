@@ -62,6 +62,8 @@ class PackageSeeder extends Seeder
                 'features_en' => ['Unlimited page structure', 'Blog / news module', 'Service detail pages', 'Bilingual (TR + EN)', 'Advanced SEO + 5 SEO pages', 'Admin panel training'],
                 'is_popular' => true,
                 'project_types' => ['kurumsal', 'yenileme'],
+                // Kapsamında zaten var: blog modülü, çoklu dil, 5 sayfa SEO metni.
+                'included_extras' => ['blog', 'dil', 'seo'],
                 'sort_order' => 3,
             ],
             /* Tek e-ticaret paketi: eski Başlangıç ve Pro birleştirildi.
@@ -139,6 +141,7 @@ class PackageSeeder extends Seeder
             'delivery' => null,
             'delivery_en' => null,
             'project_types' => null,
+            'included_extras' => null,
         ];
 
         foreach ($packages as $package) {

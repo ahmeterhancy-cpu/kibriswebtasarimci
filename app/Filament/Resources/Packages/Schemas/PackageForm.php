@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Packages\Schemas;
 
+use App\Models\Addon;
 use App\Models\Package;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
@@ -112,6 +113,13 @@ class PackageForm
                         ->columns(2)
                         ->columnSpanFull()
                         ->helperText('Hiçbiri seçilmezse paket sihirbazda hiç görünmez; yalnızca Paketler sayfasında listelenir.'),
+
+                    CheckboxList::make('included_extras')
+                        ->label('Bu paketin kapsamında zaten olan ek modüller')
+                        ->options(fn () => Addon::pricedOptions())
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->helperText('İşaretlenen modüller bu paket seçildiğinde sihirbazda "Pakete dahil" olarak görünür ve ücretlendirilmez. Aynı işi ikinci kez satmayı önler.'),
                 ])->columns(2),
 
             ])->columnSpanFull(),

@@ -38,6 +38,7 @@ class Package extends Model
             'features' => 'array',
             'features_en' => 'array',
             'project_types' => 'array',
+            'included_extras' => 'array',
             'is_popular' => 'boolean',
             'is_ecommerce' => 'boolean',
             'is_active' => 'boolean',

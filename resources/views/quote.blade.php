@@ -11,49 +11,16 @@
         ['key' => 'yenileme', 'label' => $isEn ? 'Redesign an existing site' : 'Mevcut siteyi yenileme',   'note' => $isEn ? 'You have a site; it needs rebuilding.' : 'Siteniz var; yeniden kurulması gerekiyor.'],
     ];
 
-    /* Ek modüller. `types` modülün hangi proje türlerinde anlamlı olduğunu söyler;
-       3. adım buna göre süzülür (mobil uygulama projesinde "katalog modülü" ya da
-       "iOS + Android uygulama" göstermek saçma olurdu).
-       `price` null olanlar liste fiyatı olmayan türlere aittir: seçilebilir ama
-       tutara girmez, kapsamı anlatmaya yarar. Fiyatlar ₺ ve KDV hariçtir. */
-    $extras = [
-        ['key' => 'katalog',     'price' => 5000,  'types' => ['tanitim', 'kurumsal', 'yenileme'],
-            'label' => $isEn ? 'Catalogue module (WhatsApp orders)' : 'Katalog modülü (WhatsApp sipariş)'],
-        ['key' => 'dil',         'price' => 4000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'Second language (TR / EN)' : 'İkinci dil (TR / EN)'],
-        ['key' => 'blog',        'price' => 3500,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'Blog / news module' : 'Blog / haber modülü'],
-        ['key' => 'rezervasyon', 'price' => 12000, 'types' => ['kurumsal', 'yenileme'],
-            'label' => $isEn ? 'Booking / appointment system' : 'Rezervasyon / randevu sistemi'],
-        ['key' => 'uyelik',      'price' => 15000, 'types' => ['kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'Membership / customer portal' : 'Üyelik / müşteri portalı'],
-        ['key' => 'seo',         'price' => 6000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'SEO content package (5 pages)' : 'SEO içerik paketi (5 sayfa)'],
-        ['key' => 'kimlik',      'price' => 9000,  'types' => ['tanitim', 'kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'Logo and brand identity' : 'Logo ve marka kimliği'],
-        ['key' => 'mobilapp',    'price' => 65000, 'types' => ['kurumsal', 'eticaret', 'yenileme'],
-            'label' => $isEn ? 'iOS + Android app' : 'iOS + Android uygulama'],
-
-        /* Mobil uygulama projeleri — fiyatsız kapsam maddeleri. */
-        ['key' => 'push',        'price' => null, 'types' => ['mobil'],
-            'label' => $isEn ? 'Push notifications' : 'Push bildirim'],
-        ['key' => 'uygulama-uyelik', 'price' => null, 'types' => ['mobil'],
-            'label' => $isEn ? 'Login and user accounts' : 'Giriş ve üyelik'],
-        ['key' => 'magaza-yayin', 'price' => null, 'types' => ['mobil'],
-            'label' => $isEn ? 'App Store + Google Play submission' : 'App Store + Google Play yayını'],
-        ['key' => 'uygulama-odeme', 'price' => null, 'types' => ['mobil'],
-            'label' => $isEn ? 'In-app payment' : 'Uygulama içi ödeme'],
-
-        /* Özel yazılım projeleri — fiyatsız kapsam maddeleri. */
-        ['key' => 'rol-yetki',   'price' => null, 'types' => ['yazilim'],
-            'label' => $isEn ? 'Role-based permissions' : 'Rol bazlı yetkilendirme'],
-        ['key' => 'raporlama',   'price' => null, 'types' => ['yazilim'],
-            'label' => $isEn ? 'Reporting screens' : 'Raporlama ekranları'],
-        ['key' => 'entegrasyon', 'price' => null, 'types' => ['yazilim', 'mobil'],
-            'label' => $isEn ? 'Integration with an existing system' : 'Mevcut sisteme entegrasyon'],
-        ['key' => 'api',         'price' => null, 'types' => ['yazilim'],
-            'label' => $isEn ? 'API for third parties' : 'Dışarıya API'],
-    ];
+    /* Ek modüller panelden gelir (İçerik › Ek Modüller). `project_types` modülün
+       hangi proje türlerinde gösterileceğini, boş `price` ise ücretsiz olduğunu
+       söyler. Fiyatlar ₺ ve KDV hariçtir. */
+    $extras = $addons->map(fn ($addon) => [
+        'key' => $addon->slug,
+        'label' => $addon->t('name'),
+        'note' => $addon->t('note'),
+        'price' => $addon->price,
+        'types' => (array) $addon->project_types,
+    ])->all();
 
     /* Süre yalnızca planlama bilgisidir; fiyata etki etmez. Liste fiyatları sabit,
        uydurma bir "hızlandırma farkı" çarpanı toplamı belirsizleştirirdi. */
@@ -159,8 +126,9 @@
             ->all();
     }
 
-    /* Paket verisi JS'e — tür eşlemesi ve fiyat. */
+    /* Paket verisi JS'e — tür eşlemesi, fiyat ve kapsamında zaten olan modüller. */
     $packageData = $packages->map(fn ($p) => [
+        'included' => array_values((array) $p->included_extras),
         'slug' => $p->slug,
         'name' => $p->t('name'),
         'price' => $p->price,
@@ -263,8 +231,15 @@
                                         data-price="{{ $extra['price'] ?? '' }}" data-label="{{ $extra['label'] }}" hidden>
                                     <span class="block pr-7 font-bold tracking-tight">{{ $extra['label'] }}</span>
                                     @if ($extra['price'])
-                                        <span class="mt-1 block text-sm text-[#E30613]">+{{ number_format($extra['price'], 0, ',', '.') }} ₺</span>
+                                        <span class="mt-1 block text-sm text-[#E30613]" data-extra-price>+{{ number_format($extra['price'], 0, ',', '.') }} ₺</span>
                                     @endif
+                                    @if ($extra['note'])
+                                        <span class="mt-1 block text-sm text-[#0F0F0F]/55">{{ $extra['note'] }}</span>
+                                    @endif
+                                    {{-- Seçili paket bu modülü zaten kapsıyorsa gösterilir. --}}
+                                    <span class="mt-1 hidden text-sm font-semibold text-[#0F0F0F]/45" data-extra-included>
+                                        {{ $isEn ? 'Already in your package' : 'Seçtiğiniz pakete dahil' }}
+                                    </span>
                                     <span class="k-choice__check" aria-hidden="true">
                                         <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </span>
@@ -556,20 +531,35 @@
                 packageList.appendChild(unsure);
             }
 
-            /* ── 3. adımı türe göre süz ─────────────────────────────── */
+            /* ── 3. adımı türe ve seçili pakete göre süz ─────────────── */
             function buildExtras() {
                 let visible = 0;
+                const pkg = PACKAGES.find((x) => x.slug === state.package);
+                const included = (pkg && pkg.included) || [];
 
                 extraButtons.forEach((btn) => {
+                    const key = btn.dataset.value;
                     const types = (btn.dataset.types || '').split(',');
                     const show = types.includes(state.project_type);
                     btn.hidden = !show;
-                    if (show) {
+
+                    /* Seçili paket bu modülü zaten kapsıyorsa ikinci kez satılmaz:
+                       "pakete dahil" yazar, tıklanamaz, tutara girmez. */
+                    const isIncluded = show && included.includes(key);
+                    const priceEl = btn.querySelector('[data-extra-price]');
+                    const includedEl = btn.querySelector('[data-extra-included]');
+
+                    btn.disabled = isIncluded;
+                    btn.classList.toggle('opacity-50', isIncluded);
+                    if (priceEl) priceEl.hidden = isIncluded;
+                    if (includedEl) includedEl.classList.toggle('hidden', !isIncluded);
+
+                    if (show && !isIncluded) {
                         visible++;
                     } else if (btn.classList.contains('is-picked')) {
-                        // Tür değişince artık geçerli olmayan modülleri seçimden düşür.
+                        // Tür ya da paket değişti: geçersiz kalan seçimi düşür.
                         btn.classList.remove('is-picked');
-                        const i = state.extras.findIndex((x) => x.key === btn.dataset.value);
+                        const i = state.extras.findIndex((x) => x.key === key);
                         if (i >= 0) state.extras.splice(i, 1);
                     }
                 });
@@ -676,6 +666,8 @@
                         state.packageLabel = pick.dataset.label || '';
                         state.panel = false;
                         form.querySelectorAll('[data-panel-for]').forEach((cb) => { cb.checked = false; });
+                        // Paket değişti: kapsamına giren modüller ücretsize düşer.
+                        buildExtras();
                     } else if (group === 'timeline') {
                         state.timeline = pick.dataset.value;
                         state.timelineLabel = pick.querySelector('span').textContent.trim();

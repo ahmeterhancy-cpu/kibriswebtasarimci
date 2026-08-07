@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Addon;
 use App\Models\FaqItem;
 use App\Models\Package;
 use App\Models\QuoteRequest;
@@ -16,6 +17,7 @@ class QuoteController extends Controller
     {
         return view('quote', [
             'packages' => Package::active()->projects()->get(),
+            'addons' => Addon::active()->get(),
             'services' => Service::active()->get(),
             'faqs' => FaqItem::active()->forPage('quote')->get(),
         ]);
