@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Location;
+use App\Models\Package;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\Work;
+use App\Support\AiCrawlers;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class SitemapController extends Controller
 {
@@ -59,6 +63,24 @@ class SitemapController extends Controller
             ->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
+    /**
+     * Panelde işaretli AI botları. Hiç kayıt yoksa hepsi açık kabul edilir —
+     * yeni kurulan bir sitenin sessizce yapay zekâ sonuçlarından silinmemesi
+     * için varsayılan "görünür" olmalı.
+     *
+     * @return array<int, string>
+     */
+    public static function allowedAiCrawlers(): array
+    {
+        $raw = Setting::get('ai_crawlers');
+
+        if ($raw === null) {
+            return AiCrawlers::defaults();
+        }
+
+        return array_values(array_filter(explode(',', (string) $raw)));
+    }
+
     public function robots(): Response
     {
         $lines = [
@@ -66,12 +88,111 @@ class SitemapController extends Controller
             'Allow: /',
             'Disallow: /admin',
             'Disallow: /livewire',
-            '',
-            'Sitemap: '.route('sitemap'),
-            '',
+            'Disallow: /*?kategori=',
         ];
 
+        // Yapay zekâ tarayıcıları — panelden (Yapay Zekâ Görünürlüğü) yönetilir.
+        // İzin verilenler için ayrı bir blok yazmıyoruz; `*` zaten kapsıyor.
+        // Yalnızca KAPATILANLAR için açık bir Disallow gerekiyor.
+        $allowed = static::allowedAiCrawlers();
+        $blocked = [];
+
+        foreach (AiCrawlers::all() as $key => $bot) {
+            if (! in_array($key, $allowed, true)) {
+                $blocked = array_merge($blocked, $bot['agents']);
+            }
+        }
+
+        foreach ($blocked as $agent) {
+            $lines[] = '';
+            $lines[] = 'User-agent: '.$agent;
+            $lines[] = 'Disallow: /';
+        }
+
+        $lines[] = '';
+        $lines[] = 'Sitemap: '.route('sitemap');
+
+        if (Setting::get('llms_enabled', '1') === '1') {
+            $lines[] = 'LLM-Content: '.route('llms');
+        }
+
+        $lines[] = '';
+
         return response(implode("\n", $lines))
+            ->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    /**
+     * Yapay zekâ modelleri için düz metin site özeti.
+     *
+     * llms.txt, markdown başlıkları ve bağlantı listesiyle modele "bu site
+     * nedir, hangi sayfalar önemli" der. Sitemap'ten farkı: sıralama yerine
+     * ANLAM taşır — model hangi sayfanın neye cevap verdiğini okuyabilir.
+     */
+    public function llms(): Response
+    {
+        abort_unless(Setting::get('llms_enabled', '1') === '1', 404);
+
+        $name = Setting::get('site_name', 'Kıbrıs Web Tasarımcı');
+        $out = ['# '.$name, ''];
+
+        if ($entity = Setting::get('ai_entity')) {
+            $out[] = '> '.$entity;
+            $out[] = '';
+        }
+
+        $summary = Setting::get('ai_summary') ?: Setting::get('site_description');
+
+        if ($summary) {
+            $out[] = trim($summary);
+            $out[] = '';
+        }
+
+        $section = function (string $title, array $rows) use (&$out) {
+            if (! $rows) {
+                return;
+            }
+
+            $out[] = '## '.$title;
+            $out[] = '';
+
+            foreach ($rows as $row) {
+                $out[] = '- ['.$row[0].']('.$row[1].')'.($row[2] ? ': '.$row[2] : '');
+            }
+
+            $out[] = '';
+        };
+
+        $section('Hizmetler', Service::active()->get()
+            ->map(fn ($s) => [$s->title, route('services.show', $s->slug), Str::limit(strip_tags((string) $s->excerpt), 140)])
+            ->all());
+
+        $section('Paketler ve fiyatlar', Package::active()->projects()->get()
+            ->map(fn ($p) => [$p->name, route('packages'), trim($p->formatPrice($p->price).' — '.Str::limit(strip_tags((string) $p->tagline), 120), ' —')])
+            ->all());
+
+        $section('Hizmet verilen şehirler', Location::active()->get()
+            ->map(fn ($l) => [$l->name, route('locations.show', $l->slug), Str::limit(strip_tags((string) $l->intro), 140)])
+            ->all());
+
+        $section('Yazılar', BlogPost::published()->take(20)->get()
+            ->map(fn ($p) => [$p->title, route('blog.show', $p->slug), Str::limit(strip_tags((string) $p->excerpt), 140)])
+            ->all());
+
+        $section('İletişim', array_values(array_filter([
+            ['Teklif al', route('quote'), 'Adım adım kapsam seçip anında fiyat görün'],
+            ['İletişim', route('contact'), Setting::get('contact_email')],
+            ['English version', route('en.home'), 'Same content in English'],
+        ])));
+
+        if ($note = Setting::get('ai_contact_note')) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = $note;
+            $out[] = '';
+        }
+
+        return response(implode("\n", $out))
             ->header('Content-Type', 'text/plain; charset=UTF-8');
     }
 }

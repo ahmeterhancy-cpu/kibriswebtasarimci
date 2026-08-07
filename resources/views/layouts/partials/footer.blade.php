@@ -7,6 +7,10 @@
     $socials = array_filter([
         'Instagram' => $site('social_instagram'),
         'LinkedIn' => $site('social_linkedin'),
+        'Facebook' => $site('social_facebook'),
+        'X' => $site('social_x'),
+        'YouTube' => $site('social_youtube'),
+        'TikTok' => $site('social_tiktok'),
         'Behance' => $site('social_behance'),
         'GitHub' => $site('social_github'),
     ]);

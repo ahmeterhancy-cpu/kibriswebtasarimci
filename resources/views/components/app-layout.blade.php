@@ -137,6 +137,8 @@
 
             $sameAs = array_values(array_filter([
                 $site('social_instagram'), $site('social_linkedin'),
+                $site('social_facebook'), $site('social_x'),
+                $site('social_youtube'), $site('social_tiktok'),
                 $site('social_behance'), $site('social_github'),
             ]));
             if ($sameAs) {
@@ -166,6 +168,16 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800,900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Ölçüm/pixel script'leri — çerez onayı verilene kadar yüklenmez. --}}
+    @include('layouts.partials.analytics')
+
+    {{-- Panelden girilen ham <head> kodu (doğrulama etiketi, font preload…).
+         Bilinçli olarak kaçışsız: buraya HTML girilmesi bekleniyor ve alan
+         yalnızca panel yöneticisine açık. --}}
+    @if ($customHead = $site('custom_head'))
+        {!! $customHead !!}
+    @endif
 
     @stack('head')
 </head>
@@ -211,5 +223,9 @@
     @endif
 
     @stack('scripts')
+
+    @if ($customBody = $site('custom_body'))
+        {!! $customBody !!}
+    @endif
 </body>
 </html>

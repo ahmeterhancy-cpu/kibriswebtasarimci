@@ -568,6 +568,16 @@ function initCursor() {
   const label = cursor.querySelector('[data-cursor-label]');
   let x = scroll.vw / 2, y = scroll.vh / 2, cx = x, cy = y, dx = x, dy = y;
 
+  // İmleç mürekkep renkli; #0F0F0F bölümlerin üstünde zemine karışıp
+  // kayboluyordu. Altındaki bölümün tonunu izleyip koyuda beyaza dönüyoruz.
+  const DARK = '.k-dark, .k-menu, [data-cursor-dark]';
+  let toneY = -1, toneFrame = 0;
+
+  const syncTone = (el) => {
+    if (!el || !el.closest) return;
+    cursor.classList.toggle('is-dark', !!el.closest(DARK));
+  };
+
   window.addEventListener('pointermove', (e) => {
     x = e.clientX; y = e.clientY;
     if (!cursor.classList.contains('is-live')) cursor.classList.add('is-live');
@@ -580,6 +590,14 @@ function initCursor() {
     dx = lerp(dx, x, 0.42); dy = lerp(dy, y, 0.42);
     cursor.style.transform = `translate3d(${cx.toFixed(2)}px, ${cy.toFixed(2)}px, 0) translate(-50%, -50%)`;
     if (dot) dot.style.transform = `translate3d(${(dx - cx).toFixed(2)}px, ${(dy - cy).toFixed(2)}px, 0) translate(-50%, -50%)`;
+
+    // Fare hiç kımıldamasa da kaydırma sırasında altındaki bölüm değişir.
+    // elementFromPoint yerleşimi zorladığı için yalnızca kaydırma varken ve
+    // altı karede bir bakıyoruz — göz için anlık, kare bütçesi için ucuz.
+    if (scroll.y !== toneY && ++toneFrame % 6 === 0) {
+      toneY = scroll.y;
+      syncTone(document.elementFromPoint(x, y));
+    }
   });
 
   const HOVER = 'a, button, [role="button"], input, textarea, select, summary, [data-hover]';
@@ -596,6 +614,7 @@ function initCursor() {
     const src = cta || drag || hov;
     if (label) label.textContent = (src && src.dataset.cursorLabel) || '';
     cursor.classList.toggle('has-label', !!(src && src.dataset.cursorLabel));
+    syncTone(e.target);
   });
 
   document.addEventListener('pointerout', (e) => {

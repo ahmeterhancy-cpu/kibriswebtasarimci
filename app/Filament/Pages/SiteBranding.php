@@ -39,7 +39,7 @@ class SiteBranding extends Page implements HasForms
 
     protected function settingKeys(): array
     {
-        return ['site_name', 'site_description', 'site_description__en', 'site_favicon', 'og_image'];
+        return ['site_name', 'site_description', 'site_description__en', 'site_logo', 'site_logo_light', 'logo_alt', 'site_favicon', 'og_image'];
     }
 
     public function form(Schema $schema): Schema
@@ -59,6 +59,36 @@ class SiteBranding extends Page implements HasForms
                     ->schema([
                         Textarea::make('site_description')->label('Açıklama (TR)')->rows(3)->maxLength(300),
                         Textarea::make('site_description__en')->label('Description (EN)')->rows(3)->maxLength(300),
+                    ]),
+
+                Section::make('Logo')
+                    ->description('Boş bırakılırsa header ve footer\'da tipografik logo (iki satır + kırmızı nokta) kullanılır — tasarımın varsayılanı budur. Görsel logo yüklerseniz onun yerine geçer.')
+                    ->schema([
+                        FileUpload::make('site_logo')
+                            ->label('Logo — açık zemin için')
+                            ->image()
+                            ->disk('public')
+                            ->directory('branding')
+                            ->visibility('public')
+                            ->acceptedFileTypes(['image/png', 'image/svg+xml', 'image/webp'])
+                            ->maxSize(2048)
+                            ->helperText('Header\'da kullanılır. Yatay, şeffaf zeminli PNG veya SVG; yükseklik en az 80px. Max 2 MB.'),
+
+                        FileUpload::make('site_logo_light')
+                            ->label('Logo — koyu zemin için')
+                            ->image()
+                            ->disk('public')
+                            ->directory('branding')
+                            ->visibility('public')
+                            ->acceptedFileTypes(['image/png', 'image/svg+xml', 'image/webp'])
+                            ->maxSize(2048)
+                            ->helperText('Footer ve mobil menü siyah zeminde. Boş bırakılırsa üstteki logo kullanılır — koyu renkli bir logo yüklediyseniz burada beyaz sürümünü verin, yoksa footer\'da görünmez.'),
+
+                        TextInput::make('logo_alt')
+                            ->label('Logo alt metni')
+                            ->maxLength(120)
+                            ->placeholder('Kıbrıs Web Tasarımcı')
+                            ->helperText('Ekran okuyucular ve görsel yüklenmezse görünen metin. Boş bırakılırsa site adı kullanılır.'),
                     ]),
 
                 Section::make('Favicon')->schema([

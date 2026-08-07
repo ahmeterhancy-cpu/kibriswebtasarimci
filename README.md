@@ -87,6 +87,34 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
 9. **Önbelleğe Eloquent modeli/koleksiyonu yazmayın.** Dosya ve veritabanı
    sürücüleri geri okurken *"incomplete object"* hatası verir; footer şehir
    listesi buna takıldı. `->map(fn ($m) => [...])->all()` ile düz dizi yazın.
+10. **`public/robots.txt` OLMAMALI.** Laravel varsayılanında gelir ve web
+    sunucusu statik dosyayı rotadan önce sunar; dinamik `robots.txt` sessizce
+    hiç çalışmaz. `SeoTest` dosyanın yokluğunu ayrıca kontrol ediyor.
+11. **`User::canAccessPanel()` silinmemeli.** `FilamentUser` arayüzü
+    uygulanmazsa Filament yalnız `APP_ENV=local` iken giriş verir; canlıda
+    herkes 403 alır ve panel yönetilemez hâle gelir.
+12. **`storage/framework/views` Tailwind kaynağı kaldırıldı.** Derlenmiş Blade
+    önbelleği ziyaret edilen sayfalara göre değiştiği için çıktı CSS'i her
+    derlemede farklı boyutta çıkıyordu (73 kB ↔ 89 kB).
+
+---
+
+## Panelden yönetilenler (Sistem grubu)
+
+| Sayfa | Ne yapar |
+|---|---|
+| Site Ayarları / Genel | bakım modu ve metinleri |
+| Site Markası | site adı, açıklama, **logo (açık + koyu zemin)**, favicon, OG görseli |
+| İletişim & Sosyal Medya | e-posta, telefon, WhatsApp, adres, **harita**, 8 sosyal hesap |
+| **Yapay Zekâ Görünürlüğü** | GEO: alıntılanabilir tanım, llms.txt, AI tarayıcı izinleri |
+| **Analitik & Tracking** | GA4, GTM, Ads, Meta, LinkedIn, TikTok, Clarity, Hotjar, Yandex, özel script, çerez onayı |
+| **Kullanıcılar** | panel kullanıcıları (şifre boş bırakılırsa değişmez) |
+| Footer İçeriği | footer tanıtım metni |
+
+Ölçüm script'lerinin hiçbiri `<head>`'e sabit yazılmaz: hepsi
+`layouts/partials/analytics.blade.php` içinde durur ve **çerez onayı verilene
+kadar tek bir istek bile gitmez**. Panele yalnızca kimlik girilir, kod değil —
+istisna, bilerek açık bırakılan özel script alanlarıdır.
 
 ---
 
@@ -112,6 +140,26 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
   ve ziyaretçiyi ana bölümlere yönlendirir.
 - Değişiklikten sonra `php artisan test --filter=SeoTest` çalıştırın — kanonik,
   hreflang, JSON-LD geçerliliği ve sitemap kapsamı orada kilitli.
+
+### GEO — yapay zekâ aramalarında görünürlük
+
+Klasik SEO "Google'da kaçıncı sıradayız" sorusuydu; GEO ise "ChatGPT'ye
+*Kıbrıs'ta web tasarım yapan kim var* diye sorulduğunda cevapta geçiyor muyuz".
+
+- **`/llms.txt`** — modeller için düz metin site özeti. Alıntılanabilir tanım +
+  genişletilmiş özet panelden yazılır; hizmetler, paketler (fiyatlarıyla),
+  şehirler ve son 20 yazı listeden **otomatik** üretilir. `robots.txt` içinde
+  `LLM-Content:` satırıyla bildirilir.
+- **AI tarayıcı izinleri** — panelden işaretlenir, `robots.txt`'e yazılır.
+  Kritik ayrım: 🔎 *arama/alıntı* botları (OAI-SearchBot, Claude-SearchBot,
+  PerplexityBot) kapatılırsa o motorun cevabında **hiç görünülmez**;
+  📚 *eğitim* botları (GPTBot, ClaudeBot, CCBot, Google-Extended) yalnız model
+  eğitimini etkiler. Google-Extended'ı kapatmak normal Google aramasını
+  ETKİLEMEZ — Googlebot ayrı bir bottur.
+- Hiç ayar yapılmamışsa **hepsi açıktır**; yeni kurulan bir site sessizce
+  yapay zekâ sonuçlarından silinmesin diye.
+- Modeller net, doğrulanabilir cümleleri alıntılar. Panel metinlerine pazarlama
+  sıfatı değil olgu yazın: ne, kime, nerede, hangi fiyata.
 
 ---
 

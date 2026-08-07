@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Location;
+use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -139,5 +140,72 @@ class SeoTest extends TestCase
             ->assertOk()
             ->assertSee('Disallow: /admin')
             ->assertSee('Sitemap: '.url('/sitemap.xml'));
+    }
+
+    /**
+     * Laravel varsayılan olarak `public/robots.txt` ile gelir ve web sunucusu
+     * statik dosyayı rotadan önce sunar — dinamik robots.txt sessizce hiç
+     * çalışmaz. Bir kez bu tuzağa düşüldü, bir daha düşülmesin.
+     */
+    public function test_statik_robots_dosyasi_dinamik_rotayi_golgelemiyor(): void
+    {
+        $this->assertFileDoesNotExist(public_path('robots.txt'));
+    }
+
+    public function test_yapay_zeka_botlari_varsayilan_olarak_siteye_alinir(): void
+    {
+        $robots = $this->get('/robots.txt')->assertOk()->getContent();
+
+        // Hiç ayar yapılmamışken kimse engellenmemeli — yeni kurulan bir site
+        // sessizce yapay zekâ sonuçlarından silinmesin.
+        foreach (['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended'] as $agent) {
+            $this->assertStringNotContainsString("User-agent: {$agent}\nDisallow: /", $robots);
+        }
+    }
+
+    public function test_panelden_kapatilan_bot_robotsta_engellenir(): void
+    {
+        // Yalnızca ChatGPT aramasına izin ver, gerisini kapat.
+        Setting::set('ai_crawlers', 'openai_search', 'geo');
+
+        $robots = $this->get('/robots.txt')->assertOk()->getContent();
+
+        $this->assertStringContainsString("User-agent: PerplexityBot\nDisallow: /", $robots);
+        $this->assertStringContainsString("User-agent: GPTBot\nDisallow: /", $robots);
+        $this->assertStringNotContainsString("User-agent: OAI-SearchBot\nDisallow: /", $robots);
+    }
+
+    public function test_llms_dosyasi_hizmet_paket_ve_sehirleri_listeler(): void
+    {
+        $response = $this->get('/llms.txt')->assertOk();
+
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $response->assertSee('## Hizmetler', false);
+        $response->assertSee('## Paketler ve fiyatlar', false);
+        $response->assertSee('## Hizmet verilen şehirler', false);
+
+        foreach (Location::active()->get() as $location) {
+            $response->assertSee(url('/web-tasarim/'.$location->slug), false);
+        }
+    }
+
+    public function test_llms_kapatilinca_404_doner_ve_robotstan_dusulur(): void
+    {
+        Setting::set('llms_enabled', '0', 'geo');
+
+        $this->get('/llms.txt')->assertNotFound();
+        $this->get('/robots.txt')->assertOk()->assertDontSee('LLM-Content');
+    }
+
+    public function test_cerez_onayi_verilmeden_olcum_scriptleri_yuklenmez(): void
+    {
+        Setting::set('ga4_id', 'G-TEST12345', 'analytics');
+        Setting::set('cookie_consent', '1', 'analytics');
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        // Onay bandı var, ama Google'a giden hiçbir <script src> yok.
+        $this->assertStringContainsString('k-consent', $html);
+        $this->assertStringNotContainsString('<script src="https://www.googletagmanager.com', $html);
     }
 }

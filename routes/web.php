@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
+// GEO: yapay zekâ modelleri için düz metin site özeti.
+Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms');
 
 /*
 |--------------------------------------------------------------------------

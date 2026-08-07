@@ -125,6 +125,28 @@
         </div>
     </section>
 
+    {{-- Harita — panelden adres araması ya da özel gömme adresi girilirse.
+         iframe tembel yüklenir: haritalar ağır ve sayfanın altında, ilk
+         boyamayı bekletmelerinin bir anlamı yok. --}}
+    @php
+        $mapEmbed = $site('map_embed');
+        $mapQuery = $site('map_query');
+        $mapSrc = $mapEmbed
+            ?: ($mapQuery ? 'https://www.google.com/maps?q='.rawurlencode($mapQuery).'&output=embed' : null);
+    @endphp
+
+    @if ($mapSrc)
+        <section class="border-t border-[#0F0F0F]/10">
+            <iframe
+                src="{{ $mapSrc }}"
+                title="{{ $site('map_title', $site('site_name', 'Kıbrıs Web Tasarımcı')) }}"
+                class="block h-[380px] w-full border-0 lg:h-[460px]"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen></iframe>
+        </section>
+    @endif
+
     @if ($faqs->isNotEmpty())
         <section class="bg-[#F1F1EF] px-6 py-16 lg:px-12 lg:py-24">
             <div class="mx-auto max-w-[900px]" data-acc="single">
