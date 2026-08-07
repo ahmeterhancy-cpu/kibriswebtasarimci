@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ServiceController;
@@ -36,6 +37,10 @@ Route::middleware('locale:tr')->group(function () {
 
     Route::get('/paketler', [PackageController::class, 'index'])->name('packages');
 
+    // Yerel SEO: şehir bazlı sayfalar
+    Route::get('/web-tasarim', [LocationController::class, 'index'])->name('locations.index');
+    Route::get('/web-tasarim/{location:slug}', [LocationController::class, 'show'])->name('locations.show');
+
     Route::get('/teklif-al', [QuoteController::class, 'index'])->name('quote');
     Route::post('/teklif-al', [QuoteController::class, 'store'])->name('quote.store');
 
@@ -62,6 +67,9 @@ Route::middleware('locale:en')->prefix('en')->name('en.')->group(function () {
     Route::get('/work/{work:slug}', [WorkController::class, 'show'])->name('works.show');
 
     Route::get('/pricing', [PackageController::class, 'index'])->name('packages');
+
+    Route::get('/web-design', [LocationController::class, 'index'])->name('locations.index');
+    Route::get('/web-design/{location:slug}', [LocationController::class, 'show'])->name('locations.show');
 
     Route::get('/get-quote', [QuoteController::class, 'index'])->name('quote');
     Route::post('/get-quote', [QuoteController::class, 'store'])->name('quote.store');

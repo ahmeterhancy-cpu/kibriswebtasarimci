@@ -1,8 +1,15 @@
 @php
     $isEn = app()->getLocale() === 'en';
+
+    // Kategori filtreleri aynı işleri farklı adreslerde tekrar sunuyor.
+    // Filtreli görünümü dizine sokmuyor, kanoniği filtresiz listeye veriyoruz.
+    $canonical = $r('works.index');
+    $robots = $activeCategory ? 'noindex, follow' : null;
 @endphp
 
 <x-app-layout
+    :canonical="$canonical"
+    :robots="$robots"
     :seo-title="$isEn ? 'Work' : 'İşler'"
     :seo-description="$isEn
         ? 'Selected websites, stores and web applications we designed and built.'

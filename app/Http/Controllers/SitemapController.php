@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Models\Location;
 use App\Models\Service;
 use App\Models\Work;
 use Illuminate\Http\Response;
@@ -31,6 +32,7 @@ class SitemapController extends Controller
         $add('services.index', 'en.services.index', [], null, 'monthly', '0.9');
         $add('works.index', 'en.works.index', [], null, 'weekly', '0.9');
         $add('packages', 'en.packages', [], null, 'monthly', '0.9');
+        $add('locations.index', 'en.locations.index', [], null, 'monthly', '0.8');
         $add('quote', 'en.quote', [], null, 'monthly', '0.8');
         $add('blog.index', 'en.blog.index', [], null, 'weekly', '0.8');
         $add('contact', 'en.contact', [], null, 'yearly', '0.6');
@@ -41,6 +43,11 @@ class SitemapController extends Controller
 
         foreach (Work::active()->get() as $work) {
             $add('works.show', 'en.works.show', ['work' => $work->slug], $work->updated_at?->toAtomString(), 'monthly', '0.7');
+        }
+
+        // Şehir sayfaları — yerel aramaların giriş kapısı, önceliği yüksek tutuyoruz.
+        foreach (Location::active()->get() as $location) {
+            $add('locations.show', 'en.locations.show', ['location' => $location->slug], $location->updated_at?->toAtomString(), 'monthly', '0.8');
         }
 
         foreach (BlogPost::published()->get() as $post) {

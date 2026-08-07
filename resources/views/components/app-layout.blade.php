@@ -5,6 +5,8 @@
     'ogType' => 'website',
     'canonical' => null,
     'bodyClass' => '',
+    'robots' => null,
+    'paginator' => null,
 ])
 
 @php
@@ -43,8 +45,19 @@
 
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDescription }}">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="robots" content="{{ $robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     <link rel="canonical" href="{{ $canonicalUrl }}">
+
+    {{-- Sayfalanmış listelerde önceki/sonraki — tarayıcıya dizinin sırasını
+         bildirir, 2. sayfanın tek başına değerlendirilmesini engeller. --}}
+    @if ($paginator)
+        @if ($paginator->currentPage() > 1)
+            <link rel="prev" href="{{ $paginator->previousPageUrl() }}">
+        @endif
+        @if ($paginator->hasMorePages())
+            <link rel="next" href="{{ $paginator->nextPageUrl() }}">
+        @endif
+    @endif
 
     {{-- hreflang — her sayfanın karşı dildeki eşi AppServiceProvider'da üretilir --}}
     @php
@@ -64,6 +77,9 @@
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:image" content="{{ $ogUrl }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $siteName }}">
     <meta property="og:locale" content="{{ $isEn ? 'en_US' : 'tr_TR' }}">
     <meta property="og:locale:alternate" content="{{ $isEn ? 'tr_TR' : 'en_US' }}">
     <meta name="twitter:card" content="summary_large_image">
@@ -74,34 +90,63 @@
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
-    {{-- JSON-LD: kuruluş + site --}}
+    {{-- JSON-LD: kuruluş + site.
+         areaServed listesi Şehir Sayfaları'ndan türetilir; panelden şehir
+         eklendiğinde yapısal veri de kendiliğinden güncellenir.
+         Uydurma puan/yorum (aggregateRating, review) BİLEREK YOK — gerçek
+         müşteri değerlendirmesi olmadan yazmak yanıltıcı ve cezalandırılan
+         bir uygulama. --}}
     <script type="application/ld+json">
         @php
-            $schema = [
+            $seoCities = \Illuminate\Support\Facades\Cache::remember('seo_area_served', 3600, fn () => \App\Models\Location::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get(['name', 'name_en', 'country_code'])
+                ->map(fn ($l) => [
+                    '@type' => 'City',
+                    'name' => $l->name,
+                    'containedInPlace' => [
+                        '@type' => 'Country',
+                        'name' => $l->country_code === 'TR' ? 'Türkiye' : 'Cyprus',
+                    ],
+                ])->all());
+
+            $organization = [
+                '@type' => 'ProfessionalService',
+                '@id' => url('/').'#organization',
+                'name' => $siteName,
+                'url' => url('/'),
+                'image' => $ogUrl,
+                'email' => $contactEmail,
+                'telephone' => $contactPhone,
+                'description' => $pageDescription,
+                'priceRange' => '₺₺',
+                'currenciesAccepted' => 'TRY',
+                'areaServed' => $seoCities ?: [
+                    ['@type' => 'Country', 'name' => 'Cyprus'],
+                    ['@type' => 'Country', 'name' => 'Türkiye'],
+                ],
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressLocality' => $site('contact_city', 'Girne'),
+                    'addressRegion' => $isEn ? 'North Cyprus' : 'Kuzey Kıbrıs',
+                    'addressCountry' => 'CY',
+                ],
+                'knowsLanguage' => ['tr', 'en'],
+            ];
+
+            $sameAs = array_values(array_filter([
+                $site('social_instagram'), $site('social_linkedin'),
+                $site('social_behance'), $site('social_github'),
+            ]));
+            if ($sameAs) {
+                $organization['sameAs'] = $sameAs;
+            }
+
+            echo json_encode([
                 '@context' => 'https://schema.org',
                 '@graph' => [
-                    [
-                        '@type' => 'ProfessionalService',
-                        '@id' => url('/').'#organization',
-                        'name' => $siteName,
-                        'url' => url('/'),
-                        'image' => $ogUrl,
-                        'email' => $contactEmail,
-                        'telephone' => $contactPhone,
-                        'description' => $pageDescription,
-                        'priceRange' => '₺₺',
-                        'areaServed' => [
-                            ['@type' => 'Country', 'name' => 'Cyprus'],
-                            ['@type' => 'Country', 'name' => 'Türkiye'],
-                        ],
-                        'address' => [
-                            '@type' => 'PostalAddress',
-                            'addressLocality' => $site('contact_city', 'Girne'),
-                            'addressRegion' => $isEn ? 'North Cyprus' : 'Kuzey Kıbrıs',
-                            'addressCountry' => 'CY',
-                        ],
-                        'knowsLanguage' => ['tr', 'en'],
-                    ],
+                    $organization,
                     [
                         '@type' => 'WebSite',
                         '@id' => url('/').'#website',
@@ -111,8 +156,7 @@
                         'publisher' => ['@id' => url('/').'#organization'],
                     ],
                 ],
-            ];
-            echo json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         @endphp
     </script>
 

@@ -23,6 +23,23 @@
             ['route' => 'contact', 'label' => __('site.nav.contact')],
         ],
     ];
+
+    // Şehir sayfalarına footer bağlantısı — her sayfadan erişilebilir olması
+    // yerel sonuçlarda taranma ve iç bağlantı gücü açısından belirleyici.
+    //
+    // Önbelleğe DÜZ DİZİ yazıyoruz, Eloquent koleksiyonu değil: dosya/veritabanı
+    // sürücüsü modeli serileştirip geri okurken "incomplete object" hatası verir.
+    $footerLocations = \Illuminate\Support\Facades\Cache::remember(
+        'footer_locations',
+        3600,
+        fn () => \App\Models\Location::query()
+            ->where('is_active', true)
+            ->orderBy('region')
+            ->orderBy('sort_order')
+            ->get(['slug', 'name', 'name_en'])
+            ->map(fn ($l) => ['slug' => $l->slug, 'name' => $l->name, 'name_en' => $l->name_en])
+            ->all()
+    );
 @endphp
 
 {{-- ── Kapanış CTA bandı ───────────────────────────────────────────────── --}}
@@ -119,6 +136,27 @@
                 @endif
             </div>
         </div>
+
+        @if ($footerLocations)
+            <div class="k-rule"></div>
+
+            <div class="py-8">
+                <p class="k-eyebrow mb-4" style="color:rgba(255,255,255,0.35);">
+                    <a href="{{ $r('locations.index') }}" class="k-link k-link-in transition-colors duration-300 hover:text-[#E30613]" style="color:inherit;">
+                        {{ $isEn ? 'Where we work' : 'Hizmet bölgeleri' }}
+                    </a>
+                </p>
+                <div class="flex flex-wrap gap-x-5 gap-y-2.5">
+                    @foreach ($footerLocations as $footerLocation)
+                        <a href="{{ $r('locations.show', ['location' => $footerLocation['slug']]) }}"
+                           class="k-link k-link-in text-sm transition-colors duration-300 hover:text-[#E30613]"
+                           style="color:rgba(255,255,255,0.6);">
+                            {{ ($isEn && $footerLocation['name_en']) ? $footerLocation['name_en'] : $footerLocation['name'] }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <div class="k-rule"></div>
 

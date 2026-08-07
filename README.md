@@ -84,6 +84,34 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
 7. **Timezone `Asia/Famagusta`.** Europe/Istanbul veya Europe/Nicosia kullanmayın.
 8. **İçeriği koda gömmeyin.** Veri yoksa bölüm gizlenir; sahte placeholder
    gösterilmez.
+9. **Önbelleğe Eloquent modeli/koleksiyonu yazmayın.** Dosya ve veritabanı
+   sürücüleri geri okurken *"incomplete object"* hatası verir; footer şehir
+   listesi buna takıldı. `->map(fn ($m) => [...])->all()` ile düz dizi yazın.
+
+---
+
+## SEO ve yerel arama (GEO)
+
+- **Şehir sayfaları** `/web-tasarim/{slug}` (EN: `/web-design/{slug}`) — panelden
+  yönetilir (*Şehir Sayfaları*). "girne web tasarım" gibi yerel aramaların giriş
+  kapısı. Her şehrin metni GERÇEKTEN farklı olmalı; aynı metnin şehir adı
+  değiştirilmiş kopyaları arama motorlarınca *kapı sayfası* sayılır ve cezalanır.
+  Panelde metin alanının altındaki uyarı bunu hatırlatır.
+- **Yapısal veri**: site genelinde `ProfessionalService` + `WebSite`; şehir
+  sayfalarında şehre özel `ProfessionalService` (`areaServed` + `geo`) ve
+  `BreadcrumbList`; şehir listesinde `ItemList`. Site geneli `areaServed`
+  yayındaki şehirlerden türer — panelden şehir eklendiğinde kendiliğinden büyür.
+- **Uydurma `aggregateRating` / `review` YOK.** Gerçek müşteri değerlendirmesi
+  olmadan puan yazmak hem yanıltıcı hem de manuel işlem sebebidir. `SeoTest`
+  bunu ayrıca doğruluyor.
+- **Filtreli listeler** (`?kategori=`) `noindex, follow` alır ve kanoniği
+  filtresiz listeye verir; aynı işler farklı adreslerde tekrarlanmasın diye.
+- **Sayfalanmış blog** kendi kanoniğini korur, `rel=prev/next` ile bağlanır ve
+  başlığa "— sayfa N" eklenir.
+- **404** kendi tasarımlı sayfasıdır, adresten dili okur (`/en/...` → İngilizce)
+  ve ziyaretçiyi ana bölümlere yönlendirir.
+- Değişiklikten sonra `php artisan test --filter=SeoTest` çalıştırın — kanonik,
+  hreflang, JSON-LD geçerliliği ve sitemap kapsamı orada kilitli.
 
 ---
 

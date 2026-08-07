@@ -2,10 +2,22 @@
     $isEn = app()->getLocale() === 'en';
     $featured = $posts->getCollection()->first();
     $rest = $posts->getCollection()->skip(1);
+
+    // Filtreli görünüm dizine girmesin; sayfa 2+ kendi kanoniğini korur ki
+    // içerik kaybolmasın, ama başlık "(sayfa N)" ile ayrışsın.
+    $page = $posts->currentPage();
+    $canonical = $activeCategory
+        ? ($page > 1 ? $r('blog.index').'?page='.$page : $r('blog.index'))
+        : ($page > 1 ? $r('blog.index').'?page='.$page : null);
+    $robots = $activeCategory ? 'noindex, follow' : null;
+    $pageSuffix = $page > 1 ? ($isEn ? ' — page '.$page : ' — sayfa '.$page) : '';
 @endphp
 
 <x-app-layout
-    :seo-title="$isEn ? 'Insights' : 'Blog'"
+    :canonical="$canonical"
+    :robots="$robots"
+    :paginator="$posts"
+    :seo-title="($isEn ? 'Insights' : 'Blog').$pageSuffix"
     :seo-description="$isEn
         ? 'Notes on web design, e-commerce and SEO for businesses in Cyprus.'
         : 'Kıbrıs\'taki işletmeler için web tasarım, e-ticaret ve SEO üzerine notlar.'">
