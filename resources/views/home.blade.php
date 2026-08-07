@@ -347,7 +347,18 @@
                     </a>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+                {{-- Izgara paket sayısına uyar: 4 paket 3'lü ızgarada tek başına
+                     kalan bir kart bırakıyordu. Sınıflar LİTERAL yazılmak zorunda —
+                     Tailwind kaynağı tarar, birleştirilmiş sınıf adı üretilmez. --}}
+                @php
+                    $packageCols = match (true) {
+                        $packages->count() >= 4 => 'md:grid-cols-2 xl:grid-cols-4',
+                        $packages->count() === 3 => 'md:grid-cols-3',
+                        $packages->count() === 2 => 'md:grid-cols-2',
+                        default => 'max-w-md',
+                    };
+                @endphp
+                <div class="grid grid-cols-1 gap-5 {{ $packageCols }}">
                     @foreach ($packages as $i => $package)
                         <article class="k-reveal relative flex flex-col rounded-2xl border-2 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_44px_rgba(0,0,0,0.07)] lg:p-8 {{ $package->is_popular ? 'border-[#E30613]' : 'border-[#0F0F0F]/10 hover:border-[#0F0F0F]/25' }}"
                                  data-delay="{{ min(($i + 1) * 100, 300) }}">

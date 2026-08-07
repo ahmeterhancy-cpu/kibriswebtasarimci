@@ -19,7 +19,9 @@ class HomeController extends Controller
             'services' => Service::active()->get(),
             'works' => Work::active()->featured()->with('category')->take(8)->get(),
             'brands' => Brand::active()->get(),
-            'packages' => Package::active()->where('is_ecommerce', false)->take(3)->get(),
+            // E-ticaret paketi de vitrine girer. Önceden dışarıda bırakılıyordu:
+            // tek ve en kapsamlı paket ana sayfada hiç görünmüyordu.
+            'packages' => Package::active()->take(4)->get(),
             'testimonials' => Testimonial::active()->take(6)->get(),
             'posts' => BlogPost::published()->with('category')->take(3)->get(),
             'faqs' => FaqItem::active()->forPage('home')->get(),
