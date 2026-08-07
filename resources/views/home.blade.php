@@ -58,8 +58,8 @@
             <div class="mt-10 grid grid-cols-1 gap-8 lg:mt-14 lg:grid-cols-12">
                 <p class="k-lead k-reveal max-w-xl lg:col-span-5" data-delay="300">
                     {{ $isEn
-                        ? 'Corporate websites, online stores, custom web software and mobile apps. No templates: every project is designed from a blank page and written by hand.'
-                        : 'Kurumsal web sitesi, e-ticaret, özel web yazılımı ve mobil uygulama. Şablon yok: her proje sıfırdan tasarlanır, elle yazılır.' }}
+                        ? 'Corporate websites, online stores, custom web software and mobile apps.'
+                        : 'Kurumsal web sitesi, e-ticaret, özel web yazılımı ve mobil uygulama.' }}
                 </p>
 
                 {{-- flex-nowrap: dar ekranda alt alta düşmesin, yan yana kalsın. --}}
