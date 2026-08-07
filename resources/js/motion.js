@@ -429,34 +429,26 @@ function initMarquee() {
   });
 }
 
-/* ── 8b ─ Akan kontur çizgileri (hero arka planı) ────────────────────────── */
+/* ── 8b ─ Nokta alanı (hero arka planı) ──────────────────────────────────── */
 /*
-   Canvas'a elle çizilen yatay çizgi ailesi. Her çizgi üç farklı periyotlu
-   sinüsün toplamı; hiçbiri diğeriyle aynı hızda ilerlemediği için örüntü
-   kendini tekrar etmiyor. Genlik yukarıda sıfıra yakın, aşağı indikçe açılıyor:
-   başlık alanı sakin kalıyor, hero'nun boş alt yarısı hareketleniyor.
-
-   İmleç gerekmiyor — telefonda da masaüstündekiyle aynı görünüyor. Hassas
-   işaretçi varsa çizgiler imlecin yakınında ek bir tümsek yapıyor.
+   Canvas'a elle çizilen nokta ızgarası. İki hareket kaynağı var:
+   yavaş bir dalga (imleç olmasa da yaşıyor) ve imlecin yakınında büyüyüp
+   brand rengine dönen noktalar. Kütüphane yok, tek rAF döngüsüne biniyor.
 */
 
-function initFlowLines() {
-  const host = document.querySelector('[data-backdrop]');
+function initDotField() {
+  const host = document.querySelector('[data-dots]');
   if (!host) return;
 
-  /* Yalnız geniş ekranda. Mobil hero'da boş alan yok — başlık, paragraf, iki
-     düğme ve sayaçlar ekranı dolduruyor. Tam sayfa bir arka plan hareketi
-     orada metnin arasından geçip kir gibi görünüyor. Mobilde hareketi
-     hero'nun altındaki kayan şerit ve canlı ayraç taşıyor. */
-  if (innerWidth < 768) return;
-
   const canvas = document.createElement('canvas');
-  canvas.className = 'k-backdrop';
+  canvas.className = 'k-dots';
   canvas.setAttribute('aria-hidden', 'true');
   host.prepend(canvas);
 
   const ctx = canvas.getContext('2d');
-  let w = 0, h = 0, lines = 0, step = 8, amp = 26;
+  const GAP = 34;          // noktalar arası mesafe
+  const RADIUS = 130;      // imlecin etki yarıçapı
+  let w = 0, h = 0, cols = 0, rows = 0, offsetX = 0, offsetY = 0;
   let mx = -9999, my = -9999, tx = -9999, ty = -9999;
   let t = 0;
 
@@ -470,53 +462,41 @@ function initFlowLines() {
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const small = w < 768;
-    lines = Math.max(9, Math.round(h / (small ? 46 : 54)));
-    step = small ? 12 : 8;      // dar ekranda daha az nokta, aynı yumuşaklık
-    amp = small ? 22 : 26;
+    cols = Math.ceil(w / GAP) + 1;
+    rows = Math.ceil(h / GAP) + 1;
+    // Izgarayı ortala ki kenarlarda yarım sıra kalmasın.
+    offsetX = (w - (cols - 1) * GAP) / 2;
+    offsetY = (h - (rows - 1) * GAP) / 2;
   };
 
   const draw = () => {
     ctx.clearRect(0, 0, w, h);
-    ctx.lineWidth = 1;
 
-    for (let i = 0; i < lines; i++) {
-      const p = i / (lines - 1);          // 0 üst, 1 alt
-      const baseY = p * h;
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const x = offsetX + i * GAP;
+        const y = offsetY + j * GAP;
 
-      // Üstte neredeyse düz, aşağı indikçe dalgalanan çizgiler.
-      const a = amp * Math.pow(p, 1.6);
-      const phase = i * 0.45;
+        // İki çapraz dalga üst üste — düzenli nabız yerine yavaşça kayan bir örüntü.
+        const wave = (Math.sin(i * 0.28 + t) + Math.sin(j * 0.34 - t * 0.7)) * 0.25 + 0.5;
 
-      ctx.beginPath();
-      for (let x = -step; x <= w + step; x += step) {
-        const k = x / w;
-        let y = baseY
-          + Math.sin(k * 5.2 + t * 0.5 + phase) * a
-          + Math.sin(k * 9.1 - t * 0.31 + phase * 1.7) * a * 0.45
-          + Math.sin(k * 2.3 + t * 0.19) * a * 0.35;
+        const dx = x - mx;
+        const dy = y - my;
+        const dist = Math.hypot(dx, dy);
+        const near = dist < RADIUS ? 1 - dist / RADIUS : 0;
+        const pull = near * near;   // yumuşak düşüş
 
-        // İmleç yakınında yerel tümsek (yalnız hassas işaretçide).
-        if (mx > -9998) {
-          const d = Math.hypot(x - mx, baseY - my);
-          if (d < 180) {
-            const f = 1 - d / 180;
-            y -= f * f * 34;
-          }
-        }
+        const r = 0.7 + wave * 1.1 + pull * 2.4;
+        const alpha = 0.06 + wave * 0.14 + pull * 0.5;
 
-        if (x <= -step) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        ctx.beginPath();
+        // İmleç yakınındaki noktalar dalgayla birlikte hafifçe kayar.
+        ctx.arc(x + (dx / (dist || 1)) * pull * 6, y + (dy / (dist || 1)) * pull * 6, r, 0, Math.PI * 2);
+        ctx.fillStyle = pull > 0.12
+          ? `rgba(227, 6, 19, ${alpha.toFixed(3)})`
+          : `rgba(15, 15, 15, ${alpha.toFixed(3)})`;
+        ctx.fill();
       }
-
-      // Her dördüncü çizgi brand renginde — düzenli bir vurgu ritmi.
-      const accent = i % 4 === 2;
-      const alpha = 0.05 + p * 0.13;
-      ctx.strokeStyle = accent
-        ? `rgba(227, 6, 19, ${(alpha * 1.5).toFixed(3)})`
-        : `rgba(15, 15, 15, ${alpha.toFixed(3)})`;
-      ctx.stroke();
     }
   };
 
@@ -528,20 +508,18 @@ function initFlowLines() {
   if (env.fine) {
     host.addEventListener('pointermove', (e) => {
       const rect = host.getBoundingClientRect();
-      if (tx < -9998) { mx = e.clientX - rect.left; my = e.clientY - rect.top; }
       tx = e.clientX - rect.left;
       ty = e.clientY - rect.top;
     });
-    host.addEventListener('pointerleave', () => { tx = -9999; ty = -9999; mx = -9999; my = -9999; });
+    host.addEventListener('pointerleave', () => { tx = -9999; ty = -9999; });
   }
 
   ticker.add(() => {
-    if (host.getBoundingClientRect().bottom < 0) return;   // ekran dışında çizme
-    t += 0.01;
-    if (tx > -9998) {
-      mx = lerp(mx, tx, 0.12);
-      my = lerp(my, ty, 0.12);
-    }
+    // Ekrandan çıkınca boşuna çizme.
+    if (host.getBoundingClientRect().bottom < 0) return;
+    t += 0.012;
+    mx = lerp(mx, tx, 0.1);
+    my = lerp(my, ty, 0.1);
     draw();
   });
 }
@@ -784,7 +762,7 @@ function boot() {
   initScrollLinked();
   initCounters();
   initMarquee();
-  initFlowLines();
+  initDotField();
   initMagnetic();
   initCursor();
   initHoverFollower();
