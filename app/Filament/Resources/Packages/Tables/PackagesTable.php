@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Packages\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -12,6 +13,20 @@ use Filament\Tables\Table;
 
 class PackagesTable
 {
+    /**
+     * Satır içi anahtar sessizce kaydediyordu; kullanıcı çalışmadığını sanıyordu.
+     * Kısa bir onay bildirimi ekliyoruz.
+     */
+    protected static function toggle(string $name, string $label): ToggleColumn
+    {
+        return ToggleColumn::make($name)
+            ->label($label)
+            ->afterStateUpdated(fn () => Notification::make()
+                ->title('Kaydedildi')
+                ->success()
+                ->send());
+    }
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -22,9 +37,9 @@ class PackagesTable
                 TextColumn::make('price')->label('Panelsiz')->numeric(0, ',', '.')->suffix(' ₺')->placeholder('—'),
                 TextColumn::make('price_with_panel')->label('Panelli')->numeric(0, ',', '.')->suffix(' ₺')->placeholder('—'),
                 TextColumn::make('delivery')->label('Teslim')->toggleable(),
-                ToggleColumn::make('is_ecommerce')->label('E-ticaret'),
-                ToggleColumn::make('is_popular')->label('Öne çıkan'),
-                ToggleColumn::make('is_active')->label('Yayında'),
+                self::toggle('is_ecommerce', 'E-ticaret'),
+                self::toggle('is_popular', 'Öne çıkan'),
+                self::toggle('is_active', 'Yayında'),
             ])
             ->filters([
                 TernaryFilter::make('is_ecommerce')->label('E-ticaret paketi'),

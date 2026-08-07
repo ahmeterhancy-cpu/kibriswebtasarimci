@@ -163,6 +163,14 @@
                                     <span class="text-4xl font-black tracking-tight" style="color:#ffffff;">{{ $package->formatPrice($package->price) }}</span>
                                     <span class="text-xs" style="color:rgba(255,255,255,0.45);">+ KDV</span>
                                 </div>
+                                {{-- Panelli fiyatı olan bir paket admin'den e-ticarete taşınırsa
+                                     bu satır olmadan panelli tutarı sessizce kaybolurdu. --}}
+                                @if ($package->price_with_panel)
+                                    <p class="mt-1.5 text-xs" style="color:rgba(255,255,255,0.5);">
+                                        {{ $isEn ? 'With admin panel' : 'Panelli' }}:
+                                        <strong style="color:rgba(255,255,255,0.8);">{{ $package->formatPrice($package->price_with_panel) }}</strong>
+                                    </p>
+                                @endif
                                 @if ($package->t('delivery'))
                                     <p class="mt-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#E30613]">{{ $package->t('delivery') }}</p>
                                 @endif

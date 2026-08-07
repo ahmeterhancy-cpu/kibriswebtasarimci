@@ -12,11 +12,22 @@ class Package extends Model
 
     protected $guarded = [];
 
+    /** Teklif sihirbazındaki proje türleri (paket bunlardan hangilerinde çıkacak). */
+    public const PROJECT_TYPES = [
+        'tanitim' => 'Tanıtım / tek sayfa site',
+        'kurumsal' => 'Kurumsal web sitesi',
+        'eticaret' => 'E-ticaret / online mağaza',
+        'mobil' => 'iOS / Android uygulama',
+        'yazilim' => 'Özel web yazılımı',
+        'yenileme' => 'Mevcut siteyi yenileme',
+    ];
+
     protected function casts(): array
     {
         return [
             'features' => 'array',
             'features_en' => 'array',
+            'project_types' => 'array',
             'is_popular' => 'boolean',
             'is_ecommerce' => 'boolean',
             'is_active' => 'boolean',

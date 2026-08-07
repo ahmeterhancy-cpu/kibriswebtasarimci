@@ -28,6 +28,7 @@ class PackageSeeder extends Seeder
                 'delivery_en' => '3-5 working days',
                 'features' => ['Tek sayfa tasarım', 'Mobil uyumlu', 'İletişim formu', 'WhatsApp butonu', 'SSL + hosting + domain (1 yıl)', 'Google Analytics'],
                 'features_en' => ['Single-page design', 'Mobile responsive', 'Contact form', 'WhatsApp button', 'SSL + hosting + domain (1 year)', 'Google Analytics'],
+                'project_types' => ['tanitim'],
                 'sort_order' => 1,
             ],
             [
@@ -43,6 +44,7 @@ class PackageSeeder extends Seeder
                 'delivery_en' => '4-6 working days',
                 'features' => ['Genişletilmiş tek sayfa', 'Hizmet ve referans bölümleri', 'Galeri', 'İletişim formu + harita', 'Temel SEO', 'SSL + hosting + domain (1 yıl)'],
                 'features_en' => ['Extended single page', 'Services and references sections', 'Gallery', 'Contact form + map', 'Baseline SEO', 'SSL + hosting + domain (1 year)'],
+                'project_types' => ['tanitim', 'kurumsal', 'yenileme'],
                 'sort_order' => 2,
             ],
             [
@@ -59,6 +61,7 @@ class PackageSeeder extends Seeder
                 'features' => ['Sınırsız sayfa yapısı', 'Blog / haber modülü', 'Hizmet detay sayfaları', 'Çoklu dil (TR + EN)', 'Gelişmiş SEO + 5 sayfa SEO metni', 'Yönetim paneli eğitimi'],
                 'features_en' => ['Unlimited page structure', 'Blog / news module', 'Service detail pages', 'Bilingual (TR + EN)', 'Advanced SEO + 5 SEO pages', 'Admin panel training'],
                 'is_popular' => true,
+                'project_types' => ['kurumsal', 'yenileme'],
                 'sort_order' => 3,
             ],
             /* Tek e-ticaret paketi: eski Başlangıç ve Pro birleştirildi.
@@ -78,14 +81,27 @@ class PackageSeeder extends Seeder
                 'features_en' => ['Unlimited products and variants', 'Advanced admin panel', 'Online payment integration', 'Shipping integration', 'SMS + email notifications', 'Campaigns and coupons', 'Advanced sales reporting', 'First 20 products entered by us'],
                 'is_ecommerce' => true,
                 'is_popular' => true,
+                'project_types' => ['eticaret', 'yenileme'],
                 'sort_order' => 4,
             ],
+        ];
+
+        /* Varsayılanlar ÖNCE gelir ki dizide yazılmayan bayraklar da sıfırlansın.
+           Aksi halde panelden açılan bir anahtar (örn. is_ecommerce) seeder
+           yeniden çalıştırıldığında açık kalıyordu. */
+        $defaults = [
+            'currency' => '₺',
+            'is_active' => true,
+            'is_popular' => false,
+            'is_ecommerce' => false,
+            'price_with_panel' => null,
+            'price_regular' => null,
         ];
 
         foreach ($packages as $package) {
             Package::query()->updateOrCreate(
                 ['slug' => $package['slug']],
-                $package + ['currency' => '₺', 'is_active' => true],
+                array_merge($defaults, $package),
             );
         }
 

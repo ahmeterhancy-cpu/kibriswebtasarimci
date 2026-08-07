@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Packages\Schemas;
 
+use App\Models\Package;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -93,7 +95,14 @@ class PackageForm
                         ->label('E-ticaret paketi')
                         ->helperText('İşaretlenirse paketler sayfasının koyu E-Ticaret bölümünde listelenir.'),
                     TextInput::make('sort_order')->label('Sıra')->numeric()->default(0),
-                ]),
+
+                    CheckboxList::make('project_types')
+                        ->label('Teklif sihirbazında hangi proje türlerinde çıksın')
+                        ->options(Package::PROJECT_TYPES)
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->helperText('Hiçbiri seçilmezse paket sihirbazda hiç görünmez; yalnızca Paketler sayfasında listelenir.'),
+                ])->columns(2),
 
             ])->columnSpanFull(),
         ]);

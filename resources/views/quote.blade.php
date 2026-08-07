@@ -92,38 +92,35 @@
     ];
 
     /* 2. ve 3. adımın içeriği 1. adımdaki seçime göre değişir.
-       `packages` liste fiyatı olan paketleri, `options` ise liste fiyatı olmayan
-       türlerde (mobil uygulama, özel yazılım) kapsam sorusunun şıklarını taşır.
-       Böylece hiçbir türde adım boş kalmıyor. */
+       `packages` aşağıda veritabanından doldurulur (paketin `project_types`
+       alanına göre) — burada slug listesi GÖMÜLÜ DEĞİL, yoksa panelden eklenen
+       yeni bir paket sihirbazda hiç görünmezdi.
+       `options` ise liste fiyatı olmayan türlerde (mobil uygulama, özel yazılım)
+       kapsam sorusunun şıklarını taşır; böylece hiçbir türde adım boş kalmaz. */
     $typeSteps = [
         'tanitim' => [
             'step2' => $isEn ? 'Which package?' : 'Hangi paket?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['hizli-baslangic', 'basic-onepage'],
             'options' => [],
         ],
         'kurumsal' => [
             'step2' => $isEn ? 'Which package?' : 'Hangi paket?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['basic-onepage', 'kurumsal'],
             'options' => [],
         ],
         'eticaret' => [
             'step2' => $isEn ? 'Which store package?' : 'Hangi mağaza paketi?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['e-ticaret'],
             'options' => [],
         ],
         'yenileme' => [
             'step2' => $isEn ? 'What scale is the new site?' : 'Yenilenen site hangi ölçekte olacak?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['basic-onepage', 'kurumsal', 'e-ticaret'],
             'options' => [],
         ],
         'mobil' => [
             'step2' => $isEn ? 'What will the app do?' : 'Uygulama ne yapacak?',
             'step3' => $isEn ? 'What should it include?' : 'Neler olsun?',
-            'packages' => [],
             'options' => [
                 ['key' => 'mobil-vitrin', 'label' => $isEn ? 'Showcase / catalogue app' : 'Tanıtım / katalog uygulaması',
                     'note' => $isEn ? 'Shows content, takes no orders.' : 'İçerik gösterir, sipariş almaz.'],
@@ -138,7 +135,6 @@
         'yazilim' => [
             'step2' => $isEn ? 'What kind of system?' : 'Ne tür bir sistem?',
             'step3' => $isEn ? 'What should it include?' : 'Neler olsun?',
-            'packages' => [],
             'options' => [
                 ['key' => 'yazilim-rezervasyon', 'label' => $isEn ? 'Booking / appointment system' : 'Rezervasyon / randevu sistemi',
                     'note' => $isEn ? 'Calendar, slots, confirmations.' : 'Takvim, slot, onay akışı.'],
@@ -151,6 +147,17 @@
             ],
         ],
     ];
+
+    /* Her türün paket listesi veritabanından: paketin `project_types` alanı.
+       Panelden yeni paket eklendiğinde ya da eşleme değiştiğinde sihirbaz
+       kendiliğinden güncellenir — kodda dokunulacak yer yok. */
+    foreach ($typeSteps as $typeKey => $step) {
+        $typeSteps[$typeKey]['packages'] = $packages
+            ->filter(fn ($p) => in_array($typeKey, (array) $p->project_types, true))
+            ->pluck('slug')
+            ->values()
+            ->all();
+    }
 
     /* Paket verisi JS'e — tür eşlemesi ve fiyat. */
     $packageData = $packages->map(fn ($p) => [
