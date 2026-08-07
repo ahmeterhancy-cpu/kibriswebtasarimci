@@ -29,6 +29,7 @@ class PackageSeeder extends Seeder
                 'features' => ['Tek sayfa tasarım', 'Mobil uyumlu', 'İletişim formu', 'WhatsApp butonu', 'SSL + hosting + domain (1 yıl)', 'Google Analytics'],
                 'features_en' => ['Single-page design', 'Mobile responsive', 'Contact form', 'WhatsApp button', 'SSL + hosting + domain (1 year)', 'Google Analytics'],
                 'project_types' => ['tanitim'],
+                'available_addons' => ['dil', 'seo', 'kimlik'],
                 'sort_order' => 1,
             ],
             [
@@ -45,6 +46,7 @@ class PackageSeeder extends Seeder
                 'features' => ['Genişletilmiş tek sayfa', 'Hizmet ve referans bölümleri', 'Galeri', 'İletişim formu + harita', 'Temel SEO', 'SSL + hosting + domain (1 yıl)'],
                 'features_en' => ['Extended single page', 'Services and references sections', 'Gallery', 'Contact form + map', 'Baseline SEO', 'SSL + hosting + domain (1 year)'],
                 'project_types' => ['tanitim', 'kurumsal', 'yenileme'],
+                'available_addons' => ['katalog', 'dil', 'blog', 'seo', 'kimlik'],
                 'sort_order' => 2,
             ],
             [
@@ -62,6 +64,7 @@ class PackageSeeder extends Seeder
                 'features_en' => ['Unlimited page structure', 'Blog / news module', 'Service detail pages', 'Bilingual (TR + EN)', 'Advanced SEO + 5 SEO pages', 'Admin panel training'],
                 'is_popular' => true,
                 'project_types' => ['kurumsal', 'yenileme'],
+                'available_addons' => ['katalog', 'dil', 'blog', 'rezervasyon', 'uyelik', 'seo', 'kimlik', 'mobilapp'],
                 // Kapsamında zaten var: blog modülü, çoklu dil, 5 sayfa SEO metni.
                 'included_extras' => ['blog', 'dil', 'seo'],
                 'sort_order' => 3,
@@ -84,6 +87,7 @@ class PackageSeeder extends Seeder
                 'is_ecommerce' => true,
                 'is_popular' => true,
                 'project_types' => ['eticaret', 'yenileme'],
+                'available_addons' => ['dil', 'blog', 'uyelik', 'seo', 'kimlik', 'mobilapp'],
                 'sort_order' => 4,
             ],
             /* ── Aylık bakım paketleri ─────────────────────────────────────
@@ -142,6 +146,7 @@ class PackageSeeder extends Seeder
             'delivery_en' => null,
             'project_types' => null,
             'included_extras' => null,
+            'available_addons' => null,
         ];
 
         foreach ($packages as $package) {

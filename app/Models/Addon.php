@@ -36,13 +36,30 @@ class Addon extends Model
         return 'slug';
     }
 
+    /** Paket formundaki "bu pakette sunulacak" seçimi: fiyatlı-fiyatsız hepsi. */
+    public static function options(): array
+    {
+        return static::query()
+            ->orderBy('sort_order')
+            ->get()
+            ->mapWithKeys(fn (self $a) => [
+                $a->slug => $a->price
+                    ? $a->name.' — '.number_format($a->price, 0, ',', '.').' ₺'
+                    : $a->name.' — ücretsiz',
+            ])
+            ->all();
+    }
+
     /** Paket formundaki "zaten dahil" seçimi için: yalnız ücretli modüller. */
     public static function pricedOptions(): array
     {
         return static::query()
             ->whereNotNull('price')
             ->orderBy('sort_order')
-            ->pluck('name', 'slug')
+            ->get()
+            ->mapWithKeys(fn (self $a) => [
+                $a->slug => $a->name.' — '.number_format($a->price, 0, ',', '.').' ₺',
+            ])
             ->all();
     }
 }

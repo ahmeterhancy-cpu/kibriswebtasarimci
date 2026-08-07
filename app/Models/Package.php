@@ -39,6 +39,7 @@ class Package extends Model
             'features_en' => 'array',
             'project_types' => 'array',
             'included_extras' => 'array',
+            'available_addons' => 'array',
             'is_popular' => 'boolean',
             'is_ecommerce' => 'boolean',
             'is_active' => 'boolean',

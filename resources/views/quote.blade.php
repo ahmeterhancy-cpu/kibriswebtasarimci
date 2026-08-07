@@ -129,6 +129,7 @@
     /* Paket verisi JS'e — tür eşlemesi, fiyat ve kapsamında zaten olan modüller. */
     $packageData = $packages->map(fn ($p) => [
         'included' => array_values((array) $p->included_extras),
+        'addons' => array_values((array) $p->available_addons),
         'slug' => $p->slug,
         'name' => $p->t('name'),
         'price' => $p->price,
@@ -537,10 +538,15 @@
                 const pkg = PACKAGES.find((x) => x.slug === state.package);
                 const included = (pkg && pkg.included) || [];
 
+                /* Hangi modüller gösterilecek: öncelik seçili paketin kendi
+                   listesinde. Paket seçilmediyse (mobil, özel yazılım, "emin
+                   değilim") modülün kendi proje türü ayarına düşülür. */
+                const offered = pkg && pkg.addons && pkg.addons.length ? pkg.addons : null;
+
                 extraButtons.forEach((btn) => {
                     const key = btn.dataset.value;
                     const types = (btn.dataset.types || '').split(',');
-                    const show = types.includes(state.project_type);
+                    const show = offered ? offered.includes(key) : types.includes(state.project_type);
                     btn.hidden = !show;
 
                     /* Seçili paket bu modülü zaten kapsıyorsa ikinci kez satılmaz:

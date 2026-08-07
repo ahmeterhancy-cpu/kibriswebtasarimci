@@ -80,13 +80,15 @@ class AddonResource extends Resource
                     Textarea::make('note_en')->label('Description (EN)')->rows(2)->maxLength(500),
                 ])->columns(2),
 
-            Section::make('Nerede görünsün')->schema([
-                CheckboxList::make('project_types')
-                    ->label('Hangi proje türlerinde gösterilsin')
-                    ->options(Package::PROJECT_TYPES)
-                    ->columns(2)
-                    ->columnSpanFull()
-                    ->helperText('Örnek: katalog modülü e-ticaret projesinde gösterilmez, paketle çelişir.'),
+            Section::make('Nerede görünsün')
+                ->description('Modülün hangi pakette sunulacağını Paketler ekranından seçersiniz (paket › Ek modüller sekmesi). Aşağıdaki ayar yalnız paket seçilmeyen durumlar için geçerlidir: mobil uygulama, özel yazılım ve "emin değilim".')
+                ->schema([
+                    CheckboxList::make('project_types')
+                        ->label('Paket seçilmediğinde hangi proje türlerinde gösterilsin')
+                        ->options(Package::PROJECT_TYPES)
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->bulkToggleable(),
 
                 Toggle::make('is_active')->label('Yayında')->default(true),
                 TextInput::make('sort_order')->label('Sıra')->numeric()->default(0),
@@ -104,10 +106,11 @@ class AddonResource extends Resource
                     ->description(fn (Addon $record) => $record->note),
                 TextColumn::make('price')->label('Fiyat')->numeric(0, ',', '.')->suffix(' ₺')
                     ->placeholder('ücretsiz'),
-                TextColumn::make('project_types')->label('Proje türleri')
+                TextColumn::make('project_types')->label('Paketsiz türlerde')
                     ->badge()
                     ->formatStateUsing(fn ($state) => Package::PROJECT_TYPES[$state] ?? $state)
-                    ->placeholder('— hiçbiri —'),
+                    ->placeholder('—')
+                    ->toggleable(),
                 ToggleColumn::make('is_active')->label('Yayında'),
             ])
             ->recordActions([EditAction::make()])

@@ -114,13 +114,25 @@ class PackageForm
                         ->columnSpanFull()
                         ->helperText('Hiçbiri seçilmezse paket sihirbazda hiç görünmez; yalnızca Paketler sayfasında listelenir.'),
 
+                ])->columns(2),
+
+                Tab::make('Ek modüller')->schema([
+                    CheckboxList::make('available_addons')
+                        ->label('Bu pakette sunulacak ek modüller')
+                        ->options(fn () => Addon::options())
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->bulkToggleable()
+                        ->helperText('Teklif sihirbazının 3. adımında bu paket seçiliyken hangi modüllerin çıkacağı. Hiçbiri seçilmezse modülün kendi proje türü ayarına düşülür. Modülleri İçerik › Ek Modüller\'den ekleyip fiyatlandırırsınız.'),
+
                     CheckboxList::make('included_extras')
-                        ->label('Bu paketin kapsamında zaten olan ek modüller')
+                        ->label('Bunlardan hangileri pakete zaten dahil?')
                         ->options(fn () => Addon::pricedOptions())
                         ->columns(2)
                         ->columnSpanFull()
-                        ->helperText('İşaretlenen modüller bu paket seçildiğinde sihirbazda "Pakete dahil" olarak görünür ve ücretlendirilmez. Aynı işi ikinci kez satmayı önler.'),
-                ])->columns(2),
+                        ->bulkToggleable()
+                        ->helperText('İşaretlenenler sihirbazda "Seçtiğiniz pakete dahil" yazar, tıklanamaz ve ücretlendirilmez. Aynı işi ikinci kez satmayı önler.'),
+                ]),
 
             ])->columnSpanFull(),
         ]);
