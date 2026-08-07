@@ -21,11 +21,12 @@
         ? 'Website packages and prices in North Cyprus: quick start, onepage, corporate and e-commerce. Written prices, no hidden extras.'
         : 'Kuzey Kıbrıs web sitesi paketleri ve fiyatları: hızlı başlangıç, onepage, kurumsal ve e-ticaret. Fiyatlar yazılı, gizli kalem yok.'">
 
-    <x-page-hero :eyebrow="__('site.nav.packages')"
+    {{-- Eyebrow "Paketler" değil "Fiyat listesi": başlıkta zaten "Paket" geçiyor. --}}
+    <x-page-hero :eyebrow="$isEn ? 'Price list' : 'Fiyat listesi'"
                  :lead="$isEn
                     ? 'Every package, what it includes and what it costs — written down. Prices exclude VAT.'
                     : 'Her paketin kapsamı ve fiyatı burada yazıyor. Fiyatlara KDV dahil değildir.'">
-        {{ $isEn ? 'Prices,' : 'Fiyatlar' }} <span class="k-hl">{{ $isEn ? 'in the open.' : 'açıkça yazılı.' }}</span>
+        {{ $isEn ? 'Package' : 'Paket' }} <span class="k-hl">{{ $isEn ? 'Prices' : 'Fiyatlar' }}</span>
     </x-page-hero>
 
     {{-- ── Tüm paketler tek ızgarada ───────────────────────────────────── --}}
