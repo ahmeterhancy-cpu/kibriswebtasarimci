@@ -111,13 +111,13 @@
         'eticaret' => [
             'step2' => $isEn ? 'Which store package?' : 'Hangi mağaza paketi?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['e-ticaret-baslangic', 'e-ticaret-pro'],
+            'packages' => ['e-ticaret'],
             'options' => [],
         ],
         'yenileme' => [
             'step2' => $isEn ? 'What scale is the new site?' : 'Yenilenen site hangi ölçekte olacak?',
             'step3' => $isEn ? 'Add-on modules' : 'Ek modüller',
-            'packages' => ['basic-onepage', 'kurumsal', 'e-ticaret-baslangic'],
+            'packages' => ['basic-onepage', 'kurumsal', 'e-ticaret'],
             'options' => [],
         ],
         'mobil' => [

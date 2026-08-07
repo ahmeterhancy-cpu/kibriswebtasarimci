@@ -147,7 +147,8 @@
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                {{-- Tek paket kaldığında yarım genişlikte asılı kalmasın. --}}
+                <div class="grid grid-cols-1 gap-5 {{ $ecommerce->count() > 1 ? 'md:grid-cols-2' : 'max-w-2xl' }}">
                     @foreach ($ecommerce as $i => $package)
                         <article class="k-reveal flex flex-col rounded-2xl border p-7 lg:p-9 {{ $package->is_popular ? 'border-[#E30613] bg-[#161010]' : 'border-white/12 bg-[#141414]' }}"
                                  data-delay="{{ ($i + 1) * 100 }}">

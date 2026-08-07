@@ -61,38 +61,24 @@ class PackageSeeder extends Seeder
                 'is_popular' => true,
                 'sort_order' => 3,
             ],
+            /* Tek e-ticaret paketi: eski Başlangıç ve Pro birleştirildi.
+               Pro'nun tam kapsamı, Başlangıç'ın fiyatıyla. */
             [
-                'slug' => 'e-ticaret-baslangic',
-                'name' => 'E-Ticaret — Başlangıç',
-                'name_en' => 'E-Commerce — Start',
-                'tagline' => 'Temel panel, yaklaşık 50 ürün. Online satışa ilk adım.',
-                'tagline_en' => 'Core panel, around 50 products. Your first step into online sales.',
+                'slug' => 'e-ticaret',
+                'name' => 'E-Ticaret',
+                'name_en' => 'E-Commerce',
+                'tagline' => 'Sınırsız ürün, tam panel, raporlama ve bildirimler. Tek paket, tam kapsam.',
+                'tagline_en' => 'Unlimited products, full panel, reporting and notifications. One package, everything in.',
                 'price' => 34900,
-                'price_with_panel' => null,
-                'price_regular' => null,
-                'delivery' => '15-20 iş günü',
-                'delivery_en' => '15-20 working days',
-                'features' => ['Ürün ve kategori yönetimi', '~50 ürün kapasitesi', 'Sipariş takibi', 'Online ödeme entegrasyonu', 'Kargo entegrasyonu', 'Panel kullanım eğitimi'],
-                'features_en' => ['Product and category management', '~50 product capacity', 'Order tracking', 'Online payment integration', 'Shipping integration', 'Panel training'],
-                'is_ecommerce' => true,
-                'sort_order' => 4,
-            ],
-            [
-                'slug' => 'e-ticaret-pro',
-                'name' => 'E-Ticaret — Pro',
-                'name_en' => 'E-Commerce — Pro',
-                'tagline' => 'Sınırsız ürün, gelişmiş panel, raporlama ve bildirimler.',
-                'tagline_en' => 'Unlimited products, advanced panel, reporting and notifications.',
-                'price' => 44900,
                 'price_with_panel' => null,
                 'price_regular' => 60000,
                 'delivery' => '18-25 iş günü',
                 'delivery_en' => '18-25 working days',
-                'features' => ['Sınırsız ürün ve varyant', 'Gelişmiş yönetim paneli', 'SMS + e-posta bildirimleri', 'Kampanya ve kupon sistemi', 'Gelişmiş satış raporları', 'İlk 20 ürün girişi bizden'],
-                'features_en' => ['Unlimited products and variants', 'Advanced admin panel', 'SMS + email notifications', 'Campaigns and coupons', 'Advanced sales reporting', 'First 20 products entered by us'],
+                'features' => ['Sınırsız ürün ve varyant', 'Gelişmiş yönetim paneli', 'Online ödeme entegrasyonu', 'Kargo entegrasyonu', 'SMS + e-posta bildirimleri', 'Kampanya ve kupon sistemi', 'Gelişmiş satış raporları', 'İlk 20 ürün girişi bizden'],
+                'features_en' => ['Unlimited products and variants', 'Advanced admin panel', 'Online payment integration', 'Shipping integration', 'SMS + email notifications', 'Campaigns and coupons', 'Advanced sales reporting', 'First 20 products entered by us'],
                 'is_ecommerce' => true,
                 'is_popular' => true,
-                'sort_order' => 5,
+                'sort_order' => 4,
             ],
         ];
 
@@ -102,5 +88,9 @@ class PackageSeeder extends Seeder
                 $package + ['currency' => '₺', 'is_active' => true],
             );
         }
+
+        /* Birleştirmeden önce kurulmuş depolarda eski iki kayıt kalmasın.
+           Bunlar seeder'ın kendi ürettiği veri; müşteri girdisi değil. */
+        Package::query()->whereIn('slug', ['e-ticaret-baslangic', 'e-ticaret-pro'])->delete();
     }
 }
