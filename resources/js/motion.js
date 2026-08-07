@@ -429,124 +429,119 @@ function initMarquee() {
   });
 }
 
-/* ── 8b ─ Nokta alanı (hero arka planı) ──────────────────────────────────── */
+/* ── 8b ─ Akan kontur çizgileri (hero arka planı) ────────────────────────── */
 /*
-   Canvas'a elle çizilen nokta ızgarası. İki hareket kaynağı var:
-   yavaş bir dalga (imleç olmasa da yaşıyor) ve imlecin yakınında büyüyüp
-   brand rengine dönen noktalar. Kütüphane yok, tek rAF döngüsüne biniyor.
+   Canvas'a elle çizilen yatay çizgi ailesi. Her çizgi üç farklı periyotlu
+   sinüsün toplamı; hiçbiri diğeriyle aynı hızda ilerlemediği için örüntü
+   kendini tekrar etmiyor. Genlik yukarıda sıfıra yakın, aşağı indikçe açılıyor:
+   başlık alanı sakin kalıyor, hero'nun boş alt yarısı hareketleniyor.
+
+   İmleç gerekmiyor — telefonda da masaüstündekiyle aynı görünüyor. Hassas
+   işaretçi varsa çizgiler imlecin yakınında ek bir tümsek yapıyor.
 */
 
-function initDotField() {
-  const host = document.querySelector('[data-dots]');
+function initFlowLines() {
+  const host = document.querySelector('[data-backdrop]');
   if (!host) return;
 
+  /* Yalnız geniş ekranda. Mobil hero'da boş alan yok — başlık, paragraf, iki
+     düğme ve sayaçlar ekranı dolduruyor. Tam sayfa bir arka plan hareketi
+     orada metnin arasından geçip kir gibi görünüyor. Mobilde hareketi
+     hero'nun altındaki kayan şerit ve canlı ayraç taşıyor. */
+  if (innerWidth < 768) return;
+
   const canvas = document.createElement('canvas');
-  canvas.className = 'k-dots';
+  canvas.className = 'k-backdrop';
   canvas.setAttribute('aria-hidden', 'true');
   host.prepend(canvas);
 
   const ctx = canvas.getContext('2d');
-  let w = 0, h = 0, cols = 0, rows = 0, offsetX = 0, offsetY = 0;
-  let gap = 34;            // noktalar arası mesafe
-  let intensity = 1;       // opaklık/boyut çarpanı
-  let radius = 130;        // odağın etki yarıçapı
+  let w = 0, h = 0, lines = 0, step = 8, amp = 26;
   let mx = -9999, my = -9999, tx = -9999, ty = -9999;
   let t = 0;
-
-  /* Dokunmatikte imleç yok; odak kendiliğinden dolaşsın ki hareket okunsun.
-     Masaüstünde de fare ilk kez kıpırdayana kadar bu çalışır — sayfa açılır
-     açılmaz arka plan canlı görünür, sonra kontrolü fareye bırakır. */
-  let auto = true;
 
   const resize = () => {
     const rect = host.getBoundingClientRect();
     const dpr = Math.min(devicePixelRatio || 1, 2);
     w = rect.width;
     h = rect.height;
-
-    /* Dar ekranda noktalar seyrek ama DAHA İRİ ve daha koyu: küçük ekranda
-       ince doku kayboluyor, hareketin görünmesi gerekiyor. */
-    const small = w < 768;
-    gap = small ? 42 : 34;
-    intensity = small ? 1.45 : 1;
-    radius = small ? 150 : 130;
-
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cols = Math.ceil(w / gap) + 1;
-    rows = Math.ceil(h / gap) + 1;
-    // Izgarayı ortala ki kenarlarda yarım sıra kalmasın.
-    offsetX = (w - (cols - 1) * gap) / 2;
-    offsetY = (h - (rows - 1) * gap) / 2;
+
+    const small = w < 768;
+    lines = Math.max(9, Math.round(h / (small ? 46 : 54)));
+    step = small ? 12 : 8;      // dar ekranda daha az nokta, aynı yumuşaklık
+    amp = small ? 22 : 26;
   };
 
   const draw = () => {
     ctx.clearRect(0, 0, w, h);
+    ctx.lineWidth = 1;
 
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        const x = offsetX + i * gap;
-        const y = offsetY + j * gap;
+    for (let i = 0; i < lines; i++) {
+      const p = i / (lines - 1);          // 0 üst, 1 alt
+      const baseY = p * h;
 
-        // İki çapraz dalga üst üste — düzenli nabız yerine yavaşça kayan bir örüntü.
-        const wave = (Math.sin(i * 0.28 + t) + Math.sin(j * 0.34 - t * 0.7)) * 0.25 + 0.5;
+      // Üstte neredeyse düz, aşağı indikçe dalgalanan çizgiler.
+      const a = amp * Math.pow(p, 1.6);
+      const phase = i * 0.45;
 
-        const dx = x - mx;
-        const dy = y - my;
-        const dist = Math.hypot(dx, dy);
-        const near = dist < radius ? 1 - dist / radius : 0;
-        const pull = near * near;   // yumuşak düşüş
+      ctx.beginPath();
+      for (let x = -step; x <= w + step; x += step) {
+        const k = x / w;
+        let y = baseY
+          + Math.sin(k * 5.2 + t * 0.5 + phase) * a
+          + Math.sin(k * 9.1 - t * 0.31 + phase * 1.7) * a * 0.45
+          + Math.sin(k * 2.3 + t * 0.19) * a * 0.35;
 
-        const r = (0.7 + wave * 1.1 + pull * 2.4) * (intensity > 1 ? 1.25 : 1);
-        const alpha = Math.min((0.06 + wave * 0.14 + pull * 0.5) * intensity, 0.72);
+        // İmleç yakınında yerel tümsek (yalnız hassas işaretçide).
+        if (mx > -9998) {
+          const d = Math.hypot(x - mx, baseY - my);
+          if (d < 180) {
+            const f = 1 - d / 180;
+            y -= f * f * 34;
+          }
+        }
 
-        ctx.beginPath();
-        // İmleç yakınındaki noktalar dalgayla birlikte hafifçe kayar.
-        ctx.arc(x + (dx / (dist || 1)) * pull * 6, y + (dy / (dist || 1)) * pull * 6, r, 0, Math.PI * 2);
-        ctx.fillStyle = pull > 0.12
-          ? `rgba(227, 6, 19, ${alpha.toFixed(3)})`
-          : `rgba(15, 15, 15, ${alpha.toFixed(3)})`;
-        ctx.fill();
+        if (x <= -step) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
+
+      // Her dördüncü çizgi brand renginde — düzenli bir vurgu ritmi.
+      const accent = i % 4 === 2;
+      const alpha = 0.05 + p * 0.13;
+      ctx.strokeStyle = accent
+        ? `rgba(227, 6, 19, ${(alpha * 1.5).toFixed(3)})`
+        : `rgba(15, 15, 15, ${alpha.toFixed(3)})`;
+      ctx.stroke();
     }
   };
 
   resize();
   window.addEventListener('resize', resize);
 
-  if (env.reduced) { mx = w / 2; my = h / 2; draw(); return; }
-
-  // İlk kare boş görünmesin: odak ortadan başlasın.
-  mx = w / 2;
-  my = h * 0.45;
+  if (env.reduced) { draw(); return; }
 
   if (env.fine) {
     host.addEventListener('pointermove', (e) => {
       const rect = host.getBoundingClientRect();
-      auto = false;                     // kontrol fareye geçti
+      if (tx < -9998) { mx = e.clientX - rect.left; my = e.clientY - rect.top; }
       tx = e.clientX - rect.left;
       ty = e.clientY - rect.top;
     });
-    // Fare alandan çıkınca odak yine kendi başına dolaşmaya dönsün.
-    host.addEventListener('pointerleave', () => { auto = true; });
+    host.addEventListener('pointerleave', () => { tx = -9999; ty = -9999; mx = -9999; my = -9999; });
   }
 
   ticker.add(() => {
-    // Ekrandan çıkınca boşuna çizme.
-    if (host.getBoundingClientRect().bottom < 0) return;
-    t += 0.012;
-
-    if (auto) {
-      // İki farklı periyotlu salınım — tekrar etmeyen, yavaş bir gezinti.
-      tx = w * (0.5 + 0.36 * Math.sin(t * 0.62));
-      ty = h * (0.46 + 0.32 * Math.sin(t * 0.41 + 1.3));
+    if (host.getBoundingClientRect().bottom < 0) return;   // ekran dışında çizme
+    t += 0.01;
+    if (tx > -9998) {
+      mx = lerp(mx, tx, 0.12);
+      my = lerp(my, ty, 0.12);
     }
-
-    mx = lerp(mx, tx, 0.08);
-    my = lerp(my, ty, 0.08);
     draw();
   });
 }
@@ -789,7 +784,7 @@ function boot() {
   initScrollLinked();
   initCounters();
   initMarquee();
-  initDotField();
+  initFlowLines();
   initMagnetic();
   initCursor();
   initHoverFollower();

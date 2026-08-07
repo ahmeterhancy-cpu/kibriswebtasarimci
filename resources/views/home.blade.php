@@ -32,7 +32,7 @@
          01 · HERO — dev tipografi + imleç izinde açılan iş görselleri
          ══════════════════════════════════════════════════════════════ --}}
     <section class="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-[#F1F1EF] px-6 pb-8 pt-32 lg:px-12"
-             data-dots
+             data-backdrop
              @if ($trailWorks->isNotEmpty()) data-trail data-trail-gap="170" @endif>
 
         {{-- İz için kaynak görseller (görünmez klonlanır) --}}
@@ -76,7 +76,7 @@
 
         {{-- Alt şerit: küçük istatistikler + kaydırma ipucu --}}
         <div class="relative z-10 mx-auto w-full max-w-[1600px]">
-            <div class="k-rule mb-6"></div>
+            <div class="k-rule k-rule--live mb-6"></div>
             <div class="flex flex-wrap items-end justify-between gap-6">
                 <dl class="flex flex-wrap gap-x-10 gap-y-4">
                     @foreach ($stats as $i => [$value, $unit, $label])
