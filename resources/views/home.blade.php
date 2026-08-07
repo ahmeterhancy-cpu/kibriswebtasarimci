@@ -19,7 +19,7 @@
 
     $stats = [
         ['3', $isEn ? 'working days' : 'iş gününde', $isEn ? 'fastest launch' : 'en hızlı yayın'],
-        ['2', $isEn ? 'languages' : 'dilde', $isEn ? 'every site, TR + EN' : 'her site, TR + EN'],
+        ['2', $isEn ? 'languages' : 'dil', $isEn ? 'TR + EN, more optional' : 'TR + EN, dahası opsiyonel'],
         ['0', $isEn ? 'templates' : 'şablon', $isEn ? 'every design custom' : 'her tasarım özel'],
     ];
 @endphp
@@ -46,7 +46,7 @@
 
         <div class="relative z-10 mx-auto w-full max-w-[1600px]">
             <p class="k-eyebrow k-reveal mb-7 text-[#0F0F0F]/60">
-                {{ $isEn ? 'Web design studio · North Cyprus' : 'Web tasarım stüdyosu · Kuzey Kıbrıs' }}
+                {{ $isEn ? 'Web design studio' : 'Web tasarım stüdyosu' }}
             </p>
 
             <h1 class="k-display text-[#0F0F0F]" data-split data-split-step="0.06">
@@ -62,7 +62,8 @@
                         : 'Kurumsal web sitesi, e-ticaret, özel web yazılımı ve mobil uygulama. Şablon yok: her proje sıfırdan tasarlanır, elle yazılır.' }}
                 </p>
 
-                <div class="k-reveal flex flex-wrap items-start gap-4 lg:col-span-4 lg:col-start-9 lg:justify-end" data-delay="400">
+                {{-- flex-nowrap: dar ekranda alt alta düşmesin, yan yana kalsın. --}}
+                <div class="k-reveal flex flex-nowrap items-center gap-3 lg:col-span-4 lg:col-start-9 lg:justify-end" data-delay="400">
                     <a href="{{ $r('quote') }}" data-cursor="cta" data-cursor-label="{{ $isEn ? 'Start' : 'Başla' }}"
                        data-magnetic="0.3" class="k-btn k-btn--brand">
                         <span style="color:inherit;">{{ __('site.nav.quote') }}</span>
