@@ -50,8 +50,9 @@
             </p>
 
             <h1 class="k-display text-[#0F0F0F]" data-split data-split-step="0.06">
-                {{ $isEn ? 'Corporate web and' : 'Kurumsal web ve' }}<br>
-                {{ $isEn ? 'e-commerce' : 'e-ticaret' }} <span class="k-hl">{{ $isEn ? 'solutions.' : 'çözümleri.' }}</span>
+                {{ $isEn ? 'Corporate web' : 'Kurumsal web' }}<br>
+                {{ $isEn ? 'and e-commerce' : 've e-ticaret' }}<br>
+                <span class="k-hl">{{ $isEn ? 'Solutions' : 'Çözümleri' }}</span>
             </h1>
 
             <div class="mt-10 grid grid-cols-1 gap-8 lg:mt-14 lg:grid-cols-12">

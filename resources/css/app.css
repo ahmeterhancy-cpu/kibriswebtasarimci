@@ -64,9 +64,7 @@ body {
     font-weight: 900;
     letter-spacing: -0.04em;
     line-height: 0.92;
-    /* Alt sınır 2.75rem iken 375px'te "Kurumsal web ve" satıra sığmayıp "ve"yi
-       tek başına alta atıyordu. Türkçe uzun kelimeler için biraz pay bırakıldı. */
-    font-size: clamp(2.3rem, min(9vw, 12svh), 8.5rem);
+    font-size: clamp(2.75rem, min(9vw, 12svh), 8.5rem);
 }
 
 .k-display-sm {
