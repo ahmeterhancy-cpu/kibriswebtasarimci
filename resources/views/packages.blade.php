@@ -24,8 +24,8 @@
     {{-- Eyebrow "Paketler" değil "Fiyat listesi": başlıkta zaten "Paket" geçiyor. --}}
     <x-page-hero :eyebrow="$isEn ? 'Price list' : 'Fiyat listesi'"
                  :lead="$isEn
-                    ? 'Hosting, domain and SSL are included for the first year, and the first month of care is on us. Prices exclude VAT.'
-                    : 'Hosting, domain ve SSL ilk yıl her pakete dahil; ilk ay bakım bizden. Fiyatlara KDV dahil değildir.'">
+                    ? 'Hosting, domain and SSL are included for the first year, and the first month of care is on us.'
+                    : 'Hosting, domain ve SSL ilk yıl her pakete dahil; ilk ay bakım bizden.'">
         {{ $isEn ? 'Package' : 'Paket' }} <span class="k-hl">{{ $isEn ? 'Prices' : 'Fiyatlar' }}</span>
     </x-page-hero>
 
@@ -46,7 +46,8 @@
                             {{ $isEn ? 'With panel' : 'Panelli' }}
                         </button>
                     </div>
-                    <p class="max-w-md text-sm text-[#0F0F0F]/55" data-panel-note>
+                    {{-- max-w yok: masaüstünde tek satırda kalsın, mobilde doğal sarsın. --}}
+                    <p class="text-sm text-[#0F0F0F]/55" data-panel-note>
                         {{ $isEn
                             ? 'Content is fixed; we handle updates (two free revisions a year).'
                             : 'İçerik sabittir; güncellemeleri biz yaparız (yılda iki ücretsiz revizyon).' }}
