@@ -13,7 +13,7 @@ class ServiceController extends Controller
     {
         return view('services.index', [
             'services' => Service::active()->get(),
-            'packages' => Package::active()->get(),
+            'packages' => Package::active()->projects()->get(),
         ]);
     }
 

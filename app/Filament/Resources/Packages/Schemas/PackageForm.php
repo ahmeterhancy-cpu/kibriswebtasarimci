@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Packages\Schemas;
 
 use App\Models\Package;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -22,6 +23,15 @@ class PackageForm
             Tabs::make()->tabs([
 
                 Tab::make('Türkçe')->schema([
+                    Select::make('type')
+                        ->label('Paket türü')
+                        ->options(Package::TYPES)
+                        ->default(Package::TYPE_PROJECT)
+                        ->required()
+                        ->live()
+                        ->helperText('Bakım paketleri Paketler sayfasının alt bölümünde aylık olarak listelenir; teklif sihirbazına ve ana sayfa vitrinine girmez.')
+                        ->columnSpanFull(),
+
                     TextInput::make('name')
                         ->label('Paket adı')
                         ->required()

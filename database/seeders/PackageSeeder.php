@@ -84,18 +84,61 @@ class PackageSeeder extends Seeder
                 'project_types' => ['eticaret', 'yenileme'],
                 'sort_order' => 4,
             ],
+            /* ── Aylık bakım paketleri ─────────────────────────────────────
+               Önceden paketler sayfasında sabit dizi olarak duruyordu. */
+            [
+                'slug' => 'bakim-basic',
+                'type' => Package::TYPE_CARE,
+                'name' => 'Basic',
+                'name_en' => 'Basic',
+                'tagline' => 'Yedek, güncelleme, küçük içerik düzenlemeleri.',
+                'tagline_en' => 'Backups, updates, small content edits.',
+                'price' => 1500,
+                'features' => ['Düzenli yedekleme', 'Güvenlik güncellemeleri', 'Küçük içerik düzenlemeleri'],
+                'features_en' => ['Scheduled backups', 'Security updates', 'Small content edits'],
+                'sort_order' => 10,
+            ],
+            [
+                'slug' => 'bakim-standart',
+                'type' => Package::TYPE_CARE,
+                'name' => 'Standart',
+                'name_en' => 'Standard',
+                'tagline' => 'Basic + aylık rapor ve öncelikli destek.',
+                'tagline_en' => 'Basic plus monthly reporting and priority support.',
+                'price' => 2500,
+                'features' => ['Basic\'teki her şey', 'Aylık performans raporu', 'Öncelikli destek hattı'],
+                'features_en' => ['Everything in Basic', 'Monthly performance report', 'Priority support line'],
+                'is_popular' => true,
+                'sort_order' => 11,
+            ],
+            [
+                'slug' => 'bakim-premium',
+                'type' => Package::TYPE_CARE,
+                'name' => 'Premium',
+                'name_en' => 'Premium',
+                'tagline' => 'Standart + sürekli izleme ve geliştirme saati.',
+                'tagline_en' => 'Standard plus continuous monitoring and development hours.',
+                'price' => 5000,
+                'features' => ['Standart\'taki her şey', 'Kesinti izleme', 'Aylık geliştirme saati'],
+                'features_en' => ['Everything in Standard', 'Uptime monitoring', 'Monthly development hours'],
+                'sort_order' => 12,
+            ],
         ];
 
         /* Varsayılanlar ÖNCE gelir ki dizide yazılmayan bayraklar da sıfırlansın.
            Aksi halde panelden açılan bir anahtar (örn. is_ecommerce) seeder
            yeniden çalıştırıldığında açık kalıyordu. */
         $defaults = [
+            'type' => Package::TYPE_PROJECT,
             'currency' => '₺',
             'is_active' => true,
             'is_popular' => false,
             'is_ecommerce' => false,
             'price_with_panel' => null,
             'price_regular' => null,
+            'delivery' => null,
+            'delivery_en' => null,
+            'project_types' => null,
         ];
 
         foreach ($packages as $package) {

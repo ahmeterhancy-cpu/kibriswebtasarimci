@@ -1,12 +1,6 @@
 @php
     $isEn = app()->getLocale() === 'en';
 
-    $care = [
-        ['Basic', '1.500 ₺', '€39', $isEn ? 'Backups, updates, small content edits' : 'Yedek, güncelleme, küçük içerik düzenlemeleri'],
-        ['Standart', '2.500 ₺', '€69', $isEn ? 'Basic + monthly report and priority support' : 'Basic + aylık rapor ve öncelikli destek'],
-        ['Premium', '5.000 ₺', '€129', $isEn ? 'Standard + monitoring and development hours' : 'Standart + sürekli izleme ve geliştirme saati'],
-    ];
-
     $panelNotes = [
         'off' => $isEn
             ? 'Content is fixed; we handle updates (two free revisions a year).'
@@ -130,22 +124,6 @@
                     @endforeach
                 </div>
 
-                {{-- Katalog modülü notu --}}
-                <div class="k-reveal mt-8 rounded-2xl border border-[#0F0F0F]/10 bg-[#F4F4F2] p-7 lg:p-8">
-                    <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                        <div class="max-w-2xl">
-                            <h3 class="text-lg font-black tracking-tight">
-                                {{ $isEn ? 'Want a product showcase without online payments?' : 'Online satış istemiyor, sadece ürün vitrini mi istiyorsunuz?' }}
-                            </h3>
-                            <p class="mt-2 text-sm leading-relaxed text-[#0F0F0F]/60">
-                                {{ $isEn
-                                    ? 'You do not need e-commerce. Take the Corporate package plus the catalogue module: products are displayed and orders arrive over WhatsApp.'
-                                    : 'E-ticarete gerek yok. Kurumsal paket + katalog modülü ile ürünlerinizi sergiler, siparişi WhatsApp üzerinden alırsınız.' }}
-                            </p>
-                        </div>
-                        <p class="shrink-0 text-2xl font-black tracking-tight text-[#E30613]">+5.000 ₺</p>
-                    </div>
-                </div>
             </div>
         </section>
     @endif
@@ -200,27 +178,52 @@
         </div>
     </section>
 
-    {{-- ── Bakım paketleri ─────────────────────────────────────────────── --}}
-    <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
-        <div class="mx-auto max-w-[1280px]">
-            <div class="mb-10 max-w-xl">
-                <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">{{ $isEn ? 'Care plans' : 'Bakım paketleri' }}</p>
-                <h2 class="k-display-xs k-reveal" data-delay="100">
-                    {{ $isEn ? 'After launch, monthly.' : 'Yayından sonrası, aylık.' }}
-                </h2>
-            </div>
+    {{-- ── Bakım paketleri — admin'den yönetilir (Paketler › tür: bakım) ── --}}
+    @if ($carePlans->isNotEmpty())
+        <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
+            <div class="mx-auto max-w-[1280px]">
+                <div class="mb-10 max-w-xl">
+                    <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">{{ $isEn ? 'Care plans' : 'Bakım paketleri' }}</p>
+                    <h2 class="k-display-xs k-reveal" data-delay="100">
+                        {{ $isEn ? 'After launch, monthly.' : 'Yayından sonrası, aylık.' }}
+                    </h2>
+                </div>
 
-            <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                @foreach ($care as $i => [$name, $priceTl, $priceEur, $desc])
-                    <div class="k-reveal rounded-2xl border border-[#0F0F0F]/10 p-7" data-delay="{{ ($i + 1) * 100 }}">
-                        <p class="k-eyebrow mb-4 text-[#0F0F0F]/45">{{ $name }}</p>
-                        <p class="text-2xl font-black tracking-tight">{{ $priceTl }}<span class="text-sm font-medium text-[#0F0F0F]/45"> / {{ $isEn ? 'month' : 'ay' }}</span></p>
-                        <p class="mt-3 text-sm leading-relaxed text-[#0F0F0F]/60">{{ $desc }}</p>
-                    </div>
-                @endforeach
+                @php
+                    $careCols = match (true) {
+                        $carePlans->count() >= 4 => 'md:grid-cols-2 xl:grid-cols-4',
+                        $carePlans->count() === 3 => 'md:grid-cols-3',
+                        $carePlans->count() === 2 => 'md:grid-cols-2',
+                        default => 'max-w-md',
+                    };
+                @endphp
+                <div class="grid grid-cols-1 gap-5 {{ $careCols }}">
+                    @foreach ($carePlans as $i => $plan)
+                        <div class="k-reveal flex flex-col rounded-2xl border p-7 {{ $plan->is_popular ? 'border-[#E30613]' : 'border-[#0F0F0F]/10' }}"
+                             data-delay="{{ min(($i + 1) * 100, 400) }}">
+                            <p class="k-eyebrow mb-4 text-[#0F0F0F]/45">{{ $plan->t('name') }}</p>
+                            <p class="text-2xl font-black tracking-tight">
+                                {{ $plan->formatPrice($plan->price) }}<span class="text-sm font-medium text-[#0F0F0F]/45"> / {{ $isEn ? 'month' : 'ay' }}</span>
+                            </p>
+                            @if ($plan->t('tagline'))
+                                <p class="mt-3 text-sm leading-relaxed text-[#0F0F0F]/60">{{ $plan->t('tagline') }}</p>
+                            @endif
+                            @if (filled($plan->t('features')))
+                                <ul class="mt-5 flex-1 space-y-2">
+                                    @foreach ((array) $plan->t('features') as $feature)
+                                        <li class="flex gap-2.5 text-sm text-[#0F0F0F]/70">
+                                            <span class="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]" aria-hidden="true"></span>
+                                            <span>{{ $feature }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     {{-- ── Kampanya koşulları ──────────────────────────────────────────── --}}
     <section class="border-y border-[#0F0F0F]/10 bg-[#F4F4F2] px-6 py-14 lg:px-12 lg:py-20">

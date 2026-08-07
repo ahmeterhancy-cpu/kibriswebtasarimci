@@ -15,7 +15,7 @@ class QuoteController extends Controller
     public function index(): View
     {
         return view('quote', [
-            'packages' => Package::active()->get(),
+            'packages' => Package::active()->projects()->get(),
             'services' => Service::active()->get(),
             'faqs' => FaqItem::active()->forPage('quote')->get(),
         ]);
