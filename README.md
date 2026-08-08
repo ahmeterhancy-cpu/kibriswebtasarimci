@@ -138,10 +138,15 @@ istisna, bilerek açık bırakılan özel script alanlarıdır.
   Seeder `body` alanını boş bırakır; uzun metin görünümde bölgeye göre üretilir
   (KKTC = "buradayız", Türkiye = "tamamen uzaktan"). Panelde `body` açık: o şehre
   dair **gerçek** bir şey yazılacaksa oraya, sayfanın altında görünür.
-- **`geo` koordinatı yalnız fiilen bulunulan şehirlerde** basılır. Ofisin olmadığı
-  bir şehre koordinat yazmak arama motoruna yanlış konum sinyali verir ve yerel
-  sonuçlarda ters teper. Türkiye şehirlerinde `areaServed` yeterli — test bunu da
-  kilitliyor.
+- **Adres ve `geo` yalnız ofisin olduğu şehirlerde** basılır (`has_office`).
+  Ofisin olmadığı bir şehre adres ya da koordinat yazmak arama motoruna yanlış
+  konum sinyali verir ve yerel sonuçlarda ters teper; oralarda `areaServed`
+  yeterli. Test bunu kilitliyor.
+- **Ayrım bölgeye göre DEĞİL.** İlk kurguda "KKTC = buradayız, Türkiye =
+  uzaktan" varsayılmıştı; yanlıştı, **Edirne'de gerçek ofis var**. Ofisler:
+  Girne (merkez, Bellapais) ve Edirne (Özen Plaza). Yeni bir ofis açılırsa
+  panelden *Şehir Sayfaları → Ofis* bölümünden işaretlenir; sayfa metni,
+  adres bloğu ve yapısal veri kendiliğinden değişir.
 - **Yapısal veri**: site genelinde `ProfessionalService` + `WebSite`; şehir
   sayfalarında şehre özel `ProfessionalService` (`areaServed` + `geo`) ve
   `BreadcrumbList`; şehir listesinde `ItemList`. Site geneli `areaServed`

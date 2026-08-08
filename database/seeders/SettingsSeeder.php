@@ -19,11 +19,13 @@ class SettingsSeeder extends Seeder
                 ],
             ],
             'contact' => [
+                // Merkez ofis. İkinci ofis (Edirne) Şehir Sayfaları'nda tutuluyor:
+                // adres bir şehre ait olduğu için orası doğru yer.
                 'contact_email' => ['info@kibriswebtasarimci.com', null],
-                'contact_phone' => ['+90 533 000 00 00', null],
-                'contact_whatsapp' => ['905330000000', null],
+                'contact_phone' => ['+90 548 840 4000', null],
+                'contact_whatsapp' => ['905488404000', null],
                 'contact_city' => ['Girne', 'Kyrenia'],
-                'contact_address' => ['Girne, Kuzey Kıbrıs', 'Kyrenia, North Cyprus'],
+                'contact_address' => ['Zafer Sokak No:1, Bellapais, Girne, Kuzey Kıbrıs', 'Zafer Sokak No:1, Bellapais, Kyrenia, North Cyprus'],
                 'social_instagram' => ['', null],
                 'social_linkedin' => ['', null],
                 'social_behance' => ['', null],
@@ -31,8 +33,8 @@ class SettingsSeeder extends Seeder
                 'social_x' => ['', null],
                 'social_youtube' => ['', null],
                 'social_tiktok' => ['', null],
-                'map_query' => ['Girne, Kuzey Kıbrıs', 'Kyrenia, North Cyprus'],
-                'map_title' => ['Kıbrıs Web Tasarımcı — Girne', 'Kıbrıs Web Tasarımcı — Kyrenia'],
+                'map_query' => ['Bellapais, Girne, Kıbrıs', 'Bellapais, Kyrenia, Cyprus'],
+                'map_title' => ['Kıbrıs Web Tasarımcı — Bellapais, Girne ofisi', 'Kıbrıs Web Tasarımcı — Bellapais, Kyrenia office'],
             ],
 
             // GEO — yapay zekâ motorlarının markayı tarif ederken alıntıladığı

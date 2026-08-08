@@ -78,7 +78,7 @@ class SeoTest extends TestCase
 
     public function test_sehir_sayfasi_kendi_local_business_verisini_uretir(): void
     {
-        $location = Location::active()->where('region', 'kktc')->firstOrFail();
+        $location = Location::active()->where('has_office', true)->firstOrFail();
 
         $html = $this->get('/web-tasarim/'.$location->slug)->assertOk()->getContent();
         $blocks = $this->jsonLd($html);
@@ -89,7 +89,8 @@ class SeoTest extends TestCase
 
         $business = $blocks[array_search('ProfessionalService', $types, true)];
         $this->assertSame($location->name, $business['areaServed']['name']);
-        $this->assertArrayHasKey('geo', $business, 'Bulunduğumuz şehirde koordinat bekleniyor.');
+        $this->assertArrayHasKey('geo', $business, 'Ofisimizin olduğu şehirde koordinat bekleniyor.');
+        $this->assertSame($location->address, $business['address']['streetAddress']);
 
         // Uydurma puan/yorum yapısal veriye asla girmemeli.
         $this->assertArrayNotHasKey('aggregateRating', $business);
@@ -97,19 +98,41 @@ class SeoTest extends TestCase
     }
 
     /**
-     * Ofisin olmadığı bir şehre koordinat basmak arama motoruna yanlış konum
-     * sinyali verir. Türkiye şehirlerinde yalnız `areaServed` olmalı.
+     * Ofisin olmadığı bir şehre adres ya da koordinat basmak arama motoruna
+     * yanlış konum sinyali verir; orada yalnız `areaServed` olmalı.
+     *
+     * Ayrım BÖLGEYE göre değil, ofis varlığına göre: Edirne Türkiye'de ama
+     * orada ofis var, İstanbul'da yok.
      */
-    public function test_uzaktan_calisilan_sehirde_koordinat_yayinlanmaz(): void
+    public function test_uzaktan_calisilan_sehirde_adres_ve_koordinat_yayinlanmaz(): void
     {
-        $remote = Location::active()->where('region', 'turkiye')->firstOrFail();
+        $remote = Location::active()->where('has_office', false)->firstOrFail();
 
         $blocks = $this->jsonLd($this->get('/web-tasarim/'.$remote->slug)->assertOk()->getContent());
         $types = array_map(fn ($b) => $b['@type'] ?? 'graph', $blocks);
         $business = $blocks[array_search('ProfessionalService', $types, true)];
 
         $this->assertArrayNotHasKey('geo', $business);
+        $this->assertArrayNotHasKey('address', $business);
         $this->assertSame($remote->name, $business['areaServed']['name']);
+    }
+
+    /**
+     * Ofis bilgisi bölgeden bağımsız olmalı. Bu test, "Türkiye = uzaktan"
+     * varsayımının geri sızmasını engelliyor.
+     */
+    public function test_turkiyedeki_ofis_yuz_yuze_gorusme_olarak_gosterilir(): void
+    {
+        $edirne = Location::active()->where('slug', 'edirne')->firstOrFail();
+
+        $this->assertTrue($edirne->has_office);
+        $this->assertSame('turkiye', $edirne->region);
+
+        $this->get('/web-tasarim/edirne')
+            ->assertOk()
+            ->assertSee('Buradayız.')
+            ->assertDontSee('Tamamen uzaktan.')
+            ->assertSee($edirne->address);
     }
 
     /**

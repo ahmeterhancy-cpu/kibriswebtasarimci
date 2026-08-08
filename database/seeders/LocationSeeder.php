@@ -22,9 +22,13 @@ use Illuminate\Database\Seeder;
  * bölgeye göre üretiliyor — 11 satırda aynı metnin kopyasını tutmuyoruz.
  * `body` alanı panelde açık: o şehre dair GERÇEK bir şey yazılacaksa oraya.
  *
- * Koordinat notu: yalnızca fiilen bulunduğumuz KKTC şehirlerinde koordinat
- * var. Ofisin olmadığı bir şehre koordinat basmak arama motoruna yanlış konum
- * sinyali verir; Türkiye şehirlerinde `areaServed` yeterli.
+ * Koordinat ve adres notu: yalnızca FİİLEN OFİSİMİZİN OLDUĞU şehirlerde
+ * (`has_office`) adres ve koordinat var. Ofisin olmadığı bir şehre adres ya da
+ * koordinat basmak arama motoruna yanlış konum sinyali verir; oralarda
+ * `areaServed` yeterli.
+ *
+ * Ofisler: Girne (merkez) ve Edirne. Ayrım bölgeye göre DEĞİL — Edirne
+ * Türkiye'de ama orada da yüz yüze görüşülebiliyor.
  */
 class LocationSeeder extends Seeder
 {
@@ -41,6 +45,10 @@ class LocationSeeder extends Seeder
                     'body_en' => null,
                     'highlights' => null,
                     'highlights_en' => null,
+                    // Ofis olmayan şehirlerde adres/telefon BOŞ kalmalı.
+                    'address' => null,
+                    'address_en' => null,
+                    'phone' => null,
                 ],
             );
         }
@@ -48,9 +56,21 @@ class LocationSeeder extends Seeder
 
     private function locations(): array
     {
+        // Ofisimizin bulunduğu şehir: yüz yüze görüşme gerçekten mümkün.
+        $office = fn (string $name, string $nameEn) => [
+            'has_office' => true,
+            'intro' => $name.'\'de ofisimiz var. Kurumsal web sitesi, e-ticaret ve özel yazılım; isterseniz yüz yüze oturup konuşuyoruz.',
+            'intro_en' => 'We have an office in '.$nameEn.'. Corporate websites, e-commerce and custom software — and we can sit down together if you prefer.',
+            'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
+            'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
+            'seo_description' => $name.'\'de ofisimizden web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın.',
+            'seo_description_en' => 'Websites, e-commerce and custom software from our '.$nameEn.' office. No templates, fixed prices, TR + EN.',
+        ];
+
         $kktc = fn (string $name, string $nameEn) => [
-            'intro' => $name.' ve çevresinde kurumsal web sitesi, e-ticaret ve özel yazılım. Merkezimiz Kuzey Kıbrıs\'ta; isterseniz yüz yüze görüşüyoruz.',
-            'intro_en' => 'Corporate websites, e-commerce and custom software in '.$nameEn.' and the surrounding area. We are based in North Cyprus and can meet in person.',
+            'intro' => $name.' ve çevresinde kurumsal web sitesi, e-ticaret ve özel yazılım. Merkezimiz Girne\'de; isterseniz yüz yüze görüşüyoruz.',
+            'intro_en' => 'Corporate websites, e-commerce and custom software in '.$nameEn.' and the surrounding area. Our base is in Kyrenia and we can meet in person.',
+            'has_office' => false,
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
             'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın. Sektörünüze göre kapsam.',
@@ -58,6 +78,7 @@ class LocationSeeder extends Seeder
         ];
 
         $tr = fn (string $name) => [
+            'has_office' => false,
             'intro' => $name.'\'daki işletmelerle uzaktan çalışıyoruz. Görüşme, tasarım onayı ve teslim süreci tamamen çevrimiçi yürüyor.',
             'intro_en' => 'We work remotely with businesses in '.$name.'. Meetings, design approval and delivery all run online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
@@ -72,9 +93,13 @@ class LocationSeeder extends Seeder
                 'latitude' => 35.1856, 'longitude' => 33.3823,
                 'headline' => 'Lefkoşa web tasarım', 'headline_en' => 'Web design in Nicosia'] + $kktc('Lefkoşa', 'Nicosia'),
 
+            // Merkez ofis.
             ['slug' => 'girne', 'name' => 'Girne', 'name_en' => 'Kyrenia', 'region' => 'kktc', 'country_code' => 'CY',
                 'latitude' => 35.3364, 'longitude' => 33.3192,
-                'headline' => 'Girne web tasarım', 'headline_en' => 'Web design in Kyrenia'] + $kktc('Girne', 'Kyrenia'),
+                'address' => 'Zafer Sokak No:1, Bellapais, Girne, Kuzey Kıbrıs',
+                'address_en' => 'Zafer Sokak No:1, Bellapais, Kyrenia, North Cyprus',
+                'phone' => '+90 548 840 4000',
+                'headline' => 'Girne web tasarım', 'headline_en' => 'Web design in Kyrenia'] + $office('Girne', 'Kyrenia'),
 
             ['slug' => 'gazimagusa', 'name' => 'Gazimağusa', 'name_en' => 'Famagusta', 'region' => 'kktc', 'country_code' => 'CY',
                 'latitude' => 35.1250, 'longitude' => 33.9500,
@@ -92,7 +117,20 @@ class LocationSeeder extends Seeder
                 'latitude' => 35.1103, 'longitude' => 32.8464,
                 'headline' => 'Lefke web tasarım', 'headline_en' => 'Web design in Lefke'] + $kktc('Lefke', 'Lefke'),
 
-            /* ── Türkiye — uzaktan. Koordinat YOK, ofisimiz orada değil. ── */
+            /* ── Türkiye ──────────────────────────────────────────────────
+             | Edirne'de ofis var: adres, telefon ve koordinat gerçek.
+             | Diğer şehirlerde uzaktan çalışıyoruz — oralarda adres ve
+             | koordinat BİLEREK boş.
+             */
+            ['slug' => 'edirne', 'name' => 'Edirne', 'name_en' => 'Edirne', 'region' => 'turkiye', 'country_code' => 'TR',
+                // Yaklaşık şehir merkezi koordinatı. Panelden Google Haritalar'daki
+                // kesin değerle güncellenmeli.
+                'latitude' => 41.6771, 'longitude' => 26.5557,
+                'address' => 'Hakim Çağlar Işık Cd. Özen Plaza No:1 D.31, Merkez, Edirne',
+                'address_en' => 'Hakim Caglar Isik Cd. Ozen Plaza No:1 D.31, Merkez, Edirne, Türkiye',
+                'phone' => '+90 541 392 77 05',
+                'headline' => 'Edirne web tasarım', 'headline_en' => 'Web design in Edirne'] + $office('Edirne', 'Edirne'),
+
             ['slug' => 'istanbul', 'name' => 'İstanbul', 'name_en' => 'Istanbul', 'region' => 'turkiye', 'country_code' => 'TR',
                 'latitude' => null, 'longitude' => null,
                 'headline' => 'İstanbul web tasarım', 'headline_en' => 'Web design in Istanbul'] + $tr('İstanbul'),

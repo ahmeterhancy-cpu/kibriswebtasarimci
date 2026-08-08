@@ -41,6 +41,7 @@ class Location extends Model
             'highlights_en' => 'array',
             'latitude' => 'float',
             'longitude' => 'float',
+            'has_office' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

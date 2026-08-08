@@ -2,7 +2,10 @@
     $isEn = app()->getLocale() === 'en';
     $city = $location->t('name');
     $heading = $location->t('headline') ?: $city;
-    $isLocal = $location->region === 'kktc';
+    // "Buradayız" ayrımı BÖLGEYE değil ofis varlığına bağlı: Edirne Türkiye'de
+    // ama orada da yüz yüze görüşülebiliyor.
+    $hasOffice = (bool) $location->has_office;
+    $address = $location->t('address');
 @endphp
 
 <x-app-layout
@@ -11,10 +14,10 @@
 
     @push('jsonld')
         {{-- Şehre özel ProfessionalService.
-             `geo` YALNIZCA fiilen bulunduğumuz şehirlerde basılır. Ofisin
-             olmadığı bir şehre koordinat yazmak arama motoruna yanlış konum
-             sinyali verir ve yerel sonuçlarda ters teper.
-             Uydurma adres, puan ya da yorum yok. --}}
+             `address` ve `geo` YALNIZCA ofisimizin bulunduğu şehirlerde basılır
+             (Girne, Edirne). Ofisin olmadığı bir şehre adres ya da koordinat
+             yazmak arama motoruna yanlış konum sinyali verir ve yerel
+             sonuçlarda ters teper. Uydurma puan ya da yorum yok. --}}
         <script type="application/ld+json">
             @php
                 $business = [
@@ -40,12 +43,27 @@
                     'serviceType' => $sectors->map(fn ($s) => $s->t('name'))->all(),
                 ];
 
-                if ($location->latitude && $location->longitude) {
-                    $business['geo'] = [
-                        '@type' => 'GeoCoordinates',
-                        'latitude' => $location->latitude,
-                        'longitude' => $location->longitude,
-                    ];
+                if ($hasOffice) {
+                    if ($location->phone) {
+                        $business['telephone'] = $location->phone;
+                    }
+
+                    if ($address) {
+                        $business['address'] = [
+                            '@type' => 'PostalAddress',
+                            'streetAddress' => $address,
+                            'addressLocality' => $city,
+                            'addressCountry' => $location->country_code,
+                        ];
+                    }
+
+                    if ($location->latitude && $location->longitude) {
+                        $business['geo'] = [
+                            '@type' => 'GeoCoordinates',
+                            'latitude' => $location->latitude,
+                            'longitude' => $location->longitude,
+                        ];
+                    }
                 }
 
                 echo json_encode($business, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -125,19 +143,36 @@
                     {{ $isEn ? 'How it works' : 'Nasıl çalışıyor' }}
                 </p>
                 <h2 class="k-display-sm k-reveal" style="color:#ffffff;" data-delay="100">
-                    {{ $isLocal
+                    {{ $hasOffice
                         ? ($isEn ? 'We are here.' : 'Buradayız.')
                         : ($isEn ? 'Fully remote.' : 'Tamamen uzaktan.') }}
                 </h2>
                 <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
-                    {{ $isLocal
+                    {{ $hasOffice
                         ? ($isEn
-                            ? 'Our base is in North Cyprus, so a face-to-face meeting is an option. Everything after that — approvals, revisions, launch — runs the same way it does for remote clients.'
-                            : 'Merkezimiz Kuzey Kıbrıs\'ta, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — uzaktan çalıştığımız müşterilerle aynı şekilde ilerliyor.')
+                            ? 'We have an office in this city, so a face-to-face meeting is an option. Everything after that — approvals, revisions, launch — runs the same way it does for remote clients.'
+                            : 'Bu şehirde ofisimiz var, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — uzaktan çalıştığımız müşterilerle aynı şekilde ilerliyor.')
                         : ($isEn
                             ? 'We have no office in this city and we do not pretend otherwise. Briefing, design approval, revisions and launch all happen online — which is also why the price does not carry an agency overhead.'
                             : 'Bu şehirde ofisimiz yok, olduğunu da söylemiyoruz. Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürüyor — fiyatın ajans genel giderini taşımamasının sebebi de bu.') }}
                 </p>
+
+                {{-- Gerçek ofis adresi. Yalnız ofis olan şehirlerde çıkar. --}}
+                @if ($hasOffice && ($address || $location->phone))
+                    <div class="k-reveal mt-8 border-t pt-7" style="border-color:rgba(255,255,255,0.14);" data-delay="300">
+                        <p class="k-eyebrow mb-3" style="color:rgba(255,255,255,0.35);">
+                            {{ $isEn ? 'Office' : 'Ofis' }}
+                        </p>
+                        @if ($address)
+                            <p class="text-sm leading-relaxed" style="color:#ffffff;">{{ $address }}</p>
+                        @endif
+                        @if ($location->phone)
+                            <a href="tel:{{ preg_replace('/\s+/', '', $location->phone) }}"
+                               class="k-link k-link-in mt-2 inline-block text-sm transition-colors duration-300 hover:text-[#E30613]"
+                               style="color:rgba(255,255,255,0.7);">{{ $location->phone }}</a>
+                        @endif
+                    </div>
+                @endif
             </div>
 
             <div class="lg:col-span-6 lg:col-start-7">
