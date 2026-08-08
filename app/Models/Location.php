@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 
 class Location extends Model
@@ -41,7 +42,6 @@ class Location extends Model
             'highlights_en' => 'array',
             'latitude' => 'float',
             'longitude' => 'float',
-            'has_office' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -49,6 +49,20 @@ class Location extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    /**
+     * Bu şehirdeki ofis. Bağlıysa sayfa "buradayız" der ve yapısal veriye
+     * gerçek adres/koordinat basılır; bağlı değilse yalnız `areaServed`.
+     */
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(Office::class);
+    }
+
+    public function hasOffice(): bool
+    {
+        return $this->office_id !== null;
     }
 
     public function scopeRegion(Builder $query, string $region): Builder

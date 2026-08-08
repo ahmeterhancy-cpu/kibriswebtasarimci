@@ -3,9 +3,9 @@
     $city = $location->t('name');
     $heading = $location->t('headline') ?: $city;
     // "Buradayız" ayrımı BÖLGEYE değil ofis varlığına bağlı: Edirne Türkiye'de
-    // ama orada da yüz yüze görüşülebiliyor.
-    $hasOffice = (bool) $location->has_office;
-    $address = $location->t('address');
+    // ama orada da yüz yüze görüşülebiliyor. Adres tek kaynaktan (offices).
+    $office = $location->office;
+    $hasOffice = $office !== null;
 @endphp
 
 <x-app-layout
@@ -43,25 +43,23 @@
                     'serviceType' => $sectors->map(fn ($s) => $s->t('name'))->all(),
                 ];
 
-                if ($hasOffice) {
-                    if ($location->phone) {
-                        $business['telephone'] = $location->phone;
+                if ($office) {
+                    if ($office->phone) {
+                        $business['telephone'] = $office->phone;
                     }
 
-                    if ($address) {
-                        $business['address'] = [
-                            '@type' => 'PostalAddress',
-                            'streetAddress' => $address,
-                            'addressLocality' => $city,
-                            'addressCountry' => $location->country_code,
-                        ];
-                    }
+                    $business['address'] = [
+                        '@type' => 'PostalAddress',
+                        'streetAddress' => $office->t('address'),
+                        'addressLocality' => $office->t('city'),
+                        'addressCountry' => $office->country_code,
+                    ];
 
-                    if ($location->latitude && $location->longitude) {
+                    if ($office->latitude && $office->longitude) {
                         $business['geo'] = [
                             '@type' => 'GeoCoordinates',
-                            'latitude' => $location->latitude,
-                            'longitude' => $location->longitude,
+                            'latitude' => $office->latitude,
+                            'longitude' => $office->longitude,
                         ];
                     }
                 }
@@ -157,20 +155,23 @@
                             : 'Bu şehirde ofisimiz yok, olduğunu da söylemiyoruz. Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürüyor — fiyatın ajans genel giderini taşımamasının sebebi de bu.') }}
                 </p>
 
-                {{-- Gerçek ofis adresi. Yalnız ofis olan şehirlerde çıkar. --}}
-                @if ($hasOffice && ($address || $location->phone))
+                {{-- Ofis kartı. Adres offices tablosundan; tek kaynak. --}}
+                @if ($office)
                     <div class="k-reveal mt-8 border-t pt-7" style="border-color:rgba(255,255,255,0.14);" data-delay="300">
                         <p class="k-eyebrow mb-3" style="color:rgba(255,255,255,0.35);">
                             {{ $isEn ? 'Office' : 'Ofis' }}
                         </p>
-                        @if ($address)
-                            <p class="text-sm leading-relaxed" style="color:#ffffff;">{{ $address }}</p>
-                        @endif
-                        @if ($location->phone)
-                            <a href="tel:{{ preg_replace('/\s+/', '', $location->phone) }}"
-                               class="k-link k-link-in mt-2 inline-block text-sm transition-colors duration-300 hover:text-[#E30613]"
-                               style="color:rgba(255,255,255,0.7);">{{ $location->phone }}</a>
-                        @endif
+                        <p class="text-sm leading-relaxed" style="color:#ffffff;">{{ $office->fullAddress() }}</p>
+                        <div class="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                            @if ($office->phone)
+                                <a href="tel:{{ preg_replace('/[^\d+]/', '', $office->phone) }}"
+                                   class="k-link k-link-in transition-colors duration-300 hover:text-[#E30613]"
+                                   style="color:rgba(255,255,255,0.7);">{{ $office->phone }}</a>
+                            @endif
+                            <a href="{{ $office->mapsUrl() }}" target="_blank" rel="noopener"
+                               class="k-link k-link-in text-[0.7rem] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-[#E30613]"
+                               style="color:rgba(255,255,255,0.5);">{{ $isEn ? 'Directions ↗' : 'Yol tarifi ↗' }}</a>
+                        </div>
                     </div>
                 @endif
             </div>

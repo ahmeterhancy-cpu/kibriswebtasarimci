@@ -135,6 +135,41 @@
                 'knowsLanguage' => ['tr', 'en'],
             ];
 
+            // Tüm ofisler `location` olarak bildirilir; merkez ayrıca `address`
+            // alanında zaten var. Adres tek kaynaktan geldiği için burada
+            // tutarsızlık üretme ihtimali yok.
+            $seoOffices = \Illuminate\Support\Facades\Cache::remember('seo_offices', 3600, fn () => \App\Models\Office::query()
+                ->where('is_active', true)
+                ->orderByDesc('is_primary')
+                ->orderBy('sort_order')
+                ->get()
+                ->map(function ($o) {
+                    $place = [
+                        '@type' => 'Place',
+                        'name' => $o->name,
+                        'address' => [
+                            '@type' => 'PostalAddress',
+                            'streetAddress' => $o->address,
+                            'addressLocality' => $o->city,
+                            'addressCountry' => $o->country_code,
+                        ],
+                    ];
+
+                    if ($o->latitude && $o->longitude) {
+                        $place['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => $o->latitude, 'longitude' => $o->longitude];
+                    }
+
+                    if ($o->phone) {
+                        $place['telephone'] = $o->phone;
+                    }
+
+                    return $place;
+                })->all());
+
+            if ($seoOffices) {
+                $organization['location'] = $seoOffices;
+            }
+
             $sameAs = array_values(array_filter([
                 $site('social_instagram'), $site('social_linkedin'),
                 $site('social_facebook'), $site('social_x'),

@@ -37,6 +37,7 @@ class AdminPagesTest extends TestCase
             'ayarlar — analitik' => ['/admin/analytics'],
             'kaynak — kullanıcılar' => ['/admin/users'],
             'kaynak — kullanıcı oluştur' => ['/admin/users/create'],
+            'kaynak — ofisler' => ['/admin/offices'],
             'kaynak — sektörler' => ['/admin/sectors'],
             'kaynak — şehirler' => ['/admin/locations'],
             'kaynak — paketler' => ['/admin/packages'],

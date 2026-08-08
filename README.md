@@ -108,6 +108,7 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
 | Site Ayarları / Genel | bakım modu ve metinleri |
 | Site Markası | site adı, açıklama, **logo (açık + koyu zemin)**, favicon, OG görseli |
 | İletişim & Sosyal Medya | e-posta, telefon, WhatsApp, adres, **harita**, 8 sosyal hesap |
+| **Ofisler** | Girne / Edirne / Londra — adres, telefon, e-posta, koordinat |
 | **Yapay Zekâ Görünürlüğü** | GEO: alıntılanabilir tanım, llms.txt, AI tarayıcı izinleri |
 | **Analitik & Tracking** | GA4, GTM, Ads, Meta, LinkedIn, TikTok, Clarity, Hotjar, Yandex, özel script, çerez onayı |
 | **Kullanıcılar** | panel kullanıcıları (şifre boş bırakılırsa değişmez) |
@@ -143,10 +144,25 @@ istisna, bilerek açık bırakılan özel script alanlarıdır.
   konum sinyali verir ve yerel sonuçlarda ters teper; oralarda `areaServed`
   yeterli. Test bunu kilitliyor.
 - **Ayrım bölgeye göre DEĞİL.** İlk kurguda "KKTC = buradayız, Türkiye =
-  uzaktan" varsayılmıştı; yanlıştı, **Edirne'de gerçek ofis var**. Ofisler:
-  Girne (merkez, Bellapais) ve Edirne (Özen Plaza). Yeni bir ofis açılırsa
-  panelden *Şehir Sayfaları → Ofis* bölümünden işaretlenir; sayfa metni,
-  adres bloğu ve yapısal veri kendiliğinden değişir.
+  uzaktan" varsayılmıştı; yanlıştı, Edirne'de gerçek ofis var.
+
+### Ofisler — adresin tek kaynağı
+
+`offices` tablosu (panel: *Sistem → Ofisler*). Üç kayıt: Girne (merkez,
+Bellapais), Edirne (Özen Plaza), Londra (Covent Garden).
+
+Aynı kayıt **üç yerde birden** okunuyor: iletişim sayfasındaki ofis listesi,
+bağlı şehir sayfasının "buradayız" bloğu ve yapısal veri (`Organization.location`
++ şehir sayfasının `PostalAddress`'i). Adres tek yerde tutuluyor çünkü:
+
+- üç ayrı yerde güncellenen bir adres er ya da geç tutarsız kalır,
+- ve sitedeki adres ile **Google Business Profile** kaydı arasındaki tutarsızlık
+  yerel sıralamayı doğrudan düşürür.
+
+Şehir sayfaları `locations.office_id` ile bağlanır. Bağlıysa "buradayız" +
+adres/koordinat; bağlı değilse "tamamen uzaktan" ve yapısal veride **yalnız**
+`areaServed`. `SeoTest` aynı adresin iletişim ve şehir sayfasında birebir aynı
+göründüğünü ayrıca doğruluyor.
 - **Yapısal veri**: site genelinde `ProfessionalService` + `WebSite`; şehir
   sayfalarında şehre özel `ProfessionalService` (`areaServed` + `geo`) ve
   `BreadcrumbList`; şehir listesinde `ItemList`. Site geneli `areaServed`

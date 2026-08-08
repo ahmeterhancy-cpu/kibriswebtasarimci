@@ -99,10 +99,13 @@
                         <p class="k-eyebrow mb-3 text-[#0F0F0F]/45">{{ __('site.form.phone') }}</p>
                         <a href="tel:{{ preg_replace('/\s+/', '', $phone) }}" class="k-link text-lg font-bold tracking-tight">{{ $phone }}</a>
                     </div>
-                    <div>
-                        <p class="k-eyebrow mb-3 text-[#0F0F0F]/45">{{ $isEn ? 'Where' : 'Neredeyiz' }}</p>
-                        <p class="text-lg font-bold tracking-tight">{{ $address }}</p>
-                    </div>
+                    @if ($offices->isEmpty())
+                        <div>
+                            <p class="k-eyebrow mb-3 text-[#0F0F0F]/45">{{ $isEn ? 'Where' : 'Neredeyiz' }}</p>
+                            <p class="text-lg font-bold tracking-tight">{{ $address }}</p>
+                        </div>
+                    @endif
+
                     <div class="k-rule"></div>
 
                     <div>
@@ -119,6 +122,69 @@
             </aside>
         </div>
     </section>
+
+    {{-- Ofisler.
+         Adres tek kaynaktan (offices tablosu) geliyor; burada, şehir
+         sayfalarında ve yapısal veride aynı kaydı okuyoruz. Adresin üç yerde
+         ayrı tutulması er ya da geç tutarsızlık üretir ve adres tutarsızlığı
+         yerel SEO'da doğrudan sıralama kaybı demek. --}}
+    @if ($offices->isNotEmpty())
+        <section class="k-dark bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-24">
+            <div class="mx-auto max-w-[1280px]">
+                <p class="k-eyebrow k-reveal mb-4" style="color:rgba(255,255,255,0.45);">
+                    {{ $isEn ? 'Offices' : 'Ofisler' }}
+                </p>
+                <h2 class="k-display-sm k-reveal mb-12 max-w-2xl" style="color:#ffffff;" data-delay="100">
+                    {{ $isEn ? 'Three addresses,' : 'Üç adres,' }}
+                    <span class="k-hl">{{ $isEn ? 'one team.' : 'tek ekip.' }}</span>
+                </h2>
+
+                <div class="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($offices as $i => $office)
+                        <div class="k-reveal border-t pt-7" style="border-color:rgba(255,255,255,0.14);"
+                             data-delay="{{ min(($i + 1) * 100, 400) }}">
+                            <p class="flex items-center gap-2 text-[0.7rem] font-black uppercase tracking-[0.18em]"
+                               style="color:rgba(255,255,255,0.45);">
+                                @if ($office->is_primary)
+                                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-[#E30613]" aria-hidden="true"></span>
+                                @endif
+                                {{ $office->t('name') }}
+                            </p>
+
+                            <p class="mt-4 text-lg font-bold leading-snug tracking-tight" style="color:#ffffff;">
+                                {{ $office->t('city') }}
+                            </p>
+
+                            <p class="mt-2 text-sm leading-relaxed" style="color:rgba(255,255,255,0.55);">
+                                {{ $office->t('address') }}<br>
+                                {{ $office->t('country') }}
+                            </p>
+
+                            <div class="mt-5 space-y-1.5 text-sm">
+                                @if ($office->phone)
+                                    <a href="tel:{{ preg_replace('/[^\d+]/', '', $office->phone) }}"
+                                       class="k-link k-link-in block transition-colors duration-300 hover:text-[#E30613]"
+                                       style="color:#ffffff;">{{ $office->phone }}</a>
+                                @endif
+                                @if ($office->email)
+                                    <a href="mailto:{{ $office->email }}"
+                                       class="k-link k-link-in block transition-colors duration-300 hover:text-[#E30613]"
+                                       style="color:rgba(255,255,255,0.6);">{{ $office->email }}</a>
+                                @endif
+                            </div>
+
+                            <a href="{{ $office->mapsUrl() }}" target="_blank" rel="noopener"
+                               class="k-link k-link-in mt-5 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] transition-colors duration-300 hover:text-[#E30613]"
+                               style="color:rgba(255,255,255,0.5);">
+                                <span>{{ $isEn ? 'Directions' : 'Yol tarifi' }}</span>
+                                <span aria-hidden="true">↗</span>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- Harita — panelden adres araması ya da özel gömme adresi girilirse.
          iframe tembel yüklenir: haritalar ağır ve sayfanın altında, ilk

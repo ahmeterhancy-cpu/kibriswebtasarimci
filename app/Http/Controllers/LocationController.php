@@ -22,7 +22,7 @@ class LocationController extends Controller
         abort_unless($location->is_active, 404);
 
         return view('locations.show', [
-            'location' => $location,
+            'location' => $location->load('office'),
             // Şehir sayfası bilerek geneldir; ayrışan içerik sektörlerde.
             // Bu liste sayfanın asıl işlevi: ziyaretçiyi doğru sektöre taşımak.
             'sectors' => Sector::active()->get(),

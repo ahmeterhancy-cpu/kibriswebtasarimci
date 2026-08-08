@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Location;
+use App\Models\Office;
 use Illuminate\Database\Seeder;
 
 /**
@@ -23,7 +24,7 @@ use Illuminate\Database\Seeder;
  * `body` alanı panelde açık: o şehre dair GERÇEK bir şey yazılacaksa oraya.
  *
  * Koordinat ve adres notu: yalnızca FİİLEN OFİSİMİZİN OLDUĞU şehirlerde
- * (`has_office`) adres ve koordinat var. Ofisin olmadığı bir şehre adres ya da
+ * (`office_id`) adres ve koordinat var. Ofisin olmadığı bir şehre adres ya da
  * koordinat basmak arama motoruna yanlış konum sinyali verir; oralarda
  * `areaServed` yeterli.
  *
@@ -34,21 +35,24 @@ class LocationSeeder extends Seeder
 {
     public function run(): void
     {
+        // Adres tek yerde: offices tablosu. Şehir yalnız ofise BAĞLANIR.
+        $offices = Office::query()->pluck('id', 'slug');
+
         foreach ($this->locations() as $i => $location) {
+            $officeSlug = $location['office'] ?? null;
+            unset($location['office']);
+
             Location::query()->updateOrCreate(
                 ['slug' => $location['slug']],
                 $location + [
                     'sort_order' => $i + 1,
                     'is_active' => true,
+                    'office_id' => $officeSlug ? ($offices[$officeSlug] ?? null) : null,
                     // Sektöre özgü eski metinler temizleniyor.
                     'body' => null,
                     'body_en' => null,
                     'highlights' => null,
                     'highlights_en' => null,
-                    // Ofis olmayan şehirlerde adres/telefon BOŞ kalmalı.
-                    'address' => null,
-                    'address_en' => null,
-                    'phone' => null,
                 ],
             );
         }
@@ -57,8 +61,8 @@ class LocationSeeder extends Seeder
     private function locations(): array
     {
         // Ofisimizin bulunduğu şehir: yüz yüze görüşme gerçekten mümkün.
+        // Adres burada DEĞİL — `office` anahtarı offices tablosuna bağlanır.
         $office = fn (string $name, string $nameEn) => [
-            'has_office' => true,
             'intro' => $name.'\'de ofisimiz var. Kurumsal web sitesi, e-ticaret ve özel yazılım; isterseniz yüz yüze oturup konuşuyoruz.',
             'intro_en' => 'We have an office in '.$nameEn.'. Corporate websites, e-commerce and custom software — and we can sit down together if you prefer.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
@@ -70,7 +74,6 @@ class LocationSeeder extends Seeder
         $kktc = fn (string $name, string $nameEn) => [
             'intro' => $name.' ve çevresinde kurumsal web sitesi, e-ticaret ve özel yazılım. Merkezimiz Girne\'de; isterseniz yüz yüze görüşüyoruz.',
             'intro_en' => 'Corporate websites, e-commerce and custom software in '.$nameEn.' and the surrounding area. Our base is in Kyrenia and we can meet in person.',
-            'has_office' => false,
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
             'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın. Sektörünüze göre kapsam.',
@@ -78,7 +81,6 @@ class LocationSeeder extends Seeder
         ];
 
         $tr = fn (string $name) => [
-            'has_office' => false,
             'intro' => $name.'\'daki işletmelerle uzaktan çalışıyoruz. Görüşme, tasarım onayı ve teslim süreci tamamen çevrimiçi yürüyor.',
             'intro_en' => 'We work remotely with businesses in '.$name.'. Meetings, design approval and delivery all run online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
@@ -96,9 +98,7 @@ class LocationSeeder extends Seeder
             // Merkez ofis.
             ['slug' => 'girne', 'name' => 'Girne', 'name_en' => 'Kyrenia', 'region' => 'kktc', 'country_code' => 'CY',
                 'latitude' => 35.3364, 'longitude' => 33.3192,
-                'address' => 'Zafer Sokak No:1, Bellapais, Girne, Kuzey Kıbrıs',
-                'address_en' => 'Zafer Sokak No:1, Bellapais, Kyrenia, North Cyprus',
-                'phone' => '+90 548 840 4000',
+                'office' => 'girne',
                 'headline' => 'Girne web tasarım', 'headline_en' => 'Web design in Kyrenia'] + $office('Girne', 'Kyrenia'),
 
             ['slug' => 'gazimagusa', 'name' => 'Gazimağusa', 'name_en' => 'Famagusta', 'region' => 'kktc', 'country_code' => 'CY',
@@ -126,9 +126,7 @@ class LocationSeeder extends Seeder
                 // Yaklaşık şehir merkezi koordinatı. Panelden Google Haritalar'daki
                 // kesin değerle güncellenmeli.
                 'latitude' => 41.6771, 'longitude' => 26.5557,
-                'address' => 'Hakim Çağlar Işık Cd. Özen Plaza No:1 D.31, Merkez, Edirne',
-                'address_en' => 'Hakim Caglar Isik Cd. Ozen Plaza No:1 D.31, Merkez, Edirne, Türkiye',
-                'phone' => '+90 541 392 77 05',
+                'office' => 'edirne',
                 'headline' => 'Edirne web tasarım', 'headline_en' => 'Web design in Edirne'] + $office('Edirne', 'Edirne'),
 
             ['slug' => 'istanbul', 'name' => 'İstanbul', 'name_en' => 'Istanbul', 'region' => 'turkiye', 'country_code' => 'TR',

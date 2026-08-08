@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Location;
+use App\Models\Office;
 use App\Models\Sector;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -78,7 +79,7 @@ class SeoTest extends TestCase
 
     public function test_sehir_sayfasi_kendi_local_business_verisini_uretir(): void
     {
-        $location = Location::active()->where('has_office', true)->firstOrFail();
+        $location = Location::active()->whereNotNull('office_id')->firstOrFail();
 
         $html = $this->get('/web-tasarim/'.$location->slug)->assertOk()->getContent();
         $blocks = $this->jsonLd($html);
@@ -90,7 +91,7 @@ class SeoTest extends TestCase
         $business = $blocks[array_search('ProfessionalService', $types, true)];
         $this->assertSame($location->name, $business['areaServed']['name']);
         $this->assertArrayHasKey('geo', $business, 'Ofisimizin olduğu şehirde koordinat bekleniyor.');
-        $this->assertSame($location->address, $business['address']['streetAddress']);
+        $this->assertSame($location->office->address, $business['address']['streetAddress']);
 
         // Uydurma puan/yorum yapısal veriye asla girmemeli.
         $this->assertArrayNotHasKey('aggregateRating', $business);
@@ -106,7 +107,7 @@ class SeoTest extends TestCase
      */
     public function test_uzaktan_calisilan_sehirde_adres_ve_koordinat_yayinlanmaz(): void
     {
-        $remote = Location::active()->where('has_office', false)->firstOrFail();
+        $remote = Location::active()->whereNull('office_id')->firstOrFail();
 
         $blocks = $this->jsonLd($this->get('/web-tasarim/'.$remote->slug)->assertOk()->getContent());
         $types = array_map(fn ($b) => $b['@type'] ?? 'graph', $blocks);
@@ -125,14 +126,44 @@ class SeoTest extends TestCase
     {
         $edirne = Location::active()->where('slug', 'edirne')->firstOrFail();
 
-        $this->assertTrue($edirne->has_office);
+        $this->assertTrue($edirne->hasOffice());
         $this->assertSame('turkiye', $edirne->region);
 
         $this->get('/web-tasarim/edirne')
             ->assertOk()
             ->assertSee('Buradayız.')
             ->assertDontSee('Tamamen uzaktan.')
-            ->assertSee($edirne->address);
+            ->assertSee($edirne->office->address);
+    }
+
+    /**
+     * Adres tek kaynaktan gelmeli. Aynı ofis hem iletişim sayfasında hem bağlı
+     * şehir sayfasında BİREBİR aynı yazmalı — site içi tutarsızlık, Google
+     * Business Profile eşleşmesini de bozuyor.
+     */
+    public function test_ofis_adresi_iletisim_ve_sehir_sayfasinda_ayni(): void
+    {
+        $office = Office::active()->where('slug', 'edirne')->firstOrFail();
+
+        $this->get('/iletisim')->assertOk()->assertSee($office->address);
+        $this->get('/web-tasarim/edirne')->assertOk()->assertSee($office->address);
+    }
+
+    public function test_iletisim_sayfasi_tum_ofisleri_listeler(): void
+    {
+        $response = $this->get('/iletisim')->assertOk();
+
+        foreach (Office::active()->get() as $office) {
+            $response->assertSee($office->address);
+            $response->assertSee($office->t('city'));
+        }
+    }
+
+    public function test_kurulus_verisinde_tum_ofisler_yer_alir(): void
+    {
+        $graph = $this->jsonLd($this->get('/')->assertOk()->getContent())[0]['@graph'];
+
+        $this->assertCount(Office::active()->count(), $graph[0]['location']);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactSubmission;
 use App\Models\FaqItem;
+use App\Models\Office;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class ContactController extends Controller
     {
         return view('contact', [
             'faqs' => FaqItem::active()->forPage('contact')->get(),
+            'offices' => Office::active()->get(),
         ]);
     }
 

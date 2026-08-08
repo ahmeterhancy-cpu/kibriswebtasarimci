@@ -114,41 +114,16 @@ class LocationResource extends Resource
                     ])->columns(2),
 
                     Section::make('Ofis')
-                        ->description('Bu şehirde FİİLEN ofisiniz varsa açın. Adres, telefon ve koordinat yalnızca ofis olan şehirlerde hem sayfada hem yapısal veride yayınlanır — olmayan bir adresi yazmak arama motoruna yanlış konum sinyali verir ve yerel sonuçlarda ters teper.')
+                        ->description('Bu şehirde fiilen ofisiniz varsa Ofisler listesinden seçin. Adres, telefon ve koordinat oradan gelir — tek yerde tutulur, üç yerde ayrı güncellenmez. Seçim yapılmazsa sayfada "Tamamen uzaktan" bölümü çıkar ve yapısal veriye adres/koordinat BASILMAZ (olmayan bir adres arama motoruna yanlış konum sinyali verir).')
                         ->schema([
-                            Toggle::make('has_office')
-                                ->label('Bu şehirde ofisimiz var')
-                                ->live()
-                                ->helperText('Kapalıyken sayfada "Tamamen uzaktan" bölümü çıkar.'),
-
-                            TextInput::make('phone')
-                                ->label('Ofis telefonu')
-                                ->maxLength(60)
-                                ->visible(fn ($get) => $get('has_office'))
-                                ->placeholder('+90 541 392 77 05'),
-
-                            TextInput::make('address')
-                                ->label('Ofis adresi (TR)')
-                                ->maxLength(190)
-                                ->visible(fn ($get) => $get('has_office'))
-                                ->placeholder('Hakim Çağlar Işık Cd. Özen Plaza No:1 D.31, Merkez, Edirne'),
-
-                            TextInput::make('address_en')
-                                ->label('Office address (EN)')
-                                ->maxLength(190)
-                                ->visible(fn ($get) => $get('has_office')),
-
-                            TextInput::make('latitude')
-                                ->label('Enlem')
-                                ->numeric()
-                                ->visible(fn ($get) => $get('has_office'))
-                                ->helperText('Google Haritalar\'da ofise sağ tıklayın; ilk değer enlem, ikincisi boylam.'),
-
-                            TextInput::make('longitude')
-                                ->label('Boylam')
-                                ->numeric()
-                                ->visible(fn ($get) => $get('has_office')),
-                        ])->columns(2),
+                            Select::make('office_id')
+                                ->label('Bu şehirdeki ofis')
+                                ->relationship('office', 'city')
+                                ->searchable()
+                                ->preload()
+                                ->placeholder('Yok — uzaktan çalışıyoruz')
+                                ->helperText('Yeni ofis eklemek için: Sistem → Ofisler.'),
+                        ]),
 
                     Section::make('Arama motoru')->schema([
                         TextInput::make('seo_title')->label('SEO başlığı (TR)')->maxLength(190),
@@ -179,11 +154,11 @@ class LocationResource extends Resource
                 TextColumn::make('region')->label('Bölge')->badge()
                     ->formatStateUsing(fn (string $state) => Location::REGIONS[$state] ?? $state)
                     ->color(fn (string $state) => $state === 'turkiye' ? 'info' : 'success'),
-                TextColumn::make('address')
+                TextColumn::make('office.city')
                     ->label('Ofis')
-                    ->limit(40)
+                    ->badge()
                     ->placeholder('uzaktan')
-                    ->color(fn ($record) => $record->has_office ? 'success' : 'gray'),
+                    ->color(fn ($state) => $state ? 'success' : 'gray'),
                 TextColumn::make('headline')->label('Başlık')->limit(38)->toggleable(),
                 TextColumn::make('slug')->label('Adres')->prefix('/web-tasarim/')->color('gray')->toggleable(),
                 ToggleColumn::make('is_active')->label('Yayında'),
