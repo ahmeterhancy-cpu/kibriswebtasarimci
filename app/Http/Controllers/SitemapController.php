@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use App\Models\Location;
 use App\Models\Package;
+use App\Models\Sector;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Work;
@@ -36,6 +37,7 @@ class SitemapController extends Controller
         $add('services.index', 'en.services.index', [], null, 'monthly', '0.9');
         $add('works.index', 'en.works.index', [], null, 'weekly', '0.9');
         $add('packages', 'en.packages', [], null, 'monthly', '0.9');
+        $add('sectors.index', 'en.sectors.index', [], null, 'monthly', '0.9');
         $add('locations.index', 'en.locations.index', [], null, 'monthly', '0.8');
         $add('quote', 'en.quote', [], null, 'monthly', '0.8');
         $add('blog.index', 'en.blog.index', [], null, 'weekly', '0.8');
@@ -49,9 +51,14 @@ class SitemapController extends Controller
             $add('works.show', 'en.works.show', ['work' => $work->slug], $work->updated_at?->toAtomString(), 'monthly', '0.7');
         }
 
-        // Şehir sayfaları — yerel aramaların giriş kapısı, önceliği yüksek tutuyoruz.
+        // Sektör sayfaları — içeriğin gerçekten ayrıştığı yer, en yüksek öncelik.
+        foreach (Sector::active()->get() as $sector) {
+            $add('sectors.show', 'en.sectors.show', ['sector' => $sector->slug], $sector->updated_at?->toAtomString(), 'monthly', '0.9');
+        }
+
+        // Şehir sayfaları — yerel aramaların giriş kapısı.
         foreach (Location::active()->get() as $location) {
-            $add('locations.show', 'en.locations.show', ['location' => $location->slug], $location->updated_at?->toAtomString(), 'monthly', '0.8');
+            $add('locations.show', 'en.locations.show', ['location' => $location->slug], $location->updated_at?->toAtomString(), 'monthly', '0.7');
         }
 
         foreach (BlogPost::published()->get() as $post) {
@@ -169,6 +176,12 @@ class SitemapController extends Controller
 
         $section('Paketler ve fiyatlar', Package::active()->projects()->get()
             ->map(fn ($p) => [$p->name, route('packages'), trim($p->formatPrice($p->price).' — '.Str::limit(strip_tags((string) $p->tagline), 120), ' —')])
+            ->all());
+
+        // Sektörler hizmetlerden hemen sonra: modelin "bu iş kimler için"
+        // sorusuna en net cevabı bu listede.
+        $section('Sektörler', Sector::active()->get()
+            ->map(fn ($s) => [$s->name, route('sectors.show', $s->slug), Str::limit(strip_tags((string) $s->intro), 160)])
             ->all());
 
         $section('Hizmet verilen şehirler', Location::active()->get()

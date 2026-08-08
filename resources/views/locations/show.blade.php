@@ -2,6 +2,7 @@
     $isEn = app()->getLocale() === 'en';
     $city = $location->t('name');
     $heading = $location->t('headline') ?: $city;
+    $isLocal = $location->region === 'kktc';
 @endphp
 
 <x-app-layout
@@ -9,9 +10,11 @@
     :seo-description="$location->t('seo_description') ?: $location->t('intro')">
 
     @push('jsonld')
-        {{-- Şehre özel LocalBusiness: hizmet verilen bölge ve koordinat.
-             Uydurma adres, puan ya da yorum YOK — elimizde olmayan veriyi
-             yapısal veriye yazmak hem yanıltıcı hem cezalandırılan bir şey. --}}
+        {{-- Şehre özel ProfessionalService.
+             `geo` YALNIZCA fiilen bulunduğumuz şehirlerde basılır. Ofisin
+             olmadığı bir şehre koordinat yazmak arama motoruna yanlış konum
+             sinyali verir ve yerel sonuçlarda ters teper.
+             Uydurma adres, puan ya da yorum yok. --}}
         <script type="application/ld+json">
             @php
                 $business = [
@@ -34,7 +37,7 @@
                             'name' => $location->country_code === 'TR' ? 'Türkiye' : 'Cyprus',
                         ],
                     ],
-                    'serviceType' => $services->map(fn ($s) => $s->t('title'))->all(),
+                    'serviceType' => $sectors->map(fn ($s) => $s->t('name'))->all(),
                 ];
 
                 if ($location->latitude && $location->longitude) {
@@ -76,75 +79,173 @@
         </x-slot:actions>
     </x-page-hero>
 
-    {{-- Pazar maddeleri --}}
-    @if (filled($location->t('highlights')))
-        <section class="border-b border-[#0F0F0F]/10 bg-white px-6 py-12 lg:px-12 lg:py-16">
+    {{-- Sektör seçimi — bu sayfanın asıl işi.
+         Şehir sayfaları kasten geneldir; içerik sektör sayfalarında ayrışır.
+         Ziyaretçiyi oraya taşıyan blok burasıdır. --}}
+    @if ($sectors->isNotEmpty())
+        <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
             <div class="mx-auto max-w-[1280px]">
-                <ul class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ((array) $location->t('highlights') as $i => $item)
-                        <li class="k-reveal flex gap-3 text-sm text-[#0F0F0F]/75" data-delay="{{ min(($i + 1) * 100, 400) }}">
-                            <span class="mt-[9px] block h-1 w-1 shrink-0 rounded-full bg-[#E30613]" aria-hidden="true"></span>
-                            <span>{{ $item }}</span>
-                        </li>
+                <p class="k-eyebrow k-reveal mb-4 text-[#0F0F0F]/45">
+                    {{ $isEn ? 'Start with your industry' : 'Sektörünüzden başlayın' }}
+                </p>
+                <h2 class="k-display-sm k-reveal mb-10 max-w-3xl" data-delay="100">
+                    {{ $isEn ? 'What the site has to do' : 'Sitenin ne yapacağı' }}
+                    <span class="k-hl">{{ $isEn ? 'depends on the work.' : 'işinize göre değişir.' }}</span>
+                </h2>
+
+                <div class="grid grid-cols-1 gap-x-8 md:grid-cols-2">
+                    @foreach ($sectors as $i => $sector)
+                        <a href="{{ $r('sectors.show', ['sector' => $sector->slug]) }}"
+                           class="k-reveal k-row group flex items-start gap-4 border-t border-[#0F0F0F]/12 py-6 hover:text-[#E30613] md:[&:nth-last-child(-n+2)]:border-b"
+                           data-delay="{{ min(($i % 2 + 1) * 100, 200) }}">
+                            @if ($sector->icon)
+                                <span class="mt-0.5 shrink-0 text-xl" aria-hidden="true">{{ $sector->icon }}</span>
+                            @endif
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-lg font-bold tracking-tight">{{ $sector->t('name') }}</span>
+                                @if ($sector->t('intro'))
+                                    <span class="mt-1.5 block text-sm leading-relaxed text-[#0F0F0F]/55">
+                                        {{ Str::limit($sector->t('intro'), 95) }}
+                                    </span>
+                                @endif
+                            </span>
+                            <span class="k-row__arrow mt-1 shrink-0 text-xl" aria-hidden="true">→</span>
+                        </a>
                     @endforeach
-                </ul>
+                </div>
             </div>
         </section>
     @endif
 
-    {{-- Şehre özel metin + yan sütun --}}
-    <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
+    {{-- Nasıl çalışıyoruz — bölgeye göre iki dürüst varyant. --}}
+    <section class="k-dark bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-24">
         <div class="mx-auto grid max-w-[1280px] grid-cols-1 gap-12 lg:grid-cols-12">
-            <div class="lg:col-span-7">
-                @if (filled($location->t('body')))
-                    <div class="k-article k-reveal">{!! $location->t('body') !!}</div>
-                @endif
+            <div class="lg:col-span-5">
+                <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.45);">
+                    {{ $isEn ? 'How it works' : 'Nasıl çalışıyor' }}
+                </p>
+                <h2 class="k-display-sm k-reveal" style="color:#ffffff;" data-delay="100">
+                    {{ $isLocal
+                        ? ($isEn ? 'We are here.' : 'Buradayız.')
+                        : ($isEn ? 'Fully remote.' : 'Tamamen uzaktan.') }}
+                </h2>
+                <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
+                    {{ $isLocal
+                        ? ($isEn
+                            ? 'Our base is in North Cyprus, so a face-to-face meeting is an option. Everything after that — approvals, revisions, launch — runs the same way it does for remote clients.'
+                            : 'Merkezimiz Kuzey Kıbrıs\'ta, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — uzaktan çalıştığımız müşterilerle aynı şekilde ilerliyor.')
+                        : ($isEn
+                            ? 'We have no office in this city and we do not pretend otherwise. Briefing, design approval, revisions and launch all happen online — which is also why the price does not carry an agency overhead.'
+                            : 'Bu şehirde ofisimiz yok, olduğunu da söylemiyoruz. Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürüyor — fiyatın ajans genel giderini taşımamasının sebebi de bu.') }}
+                </p>
             </div>
 
-            <aside class="lg:col-span-4 lg:col-start-9">
-                <div class="k-reveal sticky top-28 space-y-8">
-                    @if ($packages->isNotEmpty())
-                        <div class="rounded-2xl border border-[#0F0F0F]/10 bg-[#F4F4F2] p-7">
-                            <p class="k-eyebrow mb-5 text-[#0F0F0F]/45">{{ $isEn ? 'Packages' : 'Paketler' }}</p>
-                            <ul class="space-y-3">
-                                @foreach ($packages as $package)
-                                    <li class="flex items-baseline justify-between gap-4 text-sm">
-                                        <span class="text-[#0F0F0F]/80">{{ $package->t('name') }}</span>
-                                        <span class="shrink-0 font-bold">{{ $package->formatPrice($package->price) }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <a href="{{ $r('packages') }}" class="k-btn k-btn--ink mt-6 w-full justify-center">
-                                <span style="color:inherit;">{{ $isEn ? 'All packages' : 'Tüm paketler' }}</span>
-                            </a>
-                        </div>
-                    @endif
+            <div class="lg:col-span-6 lg:col-start-7">
+                <ol class="space-y-7">
+                    @php
+                        $steps = $isEn
+                            ? [
+                                ['Scope', 'You pick the scope in the quote wizard and see the exact total. No estimate ranges.'],
+                                ['Design', 'Designed from scratch for your business. No templates, no bought themes.'],
+                                ['Build', 'Hand-written front end, admin panel where you need one, TR + EN as standard.'],
+                                ['Launch', 'Domain, hosting, SSL, search console. Handed over working, not "almost ready".'],
+                            ]
+                            : [
+                                ['Kapsam', 'Teklif sihirbazından kapsamı seçiyor, kesin tutarı görüyorsunuz. Tahmini aralık yok.'],
+                                ['Tasarım', 'İşinize göre sıfırdan tasarlanıyor. Şablon yok, satın alınmış tema yok.'],
+                                ['Geliştirme', 'Elle yazılan arayüz, gerekiyorsa yönetim paneli, standart olarak TR + EN.'],
+                                ['Yayın', 'Alan adı, hosting, SSL, arama konsolu. Çalışır hâlde teslim, "neredeyse hazır" değil.'],
+                            ];
+                    @endphp
+                    @foreach ($steps as $i => [$title, $text])
+                        <li class="k-reveal flex gap-6" data-delay="{{ min(($i + 1) * 100, 400) }}">
+                            <span class="shrink-0 pt-1 text-[0.7rem] font-black tracking-[0.2em] text-[#E30613]" aria-hidden="true">
+                                {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}
+                            </span>
+                            <span>
+                                <span class="block text-lg font-bold tracking-tight" style="color:#ffffff;">{{ $title }}</span>
+                                <span class="mt-1.5 block text-sm leading-relaxed" style="color:rgba(255,255,255,0.55);">{{ $text }}</span>
+                            </span>
+                        </li>
+                    @endforeach
+                </ol>
+            </div>
+        </div>
+    </section>
 
-                    @if ($services->isNotEmpty())
-                        <div>
-                            <p class="k-eyebrow mb-4 text-[#0F0F0F]/45">
-                                {{ $isEn ? 'Services in '.$city : $city.'\'de hizmetlerimiz' }}
-                            </p>
-                            <ul class="space-y-2">
-                                @foreach ($services as $service)
-                                    <li>
-                                        <a href="{{ $r('services.show', ['service' => $service->slug]) }}"
-                                           class="k-link k-link-in text-sm text-[#0F0F0F]/75 transition-colors duration-300 hover:text-[#E30613]">
-                                            {{ $service->t('title') }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+    {{-- Panelden bu şehre GERÇEK bir metin yazıldıysa burada çıkar.
+         Varsayılan olarak boş: şehir adı değiştirilmiş kopya metin üretmemek
+         için seeder bu alanı doldurmuyor. --}}
+    @if (filled($location->t('body')))
+        <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
+            <div class="mx-auto grid max-w-[1280px] grid-cols-1 gap-12 lg:grid-cols-12">
+                <div class="lg:col-span-7">
+                    <div class="k-article k-reveal">{!! $location->t('body') !!}</div>
                 </div>
-            </aside>
+                <aside class="lg:col-span-4 lg:col-start-9">
+                    <div class="k-reveal sticky top-28">
+                        @if ($packages->isNotEmpty())
+                            <div class="rounded-2xl border border-[#0F0F0F]/10 bg-[#F4F4F2] p-7">
+                                <p class="k-eyebrow mb-5 text-[#0F0F0F]/45">{{ $isEn ? 'Packages' : 'Paketler' }}</p>
+                                <ul class="space-y-3">
+                                    @foreach ($packages as $package)
+                                        <li class="flex items-baseline justify-between gap-4 text-sm">
+                                            <span class="text-[#0F0F0F]/80">{{ $package->t('name') }}</span>
+                                            <span class="shrink-0 font-bold">{{ $package->formatPrice($package->price) }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <a href="{{ $r('packages') }}" class="k-btn k-btn--ink mt-6 w-full justify-center">
+                                    <span style="color:inherit;">{{ $isEn ? 'All packages' : 'Tüm paketler' }}</span>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </aside>
+            </div>
+        </section>
+    @endif
+
+    {{-- Hizmetler + fiyat şeridi --}}
+    <section class="bg-[#F1F1EF] px-6 py-14 lg:px-12 lg:py-20">
+        <div class="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 lg:grid-cols-12">
+            @if ($services->isNotEmpty())
+                <div class="lg:col-span-7">
+                    <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">
+                        {{ $isEn ? 'Services in '.$city : $city.'\'de hizmetlerimiz' }}
+                    </p>
+                    <ul class="flex flex-wrap gap-x-7 gap-y-3">
+                        @foreach ($services as $service)
+                            <li>
+                                <a href="{{ $r('services.show', ['service' => $service->slug]) }}"
+                                   class="k-link k-link-in text-sm text-[#0F0F0F]/75 transition-colors duration-300 hover:text-[#E30613]">
+                                    {{ $service->t('title') }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if ($packages->isNotEmpty())
+                <div class="lg:col-span-4 lg:col-start-9">
+                    <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">{{ $isEn ? 'Packages' : 'Paketler' }}</p>
+                    <ul class="k-reveal space-y-3" data-delay="100">
+                        @foreach ($packages as $package)
+                            <li class="flex items-baseline justify-between gap-4 border-b border-[#0F0F0F]/10 pb-3 text-sm">
+                                <span class="text-[#0F0F0F]/80">{{ $package->t('name') }}</span>
+                                <span class="shrink-0 font-bold">{{ $package->formatPrice($package->price) }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </section>
 
     {{-- Aynı bölgedeki diğer şehirler — iç bağlantı --}}
     @if ($siblings->isNotEmpty())
-        <section class="bg-[#F4F4F2] px-6 py-14 lg:px-12 lg:py-20">
+        <section class="bg-white px-6 py-14 lg:px-12 lg:py-20">
             <div class="mx-auto max-w-[1280px]">
                 <p class="k-eyebrow k-reveal mb-6 text-[#0F0F0F]/45">
                     {{ $isEn ? 'Other cities in '.$location->regionLabel() : $location->regionLabel().'\'ta diğer şehirler' }}

@@ -101,6 +101,8 @@ perdesi ve scroll'a bağlı efektler otomatik devre dışı kalır.
 
 ## Panelden yönetilenler (Sistem grubu)
 
+İçerik tarafında: **Sektör Sayfaları** ve **Şehir Sayfaları** (İçerik grubu).
+
 | Sayfa | Ne yapar |
 |---|---|
 | Site Ayarları / Genel | bakım modu ve metinleri |
@@ -120,11 +122,26 @@ istisna, bilerek açık bırakılan özel script alanlarıdır.
 
 ## SEO ve yerel arama (GEO)
 
-- **Şehir sayfaları** `/web-tasarim/{slug}` (EN: `/web-design/{slug}`) — panelden
-  yönetilir (*Şehir Sayfaları*). "girne web tasarım" gibi yerel aramaların giriş
-  kapısı. Her şehrin metni GERÇEKTEN farklı olmalı; aynı metnin şehir adı
-  değiştirilmiş kopyaları arama motorlarınca *kapı sayfası* sayılır ve cezalanır.
-  Panelde metin alanının altındaki uyarı bunu hatırlatır.
+### İçerik mimarisi: sektör × şehir
+
+İki eksen var ve **ağırlık sektörlerde**:
+
+- **Sektör sayfaları** `/sektorler/{slug}` (EN `/industries/{slug}`) — içeriğin
+  gerçekten ayrıştığı yer. Otel rezervasyon alır, emlakçı filtreli ilan yayınlar,
+  fabrika bayiye şifreli fiyat verir: bu farklar uydurma değil, o yüzden metinler
+  birbirinden bağımsız yazılabiliyor. Arama trafiğinin ve yapay zekâ alıntılarının
+  hedefi burası. `SeoTest` iki sektörün gövde/giriş metninin aynı olmadığını
+  ayrıca kontrol ediyor — kopyala-yapıştır tespit edilirse test kırmızı yanar.
+- **Şehir sayfaları** `/web-tasarim/{slug}` (EN `/web-design/{slug}`) — **bilerek
+  genel**. Görevi ziyaretçiyi doğru sektör sayfasına taşımak ve hizmet bölgesini
+  netleştirmek. Şehir ekonomisi hakkında doğrulanmamış iddia YAZILMAZ.
+  Seeder `body` alanını boş bırakır; uzun metin görünümde bölgeye göre üretilir
+  (KKTC = "buradayız", Türkiye = "tamamen uzaktan"). Panelde `body` açık: o şehre
+  dair **gerçek** bir şey yazılacaksa oraya, sayfanın altında görünür.
+- **`geo` koordinatı yalnız fiilen bulunulan şehirlerde** basılır. Ofisin olmadığı
+  bir şehre koordinat yazmak arama motoruna yanlış konum sinyali verir ve yerel
+  sonuçlarda ters teper. Türkiye şehirlerinde `areaServed` yeterli — test bunu da
+  kilitliyor.
 - **Yapısal veri**: site genelinde `ProfessionalService` + `WebSite`; şehir
   sayfalarında şehre özel `ProfessionalService` (`areaServed` + `geo`) ve
   `BreadcrumbList`; şehir listesinde `ItemList`. Site geneli `areaServed`

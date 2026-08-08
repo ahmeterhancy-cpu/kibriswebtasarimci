@@ -2,6 +2,7 @@
     $menu = [
         ['route' => 'home', 'label' => __('site.nav.home')],
         ['route' => 'services.index', 'label' => __('site.nav.services')],
+        ['route' => 'sectors.index', 'label' => __('site.nav.sectors')],
         ['route' => 'works.index', 'label' => __('site.nav.works')],
         ['route' => 'packages', 'label' => __('site.nav.packages')],
         ['route' => 'blog.index', 'label' => __('site.nav.blog')],

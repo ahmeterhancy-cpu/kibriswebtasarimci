@@ -5,6 +5,7 @@ return [
         'home' => 'Home',
         'services' => 'Services',
         'works' => 'Work',
+        'sectors' => 'Industries',
         'packages' => 'Pricing',
         'blog' => 'Insights',
         'contact' => 'Contact',

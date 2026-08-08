@@ -5,6 +5,7 @@ return [
         'home' => 'Ana Sayfa',
         'services' => 'Hizmetler',
         'works' => 'İşler',
+        'sectors' => 'Sektörler',
         'packages' => 'Paketler',
         'blog' => 'Blog',
         'contact' => 'İletişim',

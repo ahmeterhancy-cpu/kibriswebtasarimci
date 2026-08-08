@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\SectorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WorkController;
@@ -39,6 +40,10 @@ Route::middleware('locale:tr')->group(function () {
 
     Route::get('/paketler', [PackageController::class, 'index'])->name('packages');
 
+    // Sektör sayfaları: içeriğin gerçekten ayrıştığı yer
+    Route::get('/sektorler', [SectorController::class, 'index'])->name('sectors.index');
+    Route::get('/sektorler/{sector:slug}', [SectorController::class, 'show'])->name('sectors.show');
+
     // Yerel SEO: şehir bazlı sayfalar
     Route::get('/web-tasarim', [LocationController::class, 'index'])->name('locations.index');
     Route::get('/web-tasarim/{location:slug}', [LocationController::class, 'show'])->name('locations.show');
@@ -69,6 +74,9 @@ Route::middleware('locale:en')->prefix('en')->name('en.')->group(function () {
     Route::get('/work/{work:slug}', [WorkController::class, 'show'])->name('works.show');
 
     Route::get('/pricing', [PackageController::class, 'index'])->name('packages');
+
+    Route::get('/industries', [SectorController::class, 'index'])->name('sectors.index');
+    Route::get('/industries/{sector:slug}', [SectorController::class, 'show'])->name('sectors.show');
 
     Route::get('/web-design', [LocationController::class, 'index'])->name('locations.index');
     Route::get('/web-design/{location:slug}', [LocationController::class, 'show'])->name('locations.show');

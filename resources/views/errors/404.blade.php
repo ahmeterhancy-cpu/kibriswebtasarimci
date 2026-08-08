@@ -14,10 +14,10 @@
 
     $suggestions = [
         ['name' => 'services.index', 'label' => $isEn ? 'Services' : 'Hizmetler'],
+        ['name' => 'sectors.index', 'label' => $isEn ? 'Industries' : 'Sektörler'],
         ['name' => 'packages', 'label' => $isEn ? 'Pricing' : 'Paketler'],
         ['name' => 'works.index', 'label' => $isEn ? 'Work' : 'İşler'],
         ['name' => 'locations.index', 'label' => $isEn ? 'Where we work' : 'Hizmet bölgeleri'],
-        ['name' => 'blog.index', 'label' => $isEn ? 'Insights' : 'Blog'],
         ['name' => 'contact', 'label' => $isEn ? 'Contact' : 'İletişim'],
     ];
 @endphp

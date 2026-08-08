@@ -33,6 +33,17 @@
     //
     // Önbelleğe DÜZ DİZİ yazıyoruz, Eloquent koleksiyonu değil: dosya/veritabanı
     // sürücüsü modeli serileştirip geri okurken "incomplete object" hatası verir.
+    $footerSectors = \Illuminate\Support\Facades\Cache::remember(
+        'footer_sectors',
+        3600,
+        fn () => \App\Models\Sector::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get(['slug', 'name', 'name_en'])
+            ->map(fn ($s) => ['slug' => $s->slug, 'name' => $s->name, 'name_en' => $s->name_en])
+            ->all()
+    );
+
     $footerLocations = \Illuminate\Support\Facades\Cache::remember(
         'footer_locations',
         3600,
@@ -140,6 +151,27 @@
                 @endif
             </div>
         </div>
+
+        @if ($footerSectors)
+            <div class="k-rule"></div>
+
+            <div class="py-8">
+                <p class="k-eyebrow mb-4" style="color:rgba(255,255,255,0.35);">
+                    <a href="{{ $r('sectors.index') }}" class="k-link k-link-in transition-colors duration-300 hover:text-[#E30613]" style="color:inherit;">
+                        {{ $isEn ? 'Industries' : 'Sektörler' }}
+                    </a>
+                </p>
+                <div class="flex flex-wrap gap-x-5 gap-y-2.5">
+                    @foreach ($footerSectors as $footerSector)
+                        <a href="{{ $r('sectors.show', ['sector' => $footerSector['slug']]) }}"
+                           class="k-link k-link-in text-sm transition-colors duration-300 hover:text-[#E30613]"
+                           style="color:rgba(255,255,255,0.6);">
+                            {{ ($isEn && $footerSector['name_en']) ? $footerSector['name_en'] : $footerSector['name'] }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         @if ($footerLocations)
             <div class="k-rule"></div>

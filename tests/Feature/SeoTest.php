@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Location;
+use App\Models\Sector;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -77,7 +78,7 @@ class SeoTest extends TestCase
 
     public function test_sehir_sayfasi_kendi_local_business_verisini_uretir(): void
     {
-        $location = Location::active()->firstOrFail();
+        $location = Location::active()->where('region', 'kktc')->firstOrFail();
 
         $html = $this->get('/web-tasarim/'.$location->slug)->assertOk()->getContent();
         $blocks = $this->jsonLd($html);
@@ -88,11 +89,79 @@ class SeoTest extends TestCase
 
         $business = $blocks[array_search('ProfessionalService', $types, true)];
         $this->assertSame($location->name, $business['areaServed']['name']);
-        $this->assertArrayHasKey('geo', $business, 'Şehir sayfasında koordinat bekleniyor.');
+        $this->assertArrayHasKey('geo', $business, 'Bulunduğumuz şehirde koordinat bekleniyor.');
 
         // Uydurma puan/yorum yapısal veriye asla girmemeli.
         $this->assertArrayNotHasKey('aggregateRating', $business);
         $this->assertArrayNotHasKey('review', $business);
+    }
+
+    /**
+     * Ofisin olmadığı bir şehre koordinat basmak arama motoruna yanlış konum
+     * sinyali verir. Türkiye şehirlerinde yalnız `areaServed` olmalı.
+     */
+    public function test_uzaktan_calisilan_sehirde_koordinat_yayinlanmaz(): void
+    {
+        $remote = Location::active()->where('region', 'turkiye')->firstOrFail();
+
+        $blocks = $this->jsonLd($this->get('/web-tasarim/'.$remote->slug)->assertOk()->getContent());
+        $types = array_map(fn ($b) => $b['@type'] ?? 'graph', $blocks);
+        $business = $blocks[array_search('ProfessionalService', $types, true)];
+
+        $this->assertArrayNotHasKey('geo', $business);
+        $this->assertSame($remote->name, $business['areaServed']['name']);
+    }
+
+    /**
+     * Şehir sayfaları BİLEREK geneldir; ayrışan içerik sektör sayfalarında.
+     * Bu yüzden her şehir sayfası sektörlere bağlantı vermek zorunda — yoksa
+     * genel metinli 11 sayfa birbirinin kopyası olarak kalır.
+     */
+    public function test_sehir_sayfasi_sektorlere_kapi_acar(): void
+    {
+        $location = Location::active()->firstOrFail();
+
+        $response = $this->get('/web-tasarim/'.$location->slug)->assertOk();
+
+        foreach (Sector::active()->get() as $sector) {
+            $response->assertSee(url('/sektorler/'.$sector->slug), false);
+        }
+    }
+
+    public function test_sektor_sayfasi_kendi_service_verisini_uretir(): void
+    {
+        $sector = Sector::active()->firstOrFail();
+
+        $blocks = $this->jsonLd($this->get('/sektorler/'.$sector->slug)->assertOk()->getContent());
+        $types = array_map(fn ($b) => $b['@type'] ?? 'graph', $blocks);
+
+        $this->assertContains('Service', $types);
+        $this->assertContains('BreadcrumbList', $types);
+
+        $service = $blocks[array_search('Service', $types, true)];
+        $this->assertSame($sector->name, $service['serviceType']);
+        $this->assertArrayNotHasKey('aggregateRating', $service);
+    }
+
+    /**
+     * Sektör sayfalarının tüm değeri birbirinden farklı olmalarından geliyor.
+     * İki sektörün gövde metni aynıysa kopyala-yapıştır yapılmış demektir.
+     */
+    public function test_sektor_metinleri_birbirinin_kopyasi_degil(): void
+    {
+        $bodies = Sector::active()->pluck('body')->filter()->all();
+        $intros = Sector::active()->pluck('intro')->filter()->all();
+
+        $this->assertCount(count($bodies), array_unique($bodies), 'İki sektörde aynı gövde metni var.');
+        $this->assertCount(count($intros), array_unique($intros), 'İki sektörde aynı giriş cümlesi var.');
+    }
+
+    public function test_yayindan_kaldirilan_sektor_sayfasi_404_verir(): void
+    {
+        $sector = Sector::active()->firstOrFail();
+        $sector->update(['is_active' => false]);
+
+        $this->get('/sektorler/'.$sector->slug)->assertNotFound();
     }
 
     public function test_site_geneli_area_served_yayindaki_sehirlerden_turer(): void
@@ -112,13 +181,18 @@ class SeoTest extends TestCase
         $this->get('/web-tasarim/'.$location->slug)->assertNotFound();
     }
 
-    public function test_sitemap_her_sehri_iki_dilde_listeler(): void
+    public function test_sitemap_sehir_ve_sektorleri_iki_dilde_listeler(): void
     {
         $response = $this->get('/sitemap.xml')->assertOk();
 
         foreach (Location::active()->get() as $location) {
             $response->assertSee(url('/web-tasarim/'.$location->slug), false);
             $response->assertSee(url('/en/web-design/'.$location->slug), false);
+        }
+
+        foreach (Sector::active()->get() as $sector) {
+            $response->assertSee(url('/sektorler/'.$sector->slug), false);
+            $response->assertSee(url('/en/industries/'.$sector->slug), false);
         }
     }
 
@@ -182,7 +256,12 @@ class SeoTest extends TestCase
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $response->assertSee('## Hizmetler', false);
         $response->assertSee('## Paketler ve fiyatlar', false);
+        $response->assertSee('## Sektörler', false);
         $response->assertSee('## Hizmet verilen şehirler', false);
+
+        foreach (Sector::active()->get() as $sector) {
+            $response->assertSee(url('/sektorler/'.$sector->slug), false);
+        }
 
         foreach (Location::active()->get() as $location) {
             $response->assertSee(url('/web-tasarim/'.$location->slug), false);
