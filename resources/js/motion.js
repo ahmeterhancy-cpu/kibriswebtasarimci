@@ -758,19 +758,6 @@ function initHeader() {
   });
 }
 
-/* ── 15 ─ Kıbrıs saati ───────────────────────────────────────────────────── */
-
-function initClock() {
-  const nodes = document.querySelectorAll('[data-clock]');
-  if (!nodes.length) return;
-  const fmt = new Intl.DateTimeFormat('tr-TR', {
-    timeZone: 'Asia/Famagusta', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-  });
-  const tick = () => nodes.forEach((n) => { n.textContent = fmt.format(new Date()); });
-  tick();
-  setInterval(tick, 1000);
-}
-
 /* ── Başlat ──────────────────────────────────────────────────────────────── */
 
 function boot() {
@@ -788,7 +775,6 @@ function boot() {
   initImageTrail();
   initPageTransition();
   initHeader();
-  initClock();
 
   window.addEventListener('resize', queueMeasure);
   window.addEventListener('orientationchange', queueMeasure);

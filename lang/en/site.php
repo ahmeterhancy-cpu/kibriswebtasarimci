@@ -34,7 +34,6 @@ return [
         'empty' => 'Nothing here yet.',
         'faq' => 'Frequently asked',
         'scroll' => 'Scroll',
-        'local_time' => 'Cyprus time',
     ],
 
     'form' => [

@@ -105,12 +105,6 @@
                         ? 'A web design and development studio based in North Cyprus. One craft, done properly.'
                         : 'Kuzey Kıbrıs merkezli web tasarım ve yazılım stüdyosu. Tek iş, hakkıyla.') }}
                 </p>
-
-                <div class="mt-7 flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.16em]" style="color:rgba(255,255,255,0.4);">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-[#E30613]" aria-hidden="true"></span>
-                    <span>{{ __('site.common.local_time') }}</span>
-                    <span data-clock style="color:#ffffff;">--:--:--</span>
-                </div>
             </div>
 
             @foreach ($columns as $heading => $links)

@@ -34,7 +34,6 @@ return [
         'empty' => 'Burası şimdilik boş.',
         'faq' => 'Sıkça sorulanlar',
         'scroll' => 'Kaydır',
-        'local_time' => 'Kıbrıs saati',
     ],
 
     'form' => [

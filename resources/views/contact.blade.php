@@ -103,11 +103,6 @@
                         <p class="k-eyebrow mb-3 text-[#0F0F0F]/45">{{ $isEn ? 'Where' : 'Neredeyiz' }}</p>
                         <p class="text-lg font-bold tracking-tight">{{ $address }}</p>
                     </div>
-                    <div>
-                        <p class="k-eyebrow mb-3 text-[#0F0F0F]/45">{{ __('site.common.local_time') }}</p>
-                        <p class="text-lg font-bold tracking-tight"><span data-clock>--:--:--</span></p>
-                    </div>
-
                     <div class="k-rule"></div>
 
                     <div>
