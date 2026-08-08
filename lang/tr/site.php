@@ -13,6 +13,27 @@ return [
         'menu' => 'Menü',
         'close' => 'Kapat',
     ],
+    'testimonial' => [
+        'eyebrow' => 'Görüşünüz',
+        'title' => 'Birkaç cümle yazar mısınız?',
+        'lead' => 'Sitede yayınladığımız her yorum gerçek müşterilerden geliyor. Bu bağlantı yalnız size gönderildi.',
+        'quote' => 'Görüşünüz',
+        'quote_help' => 'Ne yaptırdığınız ve sonuç ne oldu — en faydalısı bu. En az 40 karakter.',
+        'quote_min' => 'Birkaç cümle yazarsanız çok daha faydalı olur.',
+        'role' => 'Ünvanınız',
+        'company' => 'Firma',
+        'consent' => 'Bu görüşün adım ve firmam ile birlikte web sitesinde yayınlanmasını onaylıyorum.',
+        'consent_required' => 'Yayın onayı verilmeden görüş kaydedilemiyor.',
+        'consent_note' => 'İstediğiniz zaman kaldırılmasını isteyebilirsiniz.',
+        'submit' => 'Gönder',
+        'thanks_title' => 'Teşekkürler.',
+        'thanks_text' => 'Görüşünüz bize ulaştı. Yayınlamadan önce bir kez okuyacağız; bir sorun görürsek size döneriz.',
+        'used_title' => 'Bu bağlantı kullanılmış.',
+        'used_text' => 'Görüşünüzü zaten aldık. Değişiklik isterseniz bize yazmanız yeterli.',
+        'expired_title' => 'Bağlantının süresi dolmuş.',
+        'expired_text' => 'Yeni bir bağlantı isteyebilirsiniz; bize yazın, hemen gönderelim.',
+    ],
+
 
     'common' => [
         'all' => 'Tümü',

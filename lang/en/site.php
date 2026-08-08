@@ -13,6 +13,27 @@ return [
         'menu' => 'Menu',
         'close' => 'Close',
     ],
+    'testimonial' => [
+        'eyebrow' => 'Your feedback',
+        'title' => 'Would you write a few lines?',
+        'lead' => 'Every testimonial we publish comes from a real client. This link was sent only to you.',
+        'quote' => 'Your feedback',
+        'quote_help' => 'What we built and what it changed — that is the most useful thing. At least 40 characters.',
+        'quote_min' => 'A few sentences would be far more useful.',
+        'role' => 'Your title',
+        'company' => 'Company',
+        'consent' => 'I agree to this feedback being published on the website with my name and company.',
+        'consent_required' => 'We cannot save the feedback without your permission to publish it.',
+        'consent_note' => 'You can ask us to remove it at any time.',
+        'submit' => 'Send',
+        'thanks_title' => 'Thank you.',
+        'thanks_text' => 'We have received your feedback. We will read it once before publishing and get in touch if anything looks off.',
+        'used_title' => 'This link has been used.',
+        'used_text' => 'We already have your feedback. Just write to us if you would like to change it.',
+        'expired_title' => 'This link has expired.',
+        'expired_text' => 'You can ask for a new one — drop us a line and we will send it straight away.',
+    ],
+
 
     'common' => [
         'all' => 'All',

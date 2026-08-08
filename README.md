@@ -146,6 +146,25 @@ istisna, bilerek açık bırakılan özel script alanlarıdır.
 - **Ayrım bölgeye göre DEĞİL.** İlk kurguda "KKTC = buradayız, Türkiye =
   uzaktan" varsayılmıştı; yanlıştı, Edirne'de gerçek ofis var.
 
+### Müşteri yorumları — uydurma yorum YOK
+
+Sitede yayınlanan her yorumun gerçek bir müşteriden, kendi rızasıyla geldiği
+kanıtlanabilir olmalı. Sahte referans TR'de aldatıcı reklam (Reklam Kurulu),
+UK'de **DMCC Act 2024** ile doğrudan yasak (Londra ofisi bunun kapsamında) ve
+Google tarafında manuel işlem sebebi.
+
+Akış: panelde **Yorum Davetleri** → davet oluştur → tekil bağlantıyı müşteriye
+gönder → müşteri `/gorus/{token}` sayfasında kendi yazar ve yayın onayı verir →
+yorum `is_active = false` ile bekler → panelden okuyup **Onayla ve yayınla**.
+
+- Bağlantı **tek kullanımlık** ve varsayılan 30 günde kapanır.
+- Sayfa `noindex, nofollow` — davet adresleri arama motoruna girmez.
+- Rıza kutusu işaretlenmeden kayıt olmaz; onay anı `consented_at` ile saklanır.
+- Yapısal veriye (`Review`) **yalnız** `source = form` + rızası olan yorumlar
+  yazılır. Panelden elle girilen metin sitede görünür ama arama motoruna
+  "değerlendirme" olarak bildirilmez — kanıtı yok.
+- Yorum yoksa ana sayfadaki bölüm kendini gizler; boş/placeholder gösterilmez.
+
 ### Ofisler — adresin tek kaynağı
 
 `offices` tablosu (panel: *Sistem → Ofisler*). Üç kayıt: Girne (merkez,
@@ -167,9 +186,9 @@ göründüğünü ayrıca doğruluyor.
   sayfalarında şehre özel `ProfessionalService` (`areaServed` + `geo`) ve
   `BreadcrumbList`; şehir listesinde `ItemList`. Site geneli `areaServed`
   yayındaki şehirlerden türer — panelden şehir eklendiğinde kendiliğinden büyür.
-- **Uydurma `aggregateRating` / `review` YOK.** Gerçek müşteri değerlendirmesi
-  olmadan puan yazmak hem yanıltıcı hem de manuel işlem sebebidir. `SeoTest`
-  bunu ayrıca doğruluyor.
+- **Uydurma `aggregateRating` YOK** ve `review` yalnız doğrulanmış yorumlar için
+  basılır — bkz. aşağıdaki yorum akışı. `SeoTest` ve `TestimonialTest` bunu
+  ayrıca doğruluyor.
 - **Filtreli listeler** (`?kategori=`) `noindex, follow` alır ve kanoniği
   filtresiz listeye verir; aynı işler farklı adreslerde tekrarlanmasın diye.
 - **Sayfalanmış blog** kendi kanoniğini korur, `rel=prev/next` ile bağlanır ve

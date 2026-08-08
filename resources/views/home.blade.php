@@ -412,6 +412,38 @@
          08 · REFERANSLAR
          ══════════════════════════════════════════════════════════════ --}}
     @if ($testimonials->isNotEmpty())
+        @push('jsonld')
+            {{-- Yalnız DOĞRULANMIŞ yorumlar yapısal veriye yazılır: müşteri
+                 formundan gelmiş ve yayın izni alınmış olanlar. Panelden elle
+                 girilen bir metin doğru olabilir ama kanıtı yoktur; arama
+                 motoruna "bu bir müşteri değerlendirmesidir" demek için kanıt
+                 gerekiyor. aggregateRating YOK — puan toplamıyoruz. --}}
+            @php
+                $verified = $testimonials->filter(fn ($t) => $t->isVerified());
+            @endphp
+            @if ($verified->isNotEmpty())
+                <script type="application/ld+json">
+                    @php
+                        echo json_encode([
+                            '@context' => 'https://schema.org',
+                            '@type' => 'ProfessionalService',
+                            '@id' => url('/').'#organization',
+                            'review' => $verified->map(fn ($t) => array_filter([
+                                '@type' => 'Review',
+                                'reviewBody' => $t->t('quote'),
+                                'datePublished' => $t->submitted_at?->toDateString(),
+                                'author' => array_filter([
+                                    '@type' => 'Person',
+                                    'name' => $t->name,
+                                    'worksFor' => $t->company ? ['@type' => 'Organization', 'name' => $t->company] : null,
+                                ]),
+                            ]))->values()->all(),
+                        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                    @endphp
+                </script>
+            @endif
+        @endpush
+
         <section class="bg-white px-6 py-20 lg:px-12 lg:py-32">
             <div class="mx-auto max-w-[1280px]">
                 <p class="k-eyebrow k-reveal mb-12 text-[#0F0F0F]/45">{{ $isEn ? 'Clients' : 'Müşteriler' }}</p>

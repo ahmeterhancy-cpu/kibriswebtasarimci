@@ -8,6 +8,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,10 @@ Route::middleware('locale:tr')->group(function () {
 
     Route::get('/iletisim', [ContactController::class, 'index'])->name('contact');
     Route::post('/iletisim', [ContactController::class, 'store'])->name('contact.store');
+
+    // Yorum daveti: müşteriye gönderilen tekil bağlantı. Dizine girmemeli.
+    Route::get('/gorus/{request}', [TestimonialController::class, 'form'])->name('testimonial.form');
+    Route::post('/gorus/{request}', [TestimonialController::class, 'store'])->name('testimonial.store');
 });
 
 /*
