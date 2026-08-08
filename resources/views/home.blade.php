@@ -123,18 +123,9 @@
     {{-- ══════════════════════════════════════════════════════════════════
          03 · MANİFESTO — büyük ifade, arkada süzülen dev yazı
          ══════════════════════════════════════════════════════════════ --}}
-    <section class="relative overflow-hidden bg-white px-6 py-24 lg:px-12 lg:py-40" data-drift-host>
-        {{-- Arkada süzülen dev yazı.
-             Metnin üstünde paragraf olduğu için dikey olarak aşağı alındı:
-             boşluğa denk geliyor, böylece okunaklılığı bozmadan belirgin
-             olabiliyor. --}}
-        <div class="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center opacity-[0.09] lg:bottom-12" aria-hidden="true">
-            <span class="k-display whitespace-nowrap text-[#0F0F0F]" data-drift="500">
-                {{ $isEn ? 'ALL UNDER ONE ROOF' : 'TEK ÇATI ALTINDA' }}
-            </span>
-        </div>
-
-        <div class="relative mx-auto max-w-[1280px]">
+    {{-- Arkada süzülen dev yazı kaldırıldı: bölüm metne bıraktı. --}}
+    <section class="bg-white px-6 py-24 lg:px-12 lg:py-40">
+        <div class="mx-auto max-w-[1280px]">
             <div class="grid grid-cols-1 gap-12 lg:grid-cols-12">
                 <div class="lg:col-span-3">
                     <p class="k-eyebrow k-reveal text-[#0F0F0F]/45">{{ $isEn ? 'Why us' : 'Neden biz' }}</p>
