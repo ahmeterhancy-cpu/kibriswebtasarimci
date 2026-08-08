@@ -138,21 +138,21 @@
 
                 <div class="lg:col-span-9">
                     <h2 class="k-display-sm text-[#0F0F0F]" data-split data-split-step="0.045">
-                        {{ $isEn ? 'One craft,' : 'Tek uzmanlık,' }}
-                        <span class="italic font-light">{{ $isEn ? 'done' : 'tam' }}</span>
-                        {{ $isEn ? 'properly.' : 'odak.' }}
+                        {{ $isEn ? 'A whole' : 'Arkanızda' }}
+                        <span class="italic font-light">{{ $isEn ? 'agency' : 'bütün' }}</span>
+                        {{ $isEn ? 'behind it.' : 'bir ajans.' }}
                     </h2>
 
                     <div class="mt-10 grid grid-cols-1 gap-x-14 gap-y-6 md:grid-cols-2">
                         <p class="k-reveal text-lg leading-relaxed text-[#0F0F0F]/70" data-delay="100">
                             {{ $isEn
-                                ? 'We are not a 360° agency doing twelve things at once. We build websites — that is the whole business. Every project is designed from a blank page and written by hand, without page builders or bought themes.'
-                                : 'On iki iş birden yapan 360° bir ajans değiliz. Web sitesi kuruyoruz; işin tamamı bu. Her proje boş bir sayfadan tasarlanır ve elle yazılır — hazır kurucu ya da satın alınmış tema yok.' }}
+                                ? 'We are the web arm of a full-service 360° agency. Brand identity, advertising, production, social media and print all come from the same team — so when the site goes live you are not left hunting for someone to run it.'
+                                : 'Tam kapsamlı bir 360° ajansın web kolu olarak çalışıyoruz. Marka kimliği, reklam, prodüksiyon, sosyal medya ve matbaa aynı ekipten çıkıyor — site yayına girdikten sonra "peki bunu kim yürütecek" diye ajans aramanız gerekmiyor.' }}
                         </p>
                         <p class="k-reveal text-lg leading-relaxed text-[#0F0F0F]/70" data-delay="200">
                             {{ $isEn
-                                ? 'That focus is why we ship in days, not months, and why the sites stay fast a year later. You get the domain in your name, a panel you actually control, and someone who picks up the phone after launch.'
-                                : 'Bu odak sayesinde aylar değil günler içinde teslim ediyoruz ve siteler bir yıl sonra da hızlı kalıyor. Domain sizin adınıza, panel gerçekten sizin kontrolünüzde ve yayından sonra telefonu açan biri var.' }}
+                                ? 'The web side is its own studio, though: every project is designed from a blank page and written by hand, without page builders or bought themes. You get the domain in your name, a panel you actually control, and someone who picks up the phone after launch.'
+                                : 'Web tarafı yine de kendi stüdyosu: her proje boş bir sayfadan tasarlanır ve elle yazılır — hazır kurucu ya da satın alınmış tema yok. Domain sizin adınıza, panel gerçekten sizin kontrolünüzde ve yayından sonra telefonu açan biri var.' }}
                         </p>
                     </div>
 
