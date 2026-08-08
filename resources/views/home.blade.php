@@ -124,9 +124,13 @@
          03 · MANİFESTO — büyük ifade, arkada süzülen dev yazı
          ══════════════════════════════════════════════════════════════ --}}
     <section class="relative overflow-hidden bg-white px-6 py-24 lg:px-12 lg:py-40" data-drift-host>
-        <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.035]" aria-hidden="true">
+        {{-- Arkada süzülen dev yazı.
+             Metnin üstünde paragraf olduğu için dikey olarak aşağı alındı:
+             boşluğa denk geliyor, böylece okunaklılığı bozmadan belirgin
+             olabiliyor. --}}
+        <div class="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center opacity-[0.09] lg:bottom-12" aria-hidden="true">
             <span class="k-display whitespace-nowrap text-[#0F0F0F]" data-drift="500">
-                {{ $isEn ? 'CRAFT OVER TEMPLATES' : 'ŞABLON DEĞİL ZANAAT' }}
+                {{ $isEn ? 'ALL UNDER ONE ROOF' : 'TEK ÇATI ALTINDA' }}
             </span>
         </div>
 
