@@ -23,8 +23,8 @@ class FaqSeeder extends Seeder
                 'Tanıtım ve kurumsal paketlerde %50 başlangıçta, %50 yayın öncesi. E-ticaret projelerinde üç taksit uygulanır.',
                 'For showcase and corporate packages: 50% up front, 50% before launch. E-commerce projects are split into three instalments.'],
             ['home', 'Sadece Kıbrıs\'ta mı çalışıyorsunuz?', 'Do you only work in Cyprus?',
-                'Merkezimiz Kuzey Kıbrıs ama Türkiye ve İngiltere\'deki müşterilerle de uzaktan çalışıyoruz. Süreç görüşmeleri online yürüyor.',
-                'We are based in North Cyprus but also work remotely with clients in Türkiye and the UK. The process runs online.'],
+                'Girne\'de merkez, Edirne\'de Türkiye ofisimiz var; Londra\'da da temsilimiz bulunuyor. Kıbrıs ve Türkiye genelinde proje alıyoruz — süreç her şehirde aynı şekilde yürütülür.',
+                'Our head office is in Kyrenia, our Türkiye office is in Edirne and we are also represented in London. We take on projects across Cyprus and Türkiye, and the process is the same in every city.'],
 
             ['packages', 'Panelli ve panelsiz farkı nedir?', 'What is the difference between panelled and panel-free?',
                 'Panelsiz sitede içerik sabittir; güncellemeleri biz yaparız (yılda iki ücretsiz revizyon). Panelli sitede metin, görsel, blog ve ürünleri kendiniz yönetirsiniz. İçeriği sık değişmeyen işletmeler için panelsiz daha hızlı ve ekonomiktir.',

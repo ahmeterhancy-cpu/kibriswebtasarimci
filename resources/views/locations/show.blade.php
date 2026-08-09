@@ -140,19 +140,23 @@
                 <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.45);">
                     {{ $isEn ? 'How it works' : 'Nasıl çalışıyor' }}
                 </p>
+                {{-- Ofis olmayan şehirlerde "uzaktan çalışıyoruz" denmez:
+                     eksiklik gibi okunuyor. Vurgu sürecin her şehirde aynı
+                     işlediğinde. Ofis iddiası yine yok — adres ve koordinat
+                     yalnız gerçek ofislerde basılıyor. --}}
                 <h2 class="k-display-sm k-reveal" style="color:#ffffff;" data-delay="100">
                     {{ $hasOffice
                         ? ($isEn ? 'We are here.' : 'Buradayız.')
-                        : ($isEn ? 'Fully remote.' : 'Tamamen uzaktan.') }}
+                        : ($isEn ? 'The same process.' : 'Süreç aynı.') }}
                 </h2>
                 <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
                     {{ $hasOffice
                         ? ($isEn
-                            ? 'We have an office in this city, so a face-to-face meeting is an option. Everything after that — approvals, revisions, launch — runs the same way it does for remote clients.'
-                            : 'Bu şehirde ofisimiz var, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — uzaktan çalıştığımız müşterilerle aynı şekilde ilerliyor.')
+                            ? 'We have an office in this city, so meeting in person is an option. Everything after that — approvals, revisions, launch — follows the same process as every other project.'
+                            : 'Bu şehirde ofisimiz var, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — diğer tüm projelerle aynı süreçte ilerliyor.')
                         : ($isEn
-                            ? 'We have no office in this city and we do not pretend otherwise. Briefing, design approval, revisions and launch all happen online — which is also why the price does not carry an agency overhead.'
-                            : 'Bu şehirde ofisimiz yok, olduğunu da söylemiyoruz. Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürüyor — fiyatın ajans genel giderini taşımamasının sebebi de bu.') }}
+                            ? 'Briefing, design approval, revisions and launch run online — exactly as they do for clients in the cities where we have an office. The scope, the timeline and the person you talk to do not change.'
+                            : 'Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürütülür — ofisimizin bulunduğu şehirlerdeki projelerle birebir aynı şekilde. Kapsam, takvim ve muhatabınız değişmez.') }}
                 </p>
 
                 {{-- Ofis kartı. Adres offices tablosundan; tek kaynak. --}}

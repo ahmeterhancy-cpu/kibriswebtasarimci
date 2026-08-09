@@ -41,8 +41,8 @@
 
     <x-page-hero :eyebrow="$isEn ? 'Coverage' : 'Hizmet bölgeleri'"
                  :lead="$isEn
-                    ? 'We are based in North Cyprus and work remotely across Türkiye. Every market has its own habits — pick your city to see what usually matters there.'
-                    : 'Merkezimiz Kuzey Kıbrıs; Türkiye genelinde uzaktan çalışıyoruz. Her pazarın kendi alışkanlığı var — şehrinizi seçin, orada neyin işe yaradığını yazdık.'">
+                    ? 'Offices in Kyrenia and Edirne, projects across Cyprus and Türkiye. Pick your city to see how we work there.'
+                    : 'Girne ve Edirne\'de ofis, Kıbrıs ve Türkiye genelinde proje. Şehrinizi seçin, orada nasıl çalıştığımızı görün.'">
         {{ $isEn ? 'Where we' : 'Nerelerde' }} <span class="k-hl">{{ $isEn ? 'work.' : 'çalışıyoruz.' }}</span>
     </x-page-hero>
 

@@ -80,13 +80,16 @@ class LocationSeeder extends Seeder
             'seo_description_en' => 'Websites, e-commerce and custom software in '.$nameEn.'. No templates, fixed prices, TR + EN. Scope shaped by your industry.',
         ];
 
+        // Ofisin bulunmadığı şehirler. "Uzaktan çalışıyoruz" ifadesi bilerek
+        // KULLANILMIYOR: eksiklik gibi okunuyor. Süreç zaten çevrimiçi
+        // yürüyor — bu bir kısıt değil, çalışma biçimi.
         $tr = fn (string $name) => [
-            'intro' => $name.'\'daki işletmelerle uzaktan çalışıyoruz. Görüşme, tasarım onayı ve teslim süreci tamamen çevrimiçi yürüyor.',
-            'intro_en' => 'We work remotely with businesses in '.$name.'. Meetings, design approval and delivery all run online.',
+            'intro' => $name.'\'daki işletmeler için kurumsal web sitesi, e-ticaret ve özel yazılım geliştiriyoruz. Görüşme, tasarım onayı ve teslim süreci çevrimiçi yürütülür.',
+            'intro_en' => 'Corporate websites, e-commerce and custom software for businesses in '.$name.'. Meetings, design approval and delivery run online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$name.' | Corporate Sites, E-Commerce, Software',
-            'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Uzaktan çalışıyoruz; şablon yok, sabit fiyat, TR + EN yayın.',
-            'seo_description_en' => 'Websites, e-commerce and custom software in '.$name.'. Remote delivery, no templates, fixed prices, TR + EN.',
+            'seo_description' => $name.'\'da kurumsal web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın. Sektörünüze göre kapsam.',
+            'seo_description_en' => 'Corporate websites, e-commerce and custom software in '.$name.'. No templates, fixed prices, TR + EN. Scope shaped by your industry.',
         ];
 
         return [
@@ -119,8 +122,7 @@ class LocationSeeder extends Seeder
 
             /* ── Türkiye ──────────────────────────────────────────────────
              | Edirne'de ofis var: adres, telefon ve koordinat gerçek.
-             | Diğer şehirlerde uzaktan çalışıyoruz — oralarda adres ve
-             | koordinat BİLEREK boş.
+             | Ofis olmayan şehirlerde adres ve koordinat BİLEREK boş.
              */
             ['slug' => 'edirne', 'name' => 'Edirne', 'name_en' => 'Edirne', 'region' => 'turkiye', 'country_code' => 'TR',
                 // Yaklaşık şehir merkezi koordinatı. Panelden Google Haritalar'daki
