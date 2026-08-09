@@ -57,8 +57,8 @@ class SettingsSeeder extends Seeder
 
             'footer' => [
                 'footer_about' => [
-                    'Kuzey Kıbrıs merkezli web tasarım ve yazılım stüdyosu. Tek iş, hakkıyla.',
-                    'A web design and development studio based in North Cyprus. One craft, done properly.',
+                    'Kuzey Kıbrıs ve Türkiye genelinde kurumsal web sitesi, e-ticaret ve özel yazılım geliştiren web tasarım stüdyosu.',
+                    'A web design studio building corporate websites, e-commerce and custom software across North Cyprus and Türkiye.',
                 ],
             ],
             'general' => [

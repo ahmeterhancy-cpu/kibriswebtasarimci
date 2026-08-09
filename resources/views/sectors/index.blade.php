@@ -35,7 +35,7 @@
                  :lead="$isEn
                     ? 'A hotel needs bookings, an agency needs filterable listings, a factory needs a dealer login. The design language stays ours; what the site has to do comes from your industry.'
                     : 'Otel rezervasyon alır, emlakçı filtrelenebilir ilan yayınlar, fabrika bayiye şifreli fiyat verir. Tasarım dili bizim; sitenin ne yapacağı sizin sektörünüzden çıkar.'">
-        {{ $isEn ? 'Every industry' : 'Her sektörün' }} <span class="k-hl">{{ $isEn ? 'asks differently.' : 'derdi ayrı.' }}</span>
+        {{ $isEn ? 'Every industry has' : 'Her sektörün ihtiyacı' }} <span class="k-hl">{{ $isEn ? 'different needs.' : 'farklıdır.' }}</span>
     </x-page-hero>
 
     <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">

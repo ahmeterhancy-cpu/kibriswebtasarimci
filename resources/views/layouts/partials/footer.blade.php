@@ -63,23 +63,23 @@
     {{-- Scroll'la yatay süzülen dev arka plan yazısı --}}
     <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.045]" aria-hidden="true">
         <span class="k-display whitespace-nowrap" style="color:#ffffff;" data-drift="420">
-            {{ $isEn ? 'LET US BUILD IT' : 'HADİ BAŞLAYALIM' }}
+            {{ $isEn ? 'CORPORATE WEB SOLUTIONS' : 'KURUMSAL WEB ÇÖZÜMLERİ' }}
         </span>
     </div>
 
     <div class="relative mx-auto grid max-w-[1280px] grid-cols-1 items-end gap-10 lg:grid-cols-12">
         <div class="lg:col-span-8">
             <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.45);">
-                {{ $isEn ? 'Next project' : 'Sıradaki proje' }}
+                {{ $isEn ? 'New project' : 'Yeni proje' }}
             </p>
             <h2 class="k-display-sm" style="color:#ffffff;" data-split data-split-step="0.05">
-                {{ $isEn ? 'Your site should' : 'Siteniz sadece' }}<br>
-                {{ $isEn ? 'sell, not just' : 'güzel değil,' }} <span class="k-hl">{{ $isEn ? 'sit there.' : 'satmalı.' }}</span>
+                {{ $isEn ? 'Let us plan your' : 'Projenizi birlikte' }}
+                <span class="k-hl">{{ $isEn ? 'project.' : 'planlayalım.' }}</span>
             </h2>
         </div>
 
         <div class="k-reveal lg:col-span-4 lg:text-right" data-delay="200">
-            <a href="{{ $r('quote') }}" data-cursor="cta" data-cursor-label="{{ $isEn ? 'Start' : 'Başla' }}"
+            <a href="{{ $r('quote') }}" data-cursor="cta" data-cursor-label="{{ $isEn ? 'Quote' : 'Teklif' }}"
                data-magnetic="0.3" class="k-btn k-btn--brand">
                 <span style="color:inherit;">{{ __('site.nav.quote') }}</span>
                 <span class="k-btn__arrow" aria-hidden="true">→</span>
