@@ -29,7 +29,7 @@
 
     $stats = [
         ['3', $isEn ? 'working days' : 'iş gününde', $isEn ? 'fastest launch' : 'en hızlı yayın'],
-        ['2', $isEn ? 'languages' : 'dil', $isEn ? 'TR + EN, more optional' : 'TR + EN, dahası opsiyonel'],
+        ['1', $isEn ? 'year' : 'yıl', $isEn ? 'hosting, domain and SSL included' : 'hosting, alan adı ve SSL dahil'],
         ['0', $isEn ? 'templates' : 'şablon', $isEn ? 'every design custom' : 'her tasarım özel'],
     ];
 @endphp

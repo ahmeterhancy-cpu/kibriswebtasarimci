@@ -67,8 +67,8 @@ class LocationSeeder extends Seeder
             'intro_en' => 'We have an office in '.$nameEn.'. Corporate websites, e-commerce and custom software — and we can sit down together if you prefer.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
-            'seo_description' => $name.'\'de ofisimizden web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın.',
-            'seo_description_en' => 'Websites, e-commerce and custom software from our '.$nameEn.' office. No templates, fixed prices, TR + EN.',
+            'seo_description' => $name.'\'de ofisimizden web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, yabancı dil seçenekli.',
+            'seo_description_en' => 'Websites, e-commerce and custom software from our '.$nameEn.' office. No templates, fixed prices, optional foreign language.',
         ];
 
         $kktc = fn (string $name, string $nameEn) => [
@@ -76,8 +76,8 @@ class LocationSeeder extends Seeder
             'intro_en' => 'Corporate websites, e-commerce and custom software in '.$nameEn.' and the surrounding area. Our base is in Kyrenia and we can meet in person.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
-            'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın. Sektörünüze göre kapsam.',
-            'seo_description_en' => 'Websites, e-commerce and custom software in '.$nameEn.'. No templates, fixed prices, TR + EN. Scope shaped by your industry.',
+            'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, yabancı dil seçenekli. Sektörünüze göre kapsam.',
+            'seo_description_en' => 'Websites, e-commerce and custom software in '.$nameEn.'. No templates, fixed prices, optional foreign language. Scope shaped by your industry.',
         ];
 
         // Ofisin bulunmadığı şehirler. "Uzaktan çalışıyoruz" ifadesi bilerek
@@ -88,8 +88,8 @@ class LocationSeeder extends Seeder
             'intro_en' => 'Corporate websites, e-commerce and custom software for businesses in '.$name.'. Meetings, design approval and delivery run online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$name.' | Corporate Sites, E-Commerce, Software',
-            'seo_description' => $name.'\'da kurumsal web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, TR + EN yayın. Sektörünüze göre kapsam.',
-            'seo_description_en' => 'Corporate websites, e-commerce and custom software in '.$name.'. No templates, fixed prices, TR + EN. Scope shaped by your industry.',
+            'seo_description' => $name.'\'da kurumsal web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, yabancı dil seçenekli. Sektörünüze göre kapsam.',
+            'seo_description_en' => 'Corporate websites, e-commerce and custom software in '.$name.'. No templates, fixed prices, optional foreign language. Scope shaped by your industry.',
         ];
 
         return [

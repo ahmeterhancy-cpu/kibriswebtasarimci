@@ -132,7 +132,7 @@ class SeoTest extends TestCase
         $this->get('/web-tasarim/edirne')
             ->assertOk()
             ->assertSee('Buradayız.')
-            ->assertDontSee('Süreç aynı.')
+            ->assertDontSee('Her adım onayınızla.')
             ->assertSee($edirne->office->address);
     }
 

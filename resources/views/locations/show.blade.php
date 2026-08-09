@@ -140,14 +140,15 @@
                 <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.45);">
                     {{ $isEn ? 'How it works' : 'Nasıl çalışıyor' }}
                 </p>
-                {{-- Ofis olmayan şehirlerde "uzaktan çalışıyoruz" denmez:
-                     eksiklik gibi okunuyor. Vurgu sürecin her şehirde aynı
-                     işlediğinde. Ofis iddiası yine yok — adres ve koordinat
-                     yalnız gerçek ofislerde basılıyor. --}}
+                {{-- Ofis olmayan şehirlerde ofisten HİÇ bahsedilmez. "Uzaktan
+                     çalışıyoruz" da, "ofisimizin olduğu şehirlerdeki gibi" de
+                     aynı eksikliği ima ediyor. Metin yalnız sürecin kendisini
+                     anlatır. Ofis iddiası yine yok — adres ve koordinat sadece
+                     gerçek ofislerde basılıyor. --}}
                 <h2 class="k-display-sm k-reveal" style="color:#ffffff;" data-delay="100">
                     {{ $hasOffice
                         ? ($isEn ? 'We are here.' : 'Buradayız.')
-                        : ($isEn ? 'The same process.' : 'Süreç aynı.') }}
+                        : ($isEn ? 'Every step, approved.' : 'Her adım onayınızla.') }}
                 </h2>
                 <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
                     {{ $hasOffice
@@ -155,8 +156,8 @@
                             ? 'We have an office in this city, so meeting in person is an option. Everything after that — approvals, revisions, launch — follows the same process as every other project.'
                             : 'Bu şehirde ofisimiz var, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — diğer tüm projelerle aynı süreçte ilerliyor.')
                         : ($isEn
-                            ? 'Briefing, design approval, revisions and launch run online — exactly as they do for clients in the cities where we have an office. The scope, the timeline and the person you talk to do not change.'
-                            : 'Brief, tasarım onayı, revizyon ve yayın çevrimiçi yürütülür — ofisimizin bulunduğu şehirlerdeki projelerle birebir aynı şekilde. Kapsam, takvim ve muhatabınız değişmez.') }}
+                            ? 'Once the scope is set, design, development and launch follow the agreed schedule. You speak to the same person throughout, and no step begins before you approve the one before it.'
+                            : 'Kapsam belirlendikten sonra tasarım, geliştirme ve yayın adımları planlanan takvimde ilerliyor. Baştan sona aynı kişiyle çalışıyor, bir adımı onaylamadan sonrakine geçilmiyor.') }}
                 </p>
 
                 {{-- Ofis kartı. Adres offices tablosundan; tek kaynak. --}}
@@ -187,13 +188,13 @@
                             ? [
                                 ['Scope', 'You pick the scope in the quote wizard and see the exact total. No estimate ranges.'],
                                 ['Design', 'Designed from scratch for your business. No templates, no bought themes.'],
-                                ['Build', 'Hand-written front end, admin panel where you need one, TR + EN as standard.'],
+                                ['Build', 'Hand-written front end, admin panel where you need one, multilingual-ready with a foreign language as an option.'],
                                 ['Launch', 'Domain, hosting, SSL, search console. Handed over working, not "almost ready".'],
                             ]
                             : [
                                 ['Kapsam', 'Teklif sihirbazından kapsamı seçiyor, kesin tutarı görüyorsunuz. Tahmini aralık yok.'],
                                 ['Tasarım', 'İşinize göre sıfırdan tasarlanıyor. Şablon yok, satın alınmış tema yok.'],
-                                ['Geliştirme', 'Elle yazılan arayüz, gerekiyorsa yönetim paneli, standart olarak TR + EN.'],
+                                ['Geliştirme', 'Elle yazılan arayüz, gerekiyorsa yönetim paneli, çok dilli altyapı — yabancı dil seçeneğiyle.'],
                                 ['Yayın', 'Alan adı, hosting, SSL, arama konsolu. Çalışır hâlde teslim, "neredeyse hazır" değil.'],
                             ];
                     @endphp
