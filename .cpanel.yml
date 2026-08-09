@@ -1,0 +1,65 @@
+---
+# cPanel Git Version Control dağıtım betiği.
+#
+# cPanel'de "Deploy HEAD Commit" düğmesine basıldığında bu görevler sunucuda
+# çalışır. Depo cPanel'de ~/repositories/kibriswebtasarimci altına klonlanır;
+# buradan yayın dizinine kopyalanır.
+#
+# DEPLOYPATH'i kendi hesabınıza göre düzenleyin:
+#   - Ana alan adı ise:   /home/KULLANICI/public_html/
+#   - Alt alan/addon ise: /home/KULLANICI/kibriswebtasarimci.com/
+#
+# ÖNEMLİ — Laravel'in public/ dizini:
+# cPanel yayın dizini genelde public_html'dir; Laravel ise public/ klasörünü
+# kök yapar. İki yol var:
+#   (a) Uygulamayı public_html DIŞINA kurup public_html'i public/ dizinine
+#       symlink yapmak (en temiz, SSH gerekir),
+#   (b) Uygulamayı public_html içine kurup .htaccess ile public/ dizinine
+#       yönlendirmek (SSH yoksa bu — kurulum notlarına bakın).
+#
+# vendor/ depoda YOK (.gitignore). Aşağıdaki composer adımı sunucuda çalışmazsa
+# (paylaşımlı hostta composer kapalı olabilir) DEPLOY.md'deki alternatifi
+# uygulayın.
+
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/KULLANICI/public_html
+    - export REPOPATH=/home/KULLANICI/repositories/kibriswebtasarimci
+
+    # --- Uygulama dosyaları -------------------------------------------------
+    # .env, storage/ ve vendor/ KOPYALANMAZ: bunlar sunucuda kalıcıdır,
+    # her dağıtımda üzerine yazılmamalı.
+    - /bin/rsync -av --delete
+        --exclude='.git'
+        --exclude='.env'
+        --exclude='storage/'
+        --exclude='vendor/'
+        --exclude='node_modules/'
+        --exclude='tests/'
+        $REPOPATH/ $DEPLOYPATH/
+
+    # --- Bağımlılıklar ------------------------------------------------------
+    # Composer sunucuda varsa kur; yoksa bu adım sessizce atlanır ve vendor/
+    # dizinini elle yüklemeniz gerekir (bkz. DEPLOY.md).
+    - cd $DEPLOYPATH && (command -v composer >/dev/null 2>&1 && composer install --no-dev --optimize-autoloader --no-interaction || echo "composer bulunamadi, vendor/ elle yuklenmeli")
+
+    # --- Laravel önbellekleri ----------------------------------------------
+    # Yapılandırma, rota ve görünüm önbelleği canlıda performansı belirgin
+    # artırır. Her dağıtımda yeniden üretilmeli, yoksa eski değerler kalır.
+    - cd $DEPLOYPATH && php artisan config:clear
+    - cd $DEPLOYPATH && php artisan cache:clear
+    - cd $DEPLOYPATH && php artisan view:clear
+    - cd $DEPLOYPATH && php artisan config:cache
+    - cd $DEPLOYPATH && php artisan route:cache
+    - cd $DEPLOYPATH && php artisan view:cache
+
+    # --- Yüklenen dosyalar için symlink ------------------------------------
+    # storage/app/public → public/storage. Panelden yüklenen görseller
+    # (logo, favicon, OG, iş kapakları) bu bağ olmadan görünmez.
+    - cd $DEPLOYPATH && php artisan storage:link || true
+
+    # --- Migration ----------------------------------------------------------
+    # BİLEREK OTOMATİK DEĞİL. Şema değişikliği veri kaybettirebilir; canlıda
+    # ne çalıştığını görerek yapın:
+    #   php artisan migrate --force
+    # SSH yoksa phpMyAdmin'den elle çalıştırın (README, cPanel bölümü).
