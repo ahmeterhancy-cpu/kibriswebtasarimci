@@ -42,27 +42,13 @@ GitHub → Settings → Developer settings → Personal access tokens → Fine-g
 
 1. **Create** → *Clone a Repository* işaretli
 2. **Clone URL**:
-   `https://TOKEN@github.com/KULLANICI/kibriswebtasarimci.git`
-3. **Repository Path**: `/home/KULLANICI/repositories/kibriswebtasarimci`
+   `https://TOKEN@github.com/ahmeterhancy-cpu/kibriswebtasarimci.git`
+3. **Repository Path**: `/home/kibr4830/repositories/kibriswebtasarimci`
 4. **Create**
 
 ---
 
-## 3. `.cpanel.yml` içindeki kullanıcı adını düzeltin
-
-Depodaki `.cpanel.yml` dosyasında iki satır var:
-
-```yaml
-- export DEPLOYPATH=/home/KULLANICI/public_html
-- export REPOPATH=/home/KULLANICI/repositories/kibriswebtasarimci
-```
-
-`KULLANICI` yerine cPanel kullanıcı adınızı yazıp commit'leyin ve push'layın.
-(cPanel'de sağ üstte ya da File Manager'daki `/home/...` yolunda görünür.)
-
----
-
-## 4. `.env` dosyasını oluşturun
+## 3. `.env` dosyasını oluşturun
 
 File Manager → `public_html` → **+ File** → `.env`
 (Ayarlar → *Show Hidden Files* açık olmalı, yoksa dosyayı göremezsiniz.)
@@ -80,8 +66,8 @@ APP_TIMEZONE=Asia/Famagusta
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=KULLANICI_kwt
-DB_USERNAME=KULLANICI_kwt
+DB_DATABASE=kibr4830_kwt
+DB_USERNAME=kibr4830_kwt
 DB_PASSWORD=veritabani_sifresi
 
 SESSION_DRIVER=file
@@ -109,7 +95,7 @@ php artisan key:generate --show
 
 ---
 
-## 5. `vendor/` klasörünü yükleyin (yalnız bir kez)
+## 4. `vendor/` klasörünü yükleyin (yalnız bir kez)
 
 Sunucuda composer yoksa gereklidir; varsa `.cpanel.yml` zaten hallediyor.
 
@@ -122,7 +108,7 @@ Bu paket `--no-dev` ile hazırlandı; test ve geliştirme araçları içinde yok
 
 ---
 
-## 6. İlk dağıtım
+## 5. İlk dağıtım
 
 cPanel → Git Version Control → **Manage** → **Deploy HEAD Commit**
 
@@ -134,7 +120,7 @@ Deploy günlüğünü aynı ekrandan okuyabilirsiniz.
 
 ---
 
-## 7. İçeriği yükleyin
+## 6. İçeriği yükleyin
 
 Migration'lar tabloları oluşturur ama **içerik boş gelir**. Hizmetler,
 paketler, sektörler, şehirler, ofisler ve ayarlar için tohum verisini bir kez
@@ -152,7 +138,7 @@ sonra satırı silin:
 
 ---
 
-## 8. Dosya izinleri
+## 7. Dosya izinleri
 
 File Manager → sağ tık → **Change Permissions**:
 
@@ -166,7 +152,7 @@ log dosyası da yazılamaz.
 
 ---
 
-## 9. SSL ve HTTPS
+## 8. SSL ve HTTPS
 
 1. cPanel → SSL/TLS Status → **Run AutoSSL**
 2. Sertifika geldikten **sonra** kökteki `.htaccess` dosyasında HTTPS
@@ -176,7 +162,7 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
 
 ---
 
-## 10. Yayın sonrası kontrol listesi
+## 9. Yayın sonrası kontrol listesi
 
 - [ ] `https://alanadi.com` açılıyor, kilit simgesi yeşil
 - [ ] `/admin` girişi çalışıyor → **şifreyi hemen değiştirin.**
@@ -193,7 +179,7 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
 
 ---
 
-## 11. Sonraki dağıtımlar
+## 10. Sonraki dağıtımlar
 
 ```bash
 git push

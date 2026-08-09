@@ -5,13 +5,13 @@
 # ÇALIŞIR. Yani SSH ile giriş yapamasanız bile buradaki komutlar işler;
 # composer ve artisan bu sayede kullanılabiliyor.
 #
-# TEK DÜZENLEMENİZ GEREKEN YER: aşağıdaki KULLANICI değeri.
-# cPanel → sağ üstteki kullanıcı adı ya da File Manager'daki /home/... yolu.
+# Yollar bu hesaba göre ayarlandı (cPanel kullanıcısı: kibr4830).
+# Hesap değişirse aşağıdaki iki export satırını güncelleyin.
 
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/KULLANICI/public_html
-    - export REPOPATH=/home/KULLANICI/repositories/kibriswebtasarimci
+    - export DEPLOYPATH=/home/kibr4830/public_html
+    - export REPOPATH=/home/kibr4830/repositories/kibriswebtasarimci
 
     # --- Uygulama dosyaları -------------------------------------------------
     # KOPYALANMAYANLAR ve sebepleri:
