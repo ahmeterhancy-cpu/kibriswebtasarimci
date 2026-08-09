@@ -1,12 +1,30 @@
-# Canlıya alma — cPanel + Git (SSH'sız kurulum)
+# Canlıya alma — cPanel
 
-Sırayla takip edin. Atlanan adım genelde beyaz ekranla ya da 500 hatasıyla
-geri döner.
+## Önce: shell erişimi açık mı?
 
-> **Not:** SSH erişiminiz yok, o yüzden kurulum File Manager + cPanel Git
-> üzerinden yapılıyor. cPanel'in Git dağıtımı sunucuda komut çalıştırabildiği
-> için `composer`, `migrate` ve önbellek komutları `.cpanel.yml` içinden
-> otomatik işleyecek — sizin terminale girmeniz gerekmiyor.
+cPanel → Git Version Control ekranında şu uyarı varsa **shell erişimi kapalı**:
+
+> *Your system administrator must enable shell access to allow you to view
+> clone URLs.*
+
+Bu yalnız "clone adresini göremezsin" demek değil: **`.cpanel.yml` dağıtım
+görevleri de çalışmaz.** Yani composer, migration ve önbellek komutları
+otomatik işlemez.
+
+### Yol A — shell'i açtırın (önerilen)
+
+Hosting firmasına tek cümlelik destek talebi yeterli:
+
+> `kibr4830` hesabı için **Jailed Shell (Jailed SSH)** erişimini açar mısınız?
+> Git Version Control dağıtımı için gerekiyor.
+
+Çoğu firma dakikalar içinde açıyor. Açıldıktan sonra bu belgedeki Git akışı
+olduğu gibi işler.
+
+### Yol B — shell olmadan (bu belgenin kalanı)
+
+Dosyalar File Manager ile yüklenir, veritabanı kurulumu tarayıcıdan
+çalıştırılır. Çalışır, ama her güncellemede dosyaları elle yüklemeniz gerekir.
 
 ---
 
@@ -120,21 +138,39 @@ Deploy günlüğünü aynı ekrandan okuyabilirsiniz.
 
 ---
 
-## 6. İçeriği yükleyin
+## 6. Veritabanını kurun
 
-Migration'lar tabloları oluşturur ama **içerik boş gelir**. Hizmetler,
-paketler, sektörler, şehirler, ofisler ve ayarlar için tohum verisini bir kez
-çalıştırmak gerekir.
+### Shell varsa (Yol A)
 
-`.cpanel.yml` içine geçici olarak şu satırı ekleyip bir kez deploy edin,
-sonra satırı silin:
+`.cpanel.yml` migration'ı zaten çalıştırdı. İçerik için bir kez şu satırı
+ekleyip deploy edin, sonra satırı **silin**:
 
 ```yaml
     - cd $DEPLOYPATH && php artisan db:seed --force
 ```
 
-> Satırı kalıcı bırakmayın: her dağıtımda panelden yaptığınız düzenlemeleri
-> tohum verisine geri döndürür.
+### Shell yoksa (Yol B) — tarayıcıdan kurulum
+
+`.env` dosyasına rastgele bir anahtar ekleyin:
+
+```dotenv
+SETUP_TOKEN=buraya-uzun-ve-rastgele-bir-dize-yazin
+```
+
+Sonra tarayıcıda açın:
+
+```
+https://alanadi.com/kurulum/buraya-uzun-ve-rastgele-bir-dize-yazin
+```
+
+Sayfa migration'ları çalıştırır, içeriği yükler, `storage:link` bağını kurar
+ve önbellekleri üretir; ne yaptığını ekranda satır satır yazar.
+
+**Bittiğinde `.env`'den `SETUP_TOKEN` satırını silin.** Anahtar yokken rota
+hiç kaydedilmez — silmek adresi tamamen yok etmekle aynı şeydir.
+
+> Bu adres yanlışlıkla ikinci kez açılırsa içeriğiniz **geri dönmez**:
+> tablolar kuruluysa seed adımı atlanır, yalnız bekleyen migration çalışır.
 
 ---
 

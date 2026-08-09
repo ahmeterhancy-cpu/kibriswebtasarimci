@@ -124,4 +124,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tek Seferlik Kurulum Anahtarı
+    |--------------------------------------------------------------------------
+    |
+    | Yalnızca shell erişimi olmayan sunucular için. Tanımlıysa /kurulum/{token}
+    | rotası açılır ve migration + seed tarayıcıdan çalıştırılabilir.
+    | Kurulum bitince .env'den SİLİNMELİ — boşken rota hiç kaydedilmez.
+    |
+    */
+
+    'setup_token' => env('SETUP_TOKEN'),
+
 ];
