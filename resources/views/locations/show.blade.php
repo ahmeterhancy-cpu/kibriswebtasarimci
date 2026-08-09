@@ -153,8 +153,8 @@
                 <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
                     {{ $hasOffice
                         ? ($isEn
-                            ? 'We have an office in this city, so meeting in person is an option. Everything after that — approvals, revisions, launch — follows the same process as every other project.'
-                            : 'Bu şehirde ofisimiz var, dolayısıyla yüz yüze görüşmek mümkün. Sonrası — onaylar, revizyonlar, yayın — diğer tüm projelerle aynı süreçte ilerliyor.')
+                            ? 'Meetings can be held at our office in this city or online, whichever suits you. The steps that follow — approvals, revisions, launch — run the same way on every project.'
+                            : 'Görüşmeler bu şehirdeki ofisimizde ya da çevrimiçi yapılabilir. Sonraki adımlar — onaylar, revizyonlar, yayın — her projede aynı süreçte ilerliyor.')
                         : ($isEn
                             ? 'Once the scope is set, design, development and launch follow the agreed schedule. You speak to the same person throughout, and no step begins before you approve the one before it.'
                             : 'Kapsam belirlendikten sonra tasarım, geliştirme ve yayın adımları planlanan takvimde ilerliyor. Baştan sona aynı kişiyle çalışıyor, bir adımı onaylamadan sonrakine geçilmiyor.') }}

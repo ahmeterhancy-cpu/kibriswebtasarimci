@@ -63,8 +63,8 @@ class LocationSeeder extends Seeder
         // Ofisimizin bulunduğu şehir: yüz yüze görüşme gerçekten mümkün.
         // Adres burada DEĞİL — `office` anahtarı offices tablosuna bağlanır.
         $office = fn (string $name, string $nameEn) => [
-            'intro' => $name.'\'de ofisimiz var. Kurumsal web sitesi, e-ticaret ve özel yazılım; isterseniz yüz yüze oturup konuşuyoruz.',
-            'intro_en' => 'We have an office in '.$nameEn.'. Corporate websites, e-commerce and custom software — and we can sit down together if you prefer.',
+            'intro' => $name.'\'deki işletmeler için kurumsal web sitesi, e-ticaret ve özel yazılım geliştiriyoruz. Görüşmeler ofisimizde ya da çevrimiçi yapılabilir.',
+            'intro_en' => 'Corporate websites, e-commerce and custom software for businesses in '.$nameEn.'. Meetings can be held at our office or online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
             'seo_description' => $name.'\'de ofisimizden web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, yabancı dil seçenekli.',
@@ -72,8 +72,8 @@ class LocationSeeder extends Seeder
         ];
 
         $kktc = fn (string $name, string $nameEn) => [
-            'intro' => $name.' ve çevresinde kurumsal web sitesi, e-ticaret ve özel yazılım. Merkezimiz Girne\'de; isterseniz yüz yüze görüşüyoruz.',
-            'intro_en' => 'Corporate websites, e-commerce and custom software in '.$nameEn.' and the surrounding area. Our base is in Kyrenia and we can meet in person.',
+            'intro' => $name.' ve çevresindeki işletmeler için kurumsal web sitesi, e-ticaret ve özel yazılım geliştiriyoruz. Görüşmeler Girne ofisimizde ya da çevrimiçi yapılabilir.',
+            'intro_en' => 'Corporate websites, e-commerce and custom software for businesses in '.$nameEn.' and the surrounding area. Meetings can be held at our Kyrenia office or online.',
             'seo_title' => $name.' Web Tasarım | Kurumsal Site, E-Ticaret ve Yazılım',
             'seo_title_en' => 'Web Design in '.$nameEn.' | Corporate Sites, E-Commerce, Software',
             'seo_description' => $name.'\'da web sitesi, e-ticaret ve özel yazılım. Şablon yok, sabit fiyat, yabancı dil seçenekli. Sektörünüze göre kapsam.',
