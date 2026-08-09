@@ -354,13 +354,8 @@
                         {{-- Kısa tutuldu: uzun başlıkta k-hl çubuğu iki satıra
                              bölünüp kırık görünüyordu. --}}
                         <h2 class="k-display-sm text-[#0F0F0F]" data-split data-split-step="0.05">
-                            {{ $isEn ? 'Transparent' : 'Şeffaf' }} <span class="k-hl">{{ $isEn ? 'pricing.' : 'fiyatlandırma.' }}</span>
+                            {{ $isEn ? 'Packages and' : 'Paketler ve' }} <span class="k-hl">{{ $isEn ? 'options.' : 'seçenekler.' }}</span>
                         </h2>
-                        <p class="k-reveal mt-5 text-[#0F0F0F]/60" data-delay="200">
-                            {{ $isEn
-                                ? 'The scope and price of every package are published on this site. The quote wizard gives you the exact total for the scope you select.'
-                                : 'Her paketin kapsamı ve fiyatı sitemizde açıkça belirtilmiştir. Seçtiğiniz kapsama göre kesin tutarı teklif sihirbazından görebilirsiniz.' }}
-                        </p>
                     </div>
                     <a href="{{ $r('packages') }}" class="k-reveal k-btn k-btn--ghost" data-delay="300">
                         <span>{{ $isEn ? 'All packages' : 'Tüm paketler' }}</span>
