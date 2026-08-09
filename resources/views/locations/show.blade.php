@@ -3,7 +3,7 @@
     $city = $location->t('name');
     $heading = $location->t('headline') ?: $city;
     // "Buradayız" ayrımı BÖLGEYE değil ofis varlığına bağlı: Edirne Türkiye'de
-    // ama orada da yüz yüze görüşülebiliyor. Adres tek kaynaktan (offices).
+    // ama orada da ofis var. Adres tek kaynaktan (offices tablosu).
     $office = $location->office;
     $hasOffice = $office !== null;
 @endphp
@@ -150,14 +150,13 @@
                         ? ($isEn ? 'We are here.' : 'Buradayız.')
                         : ($isEn ? 'Every step, approved.' : 'Her adım onayınızla.') }}
                 </h2>
+                {{-- Tek metin: görüşme biçiminden hiç bahsedilmiyor, yalnız
+                     süreç anlatılıyor. Ofisli/ofissiz farkı başlıkta ve
+                     aşağıdaki ofis kartında zaten görünüyor. --}}
                 <p class="k-reveal mt-6 max-w-md leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="200">
-                    {{ $hasOffice
-                        ? ($isEn
-                            ? 'Meetings can be held at our office in this city or online, whichever suits you. The steps that follow — approvals, revisions, launch — run the same way on every project.'
-                            : 'Görüşmeler bu şehirdeki ofisimizde ya da çevrimiçi yapılabilir. Sonraki adımlar — onaylar, revizyonlar, yayın — her projede aynı süreçte ilerliyor.')
-                        : ($isEn
-                            ? 'Once the scope is set, design, development and launch follow the agreed schedule. You speak to the same person throughout, and no step begins before you approve the one before it.'
-                            : 'Kapsam belirlendikten sonra tasarım, geliştirme ve yayın adımları planlanan takvimde ilerliyor. Baştan sona aynı kişiyle çalışıyor, bir adımı onaylamadan sonrakine geçilmiyor.') }}
+                    {{ $isEn
+                        ? 'Once the scope is set, design, development and launch follow the agreed schedule. You work with the same person throughout, and no step begins before you approve the one before it.'
+                        : 'Kapsam belirlendikten sonra tasarım, geliştirme ve yayın adımları planlanan takvimde ilerliyor. Baştan sona aynı kişiyle çalışıyor, bir adımı onaylamadan sonrakine geçilmiyor.' }}
                 </p>
 
                 {{-- Ofis kartı. Adres offices tablosundan; tek kaynak. --}}
