@@ -319,13 +319,15 @@
 
             {{-- Kartlar gerçekten yapışkan: her biri bir öncekinin üstüne biner.
                  JS ayrıca alttakileri hafifçe küçültüp soldurur (derinlik). --}}
-            {{-- Aralık kart sayısına göre: 4 kartta 42vh uygundu, 6 kartta
-                 toplam kaydırma mesafesini aynı tutmak için daralttık. --}}
-            <div data-stack class="space-y-[26vh] md:space-y-[29vh]">
+            {{-- Yığılma efekti HER ekranda çalışır (motion.js'teki 900px
+                 koruması da kaldırıldı). Aralık, kart yapışıkken geçen
+                 kaydırma mesafesi demek: mobilde daha kısa tutuluyor, yoksa
+                 bölüm gereğinden uzun geliyor. --}}
+            <div data-stack class="space-y-[20vh] md:space-y-[29vh]">
                 @foreach ($process as $i => [$no, $title, $text])
                     <article data-stack-item
-                             class="k-reveal rounded-2xl border border-white/12 bg-[#141414] p-7 md:sticky lg:p-10"
-                             style="top: calc(16vh + {{ $i * 16 }}px);"
+                             class="k-reveal sticky rounded-2xl border border-white/12 bg-[#141414] p-7 lg:p-10"
+                             style="top: calc(14vh + {{ $i * 14 }}px);"
                              data-delay="{{ min(($i + 1) * 100, 400) }}">
                         <div class="flex flex-col gap-5 md:flex-row md:items-start md:gap-10">
                             <span class="k-display-xs shrink-0 text-[#E30613]">{{ $no }}</span>
@@ -349,13 +351,15 @@
                 <div class="mb-12 flex flex-wrap items-end justify-between gap-6 lg:mb-16">
                     <div class="max-w-xl">
                         <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">{{ __('site.nav.packages') }}</p>
+                        {{-- Kısa tutuldu: uzun başlıkta k-hl çubuğu iki satıra
+                             bölünüp kırık görünüyordu. --}}
                         <h2 class="k-display-sm text-[#0F0F0F]" data-split data-split-step="0.05">
-                            {{ $isEn ? 'Prices,' : 'Fiyatlar' }} <span class="k-hl">{{ $isEn ? 'in the open.' : 'açıkça yazılı.' }}</span>
+                            {{ $isEn ? 'Transparent' : 'Şeffaf' }} <span class="k-hl">{{ $isEn ? 'pricing.' : 'fiyatlandırma.' }}</span>
                         </h2>
                         <p class="k-reveal mt-5 text-[#0F0F0F]/60" data-delay="200">
                             {{ $isEn
-                                ? 'No "contact us for pricing". Every package, what it includes and what it costs — written down.'
-                                : '"Fiyat için arayın" yok. Her paketin kapsamı ve fiyatı burada yazıyor.' }}
+                                ? 'The scope and price of every package are published on this site. The quote wizard gives you the exact total for the scope you select.'
+                                : 'Her paketin kapsamı ve fiyatı sitemizde açıkça belirtilmiştir. Seçtiğiniz kapsama göre kesin tutarı teklif sihirbazından görebilirsiniz.' }}
                         </p>
                     </div>
                     <a href="{{ $r('packages') }}" class="k-reveal k-btn k-btn--ghost" data-delay="300">

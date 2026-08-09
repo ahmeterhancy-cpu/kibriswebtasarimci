@@ -334,13 +334,18 @@ function initScrollLinked() {
     if (!items.length) return;
     const rec = track(wrap, 'pin', null);
     rec.apply = () => {
-      if (scroll.vw < 900) { items.forEach((c) => { c.style.transform = ''; }); return; }
       const p = progressOf(rec) * (items.length - 1);
+      // Efekt her ekranda çalışır. Dar ekranda kartlar zaten birbirine yakın
+      // durduğu için derinliği azaltıyoruz — aynı değerler telefonda kartları
+      // gereğinden fazla küçültüp okunaksız yapıyor.
+      const narrow = scroll.vw < 768;
+      const depth = narrow ? 0.028 : 0.045;
+      const lift = narrow ? 6 : 10;
       items.forEach((card, i) => {
         const local = clamp(p - i);          // bu kart ne kadar "geride kaldı"
         // Yalnızca ölçek: opaklık düşürmek üstteki kartı saydamlaştırıp
         // altındaki kartın yazısını sızdırıyor. Kartlar opak kalmalı.
-        card.style.transform = `translate3d(0, ${(-local * 10).toFixed(1)}px, 0) scale(${(1 - local * 0.045).toFixed(4)})`;
+        card.style.transform = `translate3d(0, ${(-local * lift).toFixed(1)}px, 0) scale(${(1 - local * depth).toFixed(4)})`;
       });
     };
   });
