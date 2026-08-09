@@ -2,19 +2,29 @@
     $isEn = app()->getLocale() === 'en';
     $trailWorks = $works->filter(fn ($w) => filled($w->cover))->take(6);
 
+    // Web kurulumunun gerçek adımları. "İçerik ve yapı" bilerek TASARIMDAN
+    // ÖNCE: projeleri geciktiren şey neredeyse hiç kod değil, bekleyen metin
+    // ve görsel. Bunu ikinci adıma almak müşteriye de takvimin nereye
+    // bağlı olduğunu baştan söylüyor.
     $process = [
-        ['01', $isEn ? 'Understand' : 'Anlıyoruz', $isEn
-            ? 'What you sell, who buys it and why they pick you. The design answers this, not the other way round.'
-            : 'Ne sattığınızı, kimin aldığını ve neden sizi seçtiğini konuşuyoruz. Tasarım bu cevabın üzerine kuruluyor.'],
-        ['02', $isEn ? 'Draw' : 'Çiziyoruz', $isEn
-            ? 'Flow map, then wireframe, then interface. You see every step — no surprise handovers.'
-            : 'Önce akış, sonra tel kafes, sonra arayüz. Her adımı görüyorsunuz; sürpriz teslim yok.'],
-        ['03', $isEn ? 'Build' : 'Kuruyoruz', $isEn
-            ? 'Hand-written code, no page builders. Fast on mobile, indexable by Google, editable by you.'
-            : 'Elle yazılan kod, hazır kurucu yok. Mobilde hızlı, Google\'da görünür, sizin yönetebildiğiniz.'],
-        ['04', $isEn ? 'Launch & stay' : 'Yayınlıyoruz', $isEn
-            ? 'Panel training at handover, then care: backups, updates, monitoring. First month free.'
-            : 'Teslimde panel eğitimi, sonrasında bakım: yedek, güncelleme, izleme. İlk ay ücretsiz.'],
+        ['01', $isEn ? 'Scope' : 'Kapsam', $isEn
+            ? 'Exactly what gets built: page count, modules, languages, integrations — and the exact price. Nothing is left as "we will see later".'
+            : 'Tam olarak ne yapılacağı: kaç sayfa, hangi modüller, hangi diller, hangi entegrasyonlar — ve kesin fiyat. Hiçbir şey "sonra bakarız"a bırakılmıyor.'],
+        ['02', $isEn ? 'Content & structure' : 'İçerik ve yapı', $isEn
+            ? 'Sitemap first, then the text, photos and logo. This is the step that decides the timeline — code rarely delays a project, missing content always does.'
+            : 'Önce sayfa haritası, sonra metin, fotoğraf ve logo. Takvimi belirleyen adım budur — projeyi geciktiren şey kod değil, eksik içeriktir.'],
+        ['03', $isEn ? 'Design' : 'Tasarım', $isEn
+            ? 'Home page first; inner pages once you approve it. Designed from a blank page for your business. Revisions happen here, before a line of code.'
+            : 'Önce ana sayfa, onaylayınca iç sayfalar. Şablondan değil, işinize göre sıfırdan. Revizyonlar burada yapılıyor — tek satır kod yazılmadan önce.'],
+        ['04', $isEn ? 'Build' : 'Geliştirme', $isEn
+            ? 'Hand-written code, no page builders. Admin panel set up, content loaded, mobile and desktop progressing together.'
+            : 'Elle yazılan kod, hazır kurucu yok. Yönetim paneli kuruluyor, içerik giriliyor; mobil ve masaüstü birlikte ilerliyor.'],
+        ['05', $isEn ? 'Test & launch' : 'Test ve yayın', $isEn
+            ? 'Real devices and browsers, speed measurement, every form submitted. Domain, SSL, sitemap and Search Console. Panel training at handover.'
+            : 'Gerçek cihaz ve tarayıcılarda test, hız ölçümü, her formun denenmesi. Alan adı, SSL, sitemap ve Search Console kurulumu. Teslimde panel eğitimi.'],
+        ['06', $isEn ? 'After launch' : 'Yayın sonrası', $isEn
+            ? 'Backups, updates, monitoring and content changes. First month free — and someone actually picks up the phone.'
+            : 'Yedek, güncelleme, izleme ve içerik değişiklikleri. İlk ay ücretsiz — ve telefonu gerçekten açan biri var.'],
     ];
 
     $stats = [
@@ -297,13 +307,21 @@
             <div class="mb-14 max-w-2xl">
                 <p class="k-eyebrow k-reveal mb-5" style="color:rgba(255,255,255,0.4);">{{ $isEn ? 'Process' : 'Süreç' }}</p>
                 <h2 class="k-display-sm" style="color:#ffffff;" data-split data-split-step="0.05">
-                    {{ $isEn ? 'Four steps,' : 'Dört adım,' }} {{ $isEn ? 'no surprises.' : 'sürpriz yok.' }}
+                    {{ $isEn ? 'From scope to launch,' : 'Kapsamdan yayına,' }}
+                    <span class="k-hl">{{ $isEn ? 'six steps.' : 'altı adım.' }}</span>
                 </h2>
+                <p class="k-reveal mt-6 max-w-xl leading-relaxed" style="color:rgba(255,255,255,0.55);" data-delay="200">
+                    {{ $isEn
+                        ? 'Each step ends with something you can see and approve. You are never waiting on a black box.'
+                        : 'Her adım, görüp onaylayabileceğiniz bir çıktıyla bitiyor. Kapalı bir kutunun bitmesini beklemiyorsunuz.' }}
+                </p>
             </div>
 
             {{-- Kartlar gerçekten yapışkan: her biri bir öncekinin üstüne biner.
                  JS ayrıca alttakileri hafifçe küçültüp soldurur (derinlik). --}}
-            <div data-stack class="space-y-[38vh] md:space-y-[42vh]">
+            {{-- Aralık kart sayısına göre: 4 kartta 42vh uygundu, 6 kartta
+                 toplam kaydırma mesafesini aynı tutmak için daralttık. --}}
+            <div data-stack class="space-y-[26vh] md:space-y-[29vh]">
                 @foreach ($process as $i => [$no, $title, $text])
                     <article data-stack-item
                              class="k-reveal rounded-2xl border border-white/12 bg-[#141414] p-7 md:sticky lg:p-10"
