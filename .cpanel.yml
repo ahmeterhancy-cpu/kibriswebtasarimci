@@ -1,25 +1,12 @@
 ---
-# cPanel Git Version Control dağıtım betiği.
+# cPanel Git Version Control dağıtım betiği — SSH'sız kurulum.
 #
 # cPanel'de "Deploy HEAD Commit" düğmesine basıldığında bu görevler sunucuda
-# çalışır. Depo cPanel'de ~/repositories/kibriswebtasarimci altına klonlanır;
-# buradan yayın dizinine kopyalanır.
+# ÇALIŞIR. Yani SSH ile giriş yapamasanız bile buradaki komutlar işler;
+# composer ve artisan bu sayede kullanılabiliyor.
 #
-# DEPLOYPATH'i kendi hesabınıza göre düzenleyin:
-#   - Ana alan adı ise:   /home/KULLANICI/public_html/
-#   - Alt alan/addon ise: /home/KULLANICI/kibriswebtasarimci.com/
-#
-# ÖNEMLİ — Laravel'in public/ dizini:
-# cPanel yayın dizini genelde public_html'dir; Laravel ise public/ klasörünü
-# kök yapar. İki yol var:
-#   (a) Uygulamayı public_html DIŞINA kurup public_html'i public/ dizinine
-#       symlink yapmak (en temiz, SSH gerekir),
-#   (b) Uygulamayı public_html içine kurup .htaccess ile public/ dizinine
-#       yönlendirmek (SSH yoksa bu — kurulum notlarına bakın).
-#
-# vendor/ depoda YOK (.gitignore). Aşağıdaki composer adımı sunucuda çalışmazsa
-# (paylaşımlı hostta composer kapalı olabilir) DEPLOY.md'deki alternatifi
-# uygulayın.
+# TEK DÜZENLEMENİZ GEREKEN YER: aşağıdaki KULLANICI değeri.
+# cPanel → sağ üstteki kullanıcı adı ya da File Manager'daki /home/... yolu.
 
 deployment:
   tasks:
@@ -27,8 +14,10 @@ deployment:
     - export REPOPATH=/home/KULLANICI/repositories/kibriswebtasarimci
 
     # --- Uygulama dosyaları -------------------------------------------------
-    # .env, storage/ ve vendor/ KOPYALANMAZ: bunlar sunucuda kalıcıdır,
-    # her dağıtımda üzerine yazılmamalı.
+    # KOPYALANMAYANLAR ve sebepleri:
+    #   .env      → sunucuda elle oluşturuldu, üzerine yazılmamalı
+    #   storage/  → yüklenen görseller ve loglar burada
+    #   vendor/   → depoda yok; ilk kurulumda elle yüklenir (bkz. DEPLOY.md)
     - /bin/rsync -av --delete
         --exclude='.git'
         --exclude='.env'
@@ -36,16 +25,23 @@ deployment:
         --exclude='vendor/'
         --exclude='node_modules/'
         --exclude='tests/'
+        --exclude='*.zip'
         $REPOPATH/ $DEPLOYPATH/
 
     # --- Bağımlılıklar ------------------------------------------------------
-    # Composer sunucuda varsa kur; yoksa bu adım sessizce atlanır ve vendor/
-    # dizinini elle yüklemeniz gerekir (bkz. DEPLOY.md).
-    - cd $DEPLOYPATH && (command -v composer >/dev/null 2>&1 && composer install --no-dev --optimize-autoloader --no-interaction || echo "composer bulunamadi, vendor/ elle yuklenmeli")
+    # Sunucuda composer varsa kullanır. Yoksa hata vermeden geçer; o durumda
+    # vendor/ klasörünü bir kez elle yüklemeniz yeterli (her dağıtımda değil).
+    - cd $DEPLOYPATH && (command -v composer >/dev/null 2>&1 && composer install --no-dev --optimize-autoloader --no-interaction || echo "composer yok — vendor/ elle yuklenmis olmali")
 
-    # --- Laravel önbellekleri ----------------------------------------------
-    # Yapılandırma, rota ve görünüm önbelleği canlıda performansı belirgin
-    # artırır. Her dağıtımda yeniden üretilmeli, yoksa eski değerler kalır.
+    # --- Veritabanı ---------------------------------------------------------
+    # SSH olmadığı için migration'ı burada çalıştırıyoruz. Laravel yalnızca
+    # HENÜZ ÇALIŞTIRILMAMIŞ migration'ları uygular; mevcut veriye dokunmaz.
+    # Seed BİLEREK YOK: her dağıtımda içeriği başa döndürürdü.
+    - cd $DEPLOYPATH && php artisan migrate --force
+
+    # --- Önbellekler --------------------------------------------------------
+    # Önce temizle, sonra üret. Sıra önemli: eski config cache'i temizlenmeden
+    # yeni .env değerleri okunmaz.
     - cd $DEPLOYPATH && php artisan config:clear
     - cd $DEPLOYPATH && php artisan cache:clear
     - cd $DEPLOYPATH && php artisan view:clear
@@ -53,13 +49,7 @@ deployment:
     - cd $DEPLOYPATH && php artisan route:cache
     - cd $DEPLOYPATH && php artisan view:cache
 
-    # --- Yüklenen dosyalar için symlink ------------------------------------
-    # storage/app/public → public/storage. Panelden yüklenen görseller
-    # (logo, favicon, OG, iş kapakları) bu bağ olmadan görünmez.
+    # --- Yüklenen dosyalar --------------------------------------------------
+    # storage/app/public → public/storage bağı. Bu olmadan panelden yüklenen
+    # logo, favicon, OG görseli ve iş kapakları sitede görünmez.
     - cd $DEPLOYPATH && php artisan storage:link || true
-
-    # --- Migration ----------------------------------------------------------
-    # BİLEREK OTOMATİK DEĞİL. Şema değişikliği veri kaybettirebilir; canlıda
-    # ne çalıştığını görerek yapın:
-    #   php artisan migrate --force
-    # SSH yoksa phpMyAdmin'den elle çalıştırın (README, cPanel bölümü).

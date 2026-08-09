@@ -1,0 +1,32 @@
+# ==========================================================================
+#  public_html KÖK DİZİN .htaccess
+#
+#  Bu dosya SSH'ın olmadığı cPanel kurulumu içindir. Laravel'in web kökü
+#  public/ dizinidir; burada tüm proje public_html içine kurulduğu için
+#  istekleri public/ dizinine yönlendiriyoruz.
+#
+#  SSH VARSA BU DOSYAYA GEREK YOK: public_html'i doğrudan public/ dizinine
+#  symlink yapmak hem daha temiz hem daha güvenli.
+# ==========================================================================
+
+# --- Hassas dosyaları kapat ----------------------------------------------
+# Bu kurulumda .env, veritabanı ve kaynak kodu web kökünün ALTINDA kalıyor.
+# Sunucu yapılandırması bir gün değişirse diye erişimi burada da kesiyoruz;
+# tek savunma hattına güvenilmez.
+RedirectMatch 404 (?i)^/(\.env|\.git|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml|README\.md|DEPLOY\.md)$
+RedirectMatch 404 (?i)^/(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor|node_modules)(/|$)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # --- HTTPS zorunlu ---------------------------------------------------
+    # AutoSSL kurulduktan SONRA etkinleştirin. Sertifika yokken açarsanız
+    # site erişilemez hâle gelir.
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # --- İstekleri public/ dizinine taşı ---------------------------------
+    # Zaten public/ ile başlayan istekleri tekrar yönlendirme (sonsuz döngü).
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
