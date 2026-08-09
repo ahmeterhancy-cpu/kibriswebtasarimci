@@ -70,6 +70,13 @@
                         </li>
                     @endforeach
                 </ul>
+
+                {{-- Sayfası olan şehirler bunlar; hizmet bölgesi tamamı. --}}
+                <p class="k-reveal mt-8 text-sm text-[#0F0F0F]/50" data-delay="200">
+                    {{ $region === 'turkiye'
+                        ? ($isEn ? '…and every other city in Türkiye.' : '…ve Türkiye\'nin diğer tüm şehirleri.')
+                        : ($isEn ? '…and everywhere else in North Cyprus.' : '…ve Kuzey Kıbrıs\'ın diğer tüm bölgeleri.') }}
+                </p>
             </div>
         </section>
     @endforeach

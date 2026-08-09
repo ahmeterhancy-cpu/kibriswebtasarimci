@@ -291,13 +291,21 @@
                 <p class="k-eyebrow k-reveal mb-6 text-[#0F0F0F]/45">
                     {{ $isEn ? 'Other cities in '.$location->regionLabel() : $location->regionLabel().'\'ta diğer şehirler' }}
                 </p>
-                <div class="flex flex-wrap gap-2.5">
+                <div class="flex flex-wrap items-center gap-2.5">
                     @foreach ($siblings as $sibling)
                         <a href="{{ $r('locations.show', ['location' => $sibling->slug]) }}"
                            class="k-btn k-btn--ghost !px-5 !py-2.5 !text-[0.66rem]">
                             <span>{{ $sibling->t('name') }}</span>
                         </a>
                     @endforeach
+
+                    {{-- Liste kapsamı sınırlıyormuş gibi okunmasın: sayfası olan
+                         şehirler bunlar, hizmet bölgesi tamamı. --}}
+                    <span class="ml-1 text-sm text-[#0F0F0F]/50">
+                        {{ $location->region === 'turkiye'
+                            ? ($isEn ? 'and every other city in Türkiye' : 've Türkiye\'nin diğer tüm şehirleri')
+                            : ($isEn ? 'and everywhere else in North Cyprus' : 've Kuzey Kıbrıs\'ın diğer tüm bölgeleri') }}
+                    </span>
                 </div>
             </div>
         </section>
