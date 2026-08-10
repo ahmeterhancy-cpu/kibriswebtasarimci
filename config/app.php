@@ -137,4 +137,21 @@ return [
 
     'setup_token' => env('SETUP_TOKEN'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | İlk Yönetici Hesabı
+    |--------------------------------------------------------------------------
+    |
+    | Tohum verisi çalıştırıldığında oluşturulacak hesap. Şifre BİLEREK burada
+    | yazılı değil: depo herkese açık olduğunda sabit kodlanmış bir şifre
+    | doğrudan yönetim paneline giriş demektir.
+    |
+    | ADMIN_PASSWORD tanımlı değilse seeder rastgele bir şifre üretir ve
+    | çıktıda bir kez gösterir.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'admin@kibriswebtasarimci.com'),
+    'admin_password' => env('ADMIN_PASSWORD'),
+
 ];

@@ -201,9 +201,9 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
 ## 9. Yayın sonrası kontrol listesi
 
 - [ ] `https://alanadi.com` açılıyor, kilit simgesi yeşil
-- [ ] `/admin` girişi çalışıyor → **şifreyi hemen değiştirin.**
-      `admin@kibriswebtasarimci.com` / `kwt2026!` yalnızca kurulum şifresidir
-      ve bu belgede yazılı olduğu için artık gizli değildir
+- [ ] `/admin` girişi çalışıyor. Şifre kurulum çıktısında bir kez gösterildi;
+      kaçırdıysanız `.env`'e `ADMIN_PASSWORD=` ekleyip kullanıcıyı silip
+      seed'i tekrar çalıştırın
 - [ ] `/sitemap.xml`, `/robots.txt`, `/llms.txt` gerçek alan adını gösteriyor
       (hepsi `localhost` yazıyorsa `APP_URL` yanlış ya da config cache eski)
 - [ ] Panelden bir görsel yükleyin, sitede göründüğünü doğrulayın

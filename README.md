@@ -16,7 +16,11 @@ php artisan storage:link
 npm run start          # php artisan serve :8124 + vite, birlikte
 ```
 
-Admin: <http://127.0.0.1:8124/admin> — `admin@kibriswebtasarimci.com` / `kwt2026!`
+Admin: <http://127.0.0.1:8124/admin>
+
+Şifre depoda YOK. `php artisan db:seed` ilk çalıştığında rastgele üretilip
+konsolda bir kez gösterilir; sabitlemek isterseniz `.env` içine
+`ADMIN_PASSWORD=` ekleyin.
 **Canlıya çıkmadan önce bu şifreyi değiştirin.**
 
 ### Örnek portfolyo verisi
