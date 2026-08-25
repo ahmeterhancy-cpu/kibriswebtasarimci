@@ -1,68 +1,68 @@
-# Canlıya alma — cPanel
+# Canlıya alma — cPanel + Git
 
-## Önce: shell erişimi açık mı?
-
-cPanel → Git Version Control ekranında şu uyarı varsa **shell erişimi kapalı**:
-
-> *Your system administrator must enable shell access to allow you to view
-> clone URLs.*
-
-Bu yalnız "clone adresini göremezsin" demek değil: **`.cpanel.yml` dağıtım
-görevleri de çalışmaz.** Yani composer, migration ve önbellek komutları
-otomatik işlemez.
-
-### Yol A — shell'i açtırın (önerilen)
-
-Hosting firmasına tek cümlelik destek talebi yeterli:
-
-> `kibr4830` hesabı için **Jailed Shell (Jailed SSH)** erişimini açar mısınız?
-> Git Version Control dağıtımı için gerekiyor.
-
-Çoğu firma dakikalar içinde açıyor. Açıldıktan sonra bu belgedeki Git akışı
-olduğu gibi işler.
-
-### Yol B — shell olmadan (bu belgenin kalanı)
-
-Dosyalar File Manager ile yüklenir, veritabanı kurulumu tarayıcıdan
-çalıştırılır. Çalışır, ama her güncellemede dosyaları elle yüklemeniz gerekir.
+Ay Parçası kurulumunda yanarak öğrenilen kurallar bu belgeye işlendi.
+Sırayla takip edin.
 
 ---
 
-## 0. Önce hazır olması gerekenler
+## 0. Önce bunları öğrenin
 
-| | Neden |
+| Soru | Neden önemli |
 |---|---|
-| Alan adı DNS'i sunucuya yönlendirilmiş | Yoksa site açılmaz, SSL alınamaz |
-| MySQL veritabanı + kullanıcı (cPanel → MySQL Databases) | Kullanıcıya **ALL PRIVILEGES** verin |
-| PHP **8.3+** (cPanel → MultiPHP Manager) | `composer.json` `^8.3` istiyor; 8.2'de kurulmaz |
+| **PHP sürümü kaç?** (MultiPHP Manager **ve** PHP Selector ayrı ayrı) | **8.4.1'den düşükse site hiç açılmaz** — aşağıya bakın |
+| Alan adının kök dizini değiştirilebiliyor mu? | Değişemiyorsa uygulama `public_html` içine kurulur, `.htaccess` koruması şart |
+| SSH/Terminal var mı? | Yoksa artisan komutları yalnız deploy görevlerinden çalışır |
+| Composer kurulu mu? | Yoksa `vendor/` elle yüklenir (`vendor-production.zip` hazır) |
+| MySQL veritabanı + kullanıcı | Kullanıcıya **ALL PRIVILEGES** verin |
 | Eklentiler: `mbstring`, `intl`, `pdo_mysql`, `openssl`, `fileinfo`, `zip`, `gd` | Laravel + Filament asgarisi |
+
+### PHP 8.4.1 zorunlu — dikkat
+
+`composer.json` `^8.3` yazıyor ve Laravel'in kendi kısıtı da o. **Ama** bağımlılık
+ağacındaki Symfony 8 bileşenleri `>=8.4.1` istiyor. Yani:
+
+```
+Sunucuda PHP 8.3  →  site açılmaz (beyaz ekran / fatal error)
+Sunucuda PHP 8.4.1+  →  çalışır
+```
+
+cPanel'de 8.4+ yoksa haber verin — bağımlılıkları sunucunun sürümüne göre
+yeniden çözerim (`composer.json` içine `config.platform.php` yazılır, Symfony
+7.x'e düşülür). Yerelde çözülmüş `vendor/` sunucudan yeni bir PHP ile
+üretilmişse site açılmaz; bu en sık yapılan hata.
 
 > **mbstring** bazı paylaşımlı hostlarda kapalı gelir. Kapalıysa Türkçe
 > karakterler bozulur ve panel çalışmaz. MultiPHP INI Editor'dan açın.
 
 ---
 
-## 1. GitHub deposu
+## 1. GitHub deposu — neden public
 
-Depo **private** olmalı.
+cPanel klon adresinde parola/token **kabul etmiyor**:
 
-```bash
-gh repo create kibriswebtasarimci --private --source=. --remote=origin --push
-```
+> *The clone URL cannot include a password.*
 
-Private depoyu cPanel'in çekebilmesi için bir **Personal Access Token** gerekir:
-GitHub → Settings → Developer settings → Personal access tokens → Fine-grained
-→ yalnız bu depoya `Contents: Read` yetkisi.
+SSH yoksa deploy key de üretilemiyor. Yani private depo için pratikte yol
+kalmıyor → depo **public** yapıldı.
+
+Public yapmadan önce yapılanlar (yeni projede de yapın):
+
+- `.env` geçmişte **hiç** commit'lenmemiş olmalı — git geçmişi de okunur,
+  geçmişte geçen bir parola yanmış sayılır
+- Seeder'daki sabit parolalar temizlendi → `ADMIN_PASSWORD` env'den okunur,
+  yoksa rastgele üretilip kurulum çıktısında bir kez gösterilir
 
 ---
 
 ## 2. cPanel → Git Version Control
 
-1. **Create** → *Clone a Repository* işaretli
-2. **Clone URL**:
-   `https://TOKEN@github.com/ahmeterhancy-cpu/kibriswebtasarimci.git`
-3. **Repository Path**: `/home/kibr4830/repositories/kibriswebtasarimci`
+1. **Create** → *Clone a Repository* açık
+2. **Clone URL** (token YOK):
+   `https://github.com/ahmeterhancy-cpu/kibriswebtasarimci.git`
+3. **Repository Path**: `repositories/kibriswebtasarimci`
 4. **Create**
+
+> Klonlamak dosyaları `public_html`e koymaz. Taşıyan şey **deploy**.
 
 ---
 
@@ -130,61 +130,91 @@ Bu paket `--no-dev` ile hazırlandı; test ve geliştirme araçları içinde yok
 
 cPanel → Git Version Control → **Manage** → **Deploy HEAD Commit**
 
-`.cpanel.yml` şunları yapar: dosyaları `public_html`e kopyalar, composer'ı
-dener, **migration'ları çalıştırır**, önbellekleri üretir, `storage:link`
+`.cpanel.yml` şunları yapar: dizinleri açar, dosyaları `public_html`e kopyalar,
+`storage/framework` iskeletini kurar, izinleri 775 yapar, composer'ı dener,
+**migration'ları çalıştırır**, `optimize` ile önbellek üretir, `storage:link`
 bağını kurar.
 
-Deploy günlüğünü aynı ekrandan okuyabilirsiniz.
+### Günlüğü okuyun
+
+`.cpanel.yml` kendi günlüğünü yazıyor:
+
+```
+/home/kibr4830/deploy-son.log
+```
+
+File Manager ile açın. cPanel'in kendi günlüğünü aramaktan daha hızlı ve
+`php -v` çıktısı da içinde — **hangi PHP sürümüyle çalıştığını buradan
+görürsünüz.** 8.4.1'in altındaysa haber verin.
+
+### Deploy sessizce düşerse
+
+`.cpanel.yml` geçersiz YAML olursa cPanel hata **göstermez**; "Last Deployed"
+son başarılı commit'te donar. En sık sebep: bir görev metnine **iki nokta +
+boşluk** girmesi (`echo "ENV: VAR"`). Dosyayı düzenlerseniz bu kurala dikkat.
 
 ---
 
 ## 6. Veritabanını kurun
 
-### Shell varsa (Yol A)
+Migration'lar `.cpanel.yml` içinde otomatik çalışıyor; tablolar kurulur ama
+**içerik boş gelir**. İçeriği yüklemenin üç yolu var, sırayla deneyin.
 
-`.cpanel.yml` migration'ı zaten çalıştırdı. İçerik için bir kez şu satırı
-ekleyip deploy edin, sonra satırı **silin**:
+### (a) Deploy görevine tek satır — en basit
+
+`.cpanel.yml` sonuna geçici olarak ekleyin, bir kez deploy edin, satırı **silin**:
 
 ```yaml
-    - cd $DEPLOYPATH && php artisan db:seed --force
+    - cd /home/kibr4830/public_html && php artisan db:seed --force >> /home/kibr4830/deploy-son.log 2>&1
 ```
 
-### Shell yoksa (Yol B) — tarayıcıdan kurulum
+Yönetici şifresi rastgele üretilip **günlüğe yazılır** — `deploy-son.log`
+dosyasından alın.
 
-`.env` dosyasına rastgele bir anahtar ekleyin:
+> Satırı kalıcı bırakmayın: her dağıtımda panelden yaptığınız düzenlemeleri
+> tohum verisine geri döndürür.
+
+### (b) Tarayıcıdan kurulum
+
+Deploy görevleri hiç çalışmıyorsa (`.env` dosyasına ekleyin):
 
 ```dotenv
 SETUP_TOKEN=buraya-uzun-ve-rastgele-bir-dize-yazin
 ```
 
-Sonra tarayıcıda açın:
+Sonra açın: `https://alanadi.com/kurulum/AYNI-DIZE`
 
-```
-https://alanadi.com/kurulum/buraya-uzun-ve-rastgele-bir-dize-yazin
-```
+Migration + seed + `storage:link` + önbellek üretimini çalıştırır, ne yaptığını
+ekranda satır satır yazar. **Bittiğinde `.env`'den `SETUP_TOKEN` satırını
+silin** — anahtar yokken rota hiç kaydedilmez.
 
-Sayfa migration'ları çalıştırır, içeriği yükler, `storage:link` bağını kurar
-ve önbellekleri üretir; ne yaptığını ekranda satır satır yazar.
+> İkinci kez açılırsa içeriğiniz geri dönmez: tablolar kuruluysa seed atlanır.
 
-**Bittiğinde `.env`'den `SETUP_TOKEN` satırını silin.** Anahtar yokken rota
-hiç kaydedilmez — silmek adresi tamamen yok etmekle aynı şeydir.
+### (c) mysqldump + phpMyAdmin — en hızlısı
 
-> Bu adres yanlışlıkla ikinci kez açılırsa içeriğiniz **geri dönmez**:
-> tablolar kuruluysa seed adımı atlanır, yalnız bekleyen migration çalışır.
+Ay Parçası'nda en hızlı yol buydu. Yerelde geçici bir MySQL kurup şemayı ve
+veriyi dökün, phpMyAdmin'den içe aktarın.
+
+Bu projede yerel veritabanı **SQLite** olduğu için önce MySQL'e taşımak
+gerekir; (a) ya da (b) çalışıyorsa buna gerek yok.
+
+phpMyAdmin'e SQL yapıştırırken:
+
+- `--` yorum satırı kullanmayın, `/* */` kullanın (satır sonları kayboluyor)
+- `information_schema` sorgusu koymayın — `#1044` verip tüm import'u iptal eder
 
 ---
 
 ## 7. Dosya izinleri
 
-File Manager → sağ tık → **Change Permissions**:
+`.cpanel.yml` her dağıtımda `storage` ve `bootstrap/cache` dizinlerini **775**
+yapıyor — normalde elle bir şey gerekmez.
 
-| Klasör | İzin |
-|---|---|
-| `storage` ve tüm alt klasörleri | **775** (Recurse into subdirectories) |
-| `bootstrap/cache` | **775** |
+Yine de beyaz ekran görürseniz File Manager → sağ tık → **Change Permissions**
+ile doğrulayın (Recurse into subdirectories işaretli).
 
-Yazılamayan `storage/` = beyaz ekran. Hata log dosyasında da görünmez, çünkü
-log dosyası da yazılamaz.
+> Yazılamayan `storage/` = beyaz ekran. Hata log dosyasında da görünmez,
+> çünkü log dosyası da yazılamaz.
 
 ---
 
@@ -209,7 +239,10 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
 - [ ] Panelden bir görsel yükleyin, sitede göründüğünü doğrulayın
       (`storage:link` çalışmamışsa görünmez)
 - [ ] İletişim formundan test mesajı gönderin, panele düştüğünü görün
-- [ ] `.env` dosyasına tarayıcıdan erişilemiyor: `alanadi.com/.env` → 404
+- [ ] `.env` dosyasına tarayıcıdan erişilemiyor: `alanadi.com/.env` → 403/404
+- [ ] `alanadi.com/vendor/` ve `alanadi.com/storage/logs/` → 403/404
+- [ ] `alanadi.com/storage/` altındaki yüklenmiş bir görsel **açılıyor**
+      (bu adres kapatılmamalı, panel görselleri buradan servis edilir)
 - [ ] Google Search Console doğrulaması + sitemap gönderimi
 - [ ] Google Business Profile adresi ile sitedeki adres birebir aynı
 
@@ -221,8 +254,14 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
 git push
 ```
 
-cPanel → Git Version Control → **Manage** → **Update from Remote** →
-**Deploy HEAD Commit**.
+cPanel → Git Version Control → **Manage** →
+
+1. **Update from Remote** — GitHub'daki yeni commit'leri sunucudaki depoya çeker
+2. **Deploy HEAD Commit** — çekilen kodu `public_html`e taşır
+
+**İki düğme iki ayrı iş.** Yalnız ikincisine basmak eski kodu tekrar kurar —
+bu tuzağa birkaç kez düşüldü. Basdıktan sonra **Last Deployed SHA değişti mi**
+kontrol edin; değişmediyse deploy düşmüş demektir (günlüğe bakın).
 
 Migration otomatik çalışır (yalnız yenileri). Seed çalışmaz — panel
 içeriğiniz korunur.

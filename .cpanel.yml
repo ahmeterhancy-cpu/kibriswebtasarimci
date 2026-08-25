@@ -1,55 +1,73 @@
 ---
-# cPanel Git Version Control dağıtım betiği — SSH'sız kurulum.
+# cPanel Git Version Control dagitim betigi.
 #
-# cPanel'de "Deploy HEAD Commit" düğmesine basıldığında bu görevler sunucuda
-# ÇALIŞIR. Yani SSH ile giriş yapamasanız bile buradaki komutlar işler;
-# composer ve artisan bu sayede kullanılabiliyor.
+# BES KURAL (baska projede yanarak ogrenildi, bozmayin):
+#   1. Her gorev TEK SATIR. Cok satirli komut ayristiriciyi kirar.
+#   2. Metinlerde iki nokta + BOSLUK kullanma. "ENV: VAR" gibi bir echo
+#      dosyayi gecersiz YAML yapar; cPanel deploy'u SESSIZCE dusurur ve
+#      "Last Deployed" son basarili commit'te donar. Hata gorunmez.
+#   3. Mutlak yol kullan. Deploy kabugunun PATH'i dar. rsync cogu sunucuda
+#      YOK — kopyalama /bin/cp ile ve dizinler tek tek sayilarak yapilir.
+#   4. .env ve storage/ kopyalanmaz; ama storage/framework iskeleti
+#      mkdir -p ile kurulur, ilk deploy'da yoktur.
+#   5. Kendi gunlugunu yaz. cPanel'in gunlugunu aramaktan iyidir.
 #
-# Yollar bu hesaba göre ayarlandı (cPanel kullanıcısı: kibr4830).
-# Hesap değişirse aşağıdaki iki export satırını güncelleyin.
+# Degisken kullanilmiyor: gorevler ayri kabukta calisirsa export kaybolur.
+# Yollar birebir yazili. Hesap degisirse tumunu degistirin (kibr4830).
+#
+# Gunluk: /home/kibr4830/deploy-son.log
+# Dosya Yoneticisi'nden acip okuyun.
 
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/kibr4830/public_html
-    - export REPOPATH=/home/kibr4830/repositories/kibriswebtasarimci
+    - /bin/echo "===== DEPLOY BASLADI =====" > /home/kibr4830/deploy-son.log 2>&1
+    - /bin/date >> /home/kibr4830/deploy-son.log 2>&1
+    - php -v >> /home/kibr4830/deploy-son.log 2>&1
 
-    # --- Uygulama dosyaları -------------------------------------------------
-    # KOPYALANMAYANLAR ve sebepleri:
-    #   .env      → sunucuda elle oluşturuldu, üzerine yazılmamalı
-    #   storage/  → yüklenen görseller ve loglar burada
-    #   vendor/   → depoda yok; ilk kurulumda elle yüklenir (bkz. DEPLOY.md)
-    - /bin/rsync -av --delete
-        --exclude='.git'
-        --exclude='.env'
-        --exclude='storage/'
-        --exclude='vendor/'
-        --exclude='node_modules/'
-        --exclude='tests/'
-        --exclude='*.zip'
-        $REPOPATH/ $DEPLOYPATH/
+    - /bin/mkdir -p /home/kibr4830/public_html >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/app >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/bootstrap >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/config >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/database >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/lang >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/public >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/resources >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/routes >> /home/kibr4830/deploy-son.log 2>&1
 
-    # --- Bağımlılıklar ------------------------------------------------------
-    # Sunucuda composer varsa kullanır. Yoksa hata vermeden geçer; o durumda
-    # vendor/ klasörünü bir kez elle yüklemeniz yeterli (her dağıtımda değil).
-    - cd $DEPLOYPATH && (command -v composer >/dev/null 2>&1 && composer install --no-dev --optimize-autoloader --no-interaction || echo "composer yok — vendor/ elle yuklenmis olmali")
+    - /bin/echo "----- dosyalar kopyalaniyor -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/app/. /home/kibr4830/public_html/app/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/bootstrap/. /home/kibr4830/public_html/bootstrap/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/config/. /home/kibr4830/public_html/config/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/database/. /home/kibr4830/public_html/database/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/lang/. /home/kibr4830/public_html/lang/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/public/. /home/kibr4830/public_html/public/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/resources/. /home/kibr4830/public_html/resources/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/routes/. /home/kibr4830/public_html/routes/ >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/artisan /home/kibr4830/public_html/artisan >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/composer.json /home/kibr4830/public_html/composer.json >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/composer.lock /home/kibr4830/public_html/composer.lock >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/cp -a /home/kibr4830/repositories/kibriswebtasarimci/.htaccess /home/kibr4830/public_html/.htaccess >> /home/kibr4830/deploy-son.log 2>&1
 
-    # --- Veritabanı ---------------------------------------------------------
-    # SSH olmadığı için migration'ı burada çalıştırıyoruz. Laravel yalnızca
-    # HENÜZ ÇALIŞTIRILMAMIŞ migration'ları uygular; mevcut veriye dokunmaz.
-    # Seed BİLEREK YOK: her dağıtımda içeriği başa döndürürdü.
-    - cd $DEPLOYPATH && php artisan migrate --force
+    - /bin/echo "----- storage iskeleti -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/storage/app/public >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/storage/framework/cache/data >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/storage/framework/sessions >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/storage/framework/views >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/storage/logs >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/mkdir -p /home/kibr4830/public_html/bootstrap/cache >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/chmod -R 775 /home/kibr4830/public_html/storage >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/chmod -R 775 /home/kibr4830/public_html/bootstrap/cache >> /home/kibr4830/deploy-son.log 2>&1
 
-    # --- Önbellekler --------------------------------------------------------
-    # Önce temizle, sonra üret. Sıra önemli: eski config cache'i temizlenmeden
-    # yeni .env değerleri okunmaz.
-    - cd $DEPLOYPATH && php artisan config:clear
-    - cd $DEPLOYPATH && php artisan cache:clear
-    - cd $DEPLOYPATH && php artisan view:clear
-    - cd $DEPLOYPATH && php artisan config:cache
-    - cd $DEPLOYPATH && php artisan route:cache
-    - cd $DEPLOYPATH && php artisan view:cache
+    - /bin/echo "----- composer -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && composer install --no-dev --optimize-autoloader --no-interaction >> /home/kibr4830/deploy-son.log 2>&1 || /bin/echo "composer yok, vendor elle yuklenmis olmali" >> /home/kibr4830/deploy-son.log 2>&1
 
-    # --- Yüklenen dosyalar --------------------------------------------------
-    # storage/app/public → public/storage bağı. Bu olmadan panelden yüklenen
-    # logo, favicon, OG görseli ve iş kapakları sitede görünmez.
-    - cd $DEPLOYPATH && php artisan storage:link || true
+    - /bin/echo "----- veritabani -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && php artisan migrate --force >> /home/kibr4830/deploy-son.log 2>&1
+
+    - /bin/echo "----- onbellek -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && php artisan optimize:clear >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && php artisan optimize >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && php artisan storage:link >> /home/kibr4830/deploy-son.log 2>&1 || /bin/echo "storage link zaten var" >> /home/kibr4830/deploy-son.log 2>&1
+
+    - /bin/echo "===== DEPLOY BITTI =====" >> /home/kibr4830/deploy-son.log 2>&1
+    - /bin/date >> /home/kibr4830/deploy-son.log 2>&1
