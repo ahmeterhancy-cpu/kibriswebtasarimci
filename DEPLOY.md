@@ -115,16 +115,28 @@ php artisan key:generate --show
 
 ---
 
-## 4. `vendor/` klasörünü yükleyin (yalnız bir kez)
+## 4. `vendor/` klasörünü yükleyin
 
-Sunucuda composer yoksa gereklidir; varsa `.cpanel.yml` zaten hallediyor.
+**Bu sunucuda composer YOK** — deploy günlüğü doğruladı:
+
+```
+composer: command not found
+```
+
+`.cpanel.yml` bilinen dört yolu deniyor; hiçbiri bulunamazsa `vendor/`
+elle yüklenmek zorunda. Bu kurulumda öyle.
 
 1. Proje kökündeki **`vendor-production.zip`** (16 MB) dosyasını File Manager
-   ile `public_html` içine yükleyin
-2. Sağ tık → **Extract**
+   ile `/home/kibr4830/public_html` içine yükleyin
+2. Sağ tık → **Extract** → `public_html/vendor/` oluşur
 3. Zip dosyasını silin
+4. Doğrulayın: `public_html/vendor/autoload.php` dosyası var mı
 
-Bu paket `--no-dev` ile hazırlandı; test ve geliştirme araçları içinde yok.
+Paket `--no-dev --optimize-autoloader` ile ve **PHP 8.4.1 hedefiyle**
+hazırlandı; test ve geliştirme araçları içinde yok.
+
+> Bir daha gerekmez. Sonraki dağıtımlar `vendor/` dizinine dokunmuyor.
+> Yalnızca `composer.lock` değişirse (yeni paket eklenirse) zip'i yenilerim.
 
 ---
 

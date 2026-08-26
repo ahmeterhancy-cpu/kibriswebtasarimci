@@ -58,16 +58,20 @@ deployment:
     - /bin/chmod -R 775 /home/kibr4830/public_html/storage >> /home/kibr4830/deploy-son.log 2>&1
     - /bin/chmod -R 775 /home/kibr4830/public_html/bootstrap/cache >> /home/kibr4830/deploy-son.log 2>&1
 
+    # composer PATH'te yok. cPanel/CloudLinux'ta bilinen yollar sirayla denenir;
+    # hicbiri yoksa vendor/ elle yuklenmis olmali (vendor-production.zip).
     - /bin/echo "----- composer -----" >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && composer install --no-dev --optimize-autoloader --no-interaction >> /home/kibr4830/deploy-son.log 2>&1 || /bin/echo "composer yok, vendor elle yuklenmis olmali" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction || /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction || /usr/bin/composer install --no-dev --optimize-autoloader --no-interaction || composer install --no-dev --optimize-autoloader --no-interaction || /bin/echo "composer bulunamadi, vendor elle yuklenmis olmali" ) >> /home/kibr4830/deploy-son.log 2>&1
 
+    # vendor yoksa artisan hic calismaz. Guard olmadan deploy gunlugu
+    # okunmaz fatal error yiginina donuyor.
     - /bin/echo "----- veritabani -----" >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && php artisan migrate --force >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan migrate --force || /bin/echo "vendor yok, migrate atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
 
     - /bin/echo "----- onbellek -----" >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && php artisan optimize:clear >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && php artisan optimize >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && php artisan storage:link >> /home/kibr4830/deploy-son.log 2>&1 || /bin/echo "storage link zaten var" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan optimize:clear || /bin/echo "vendor yok, onbellek atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan optimize || /bin/true ) >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan storage:link || /bin/true ) >> /home/kibr4830/deploy-son.log 2>&1
 
     - /bin/echo "===== DEPLOY BITTI =====" >> /home/kibr4830/deploy-son.log 2>&1
     - /bin/date >> /home/kibr4830/deploy-son.log 2>&1
