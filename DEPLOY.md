@@ -9,7 +9,7 @@ Sırayla takip edin.
 
 | Soru | Neden önemli |
 |---|---|
-| **PHP sürümü kaç?** (MultiPHP Manager **ve** PHP Selector ayrı ayrı) | **8.4.1'den düşükse site hiç açılmaz** — aşağıya bakın |
+| **PHP sürümü kaç?** (MultiPHP Manager **ve** PHP Selector ayrı ayrı) | **8.4.1+ gerekiyor.** Bu kurulumda 8.4 seçildi ✓ |
 | Alan adının kök dizini değiştirilebiliyor mu? | Değişemiyorsa uygulama `public_html` içine kurulur, `.htaccess` koruması şart |
 | SSH/Terminal var mı? | Yoksa artisan komutları yalnız deploy görevlerinden çalışır |
 | Composer kurulu mu? | Yoksa `vendor/` elle yüklenir (`vendor-production.zip` hazır) |
@@ -22,14 +22,16 @@ Sırayla takip edin.
 ağacındaki Symfony 8 bileşenleri `>=8.4.1` istiyor. Yani:
 
 ```
-Sunucuda PHP 8.3  →  site açılmaz (beyaz ekran / fatal error)
-Sunucuda PHP 8.4.1+  →  çalışır
+Sunucuda PHP 8.3    →  site açılmaz (beyaz ekran / fatal error)
+Sunucuda PHP 8.4.1+ →  çalışır   ← bu kurulumda seçilen
 ```
 
-cPanel'de 8.4+ yoksa haber verin — bağımlılıkları sunucunun sürümüne göre
-yeniden çözerim (`composer.json` içine `config.platform.php` yazılır, Symfony
-7.x'e düşülür). Yerelde çözülmüş `vendor/` sunucudan yeni bir PHP ile
-üretilmişse site açılmaz; bu en sık yapılan hata.
+`composer.json` içinde `config.platform.php` **8.4.1** olarak sabitlendi.
+Bu sayede yerel PHP daha yeni olsa bile (`8.5`) bağımlılıklar 8.4.1 hedefiyle
+çözülüyor — sunucudan yeni bir PHP ile üretilmiş `vendor/` yüzünden sitenin
+açılmaması, en sık yapılan hata, böylece engellendi.
+
+Sunucu sürümü değişirse bu değeri güncelleyip `composer update` çalıştırın.
 
 > **mbstring** bazı paylaşımlı hostlarda kapalı gelir. Kapalıysa Türkçe
 > karakterler bozulur ve panel çalışmaz. MultiPHP INI Editor'dan açın.
