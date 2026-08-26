@@ -84,7 +84,7 @@ APP_LOCALE=tr
 APP_TIMEZONE=Asia/Famagusta
 
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=kibr4830_kwt
 DB_USERNAME=kibr4830_kwt
@@ -103,6 +103,12 @@ MAIL_PASSWORD=
 MAIL_FROM_ADDRESS=info@kibriswebtasarimci.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
+
+> **`DB_HOST` neden `localhost`?** cPanel'de `localhost` MySQL'e Unix soketi
+> üzerinden bağlanır, `127.0.0.1` ise TCP üzerinden. Genelde ikisi de çalışır
+> ama MySQL yalnız sokette dinliyorsa `127.0.0.1` "Connection refused" verir.
+> Laravel'in varsayılanı `127.0.0.1`; cPanel geleneği `localhost`. Biri
+> çalışmazsa diğerini deneyin.
 
 **`APP_KEY`** için yerelde şunu çalıştırıp çıktıyı yapıştırın:
 
