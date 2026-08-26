@@ -30,3 +30,6 @@ Thumbs.db
 
 # Canlıya elle yüklenen üretim bağımlılıkları (16 MB) — depoda tutulmaz
 /vendor-production.zip
+
+# phpMyAdmin icin uretilen kurulum dokumu (icinde yonetici hash'i var)
+/kibriswebtasarimci-kurulum.sql

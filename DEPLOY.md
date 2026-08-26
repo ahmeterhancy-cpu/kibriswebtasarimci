@@ -210,18 +210,37 @@ silin** — anahtar yokken rota hiç kaydedilmez.
 
 > İkinci kez açılırsa içeriğiniz geri dönmez: tablolar kuruluysa seed atlanır.
 
-### (c) mysqldump + phpMyAdmin — en hızlısı
+### (c) Hazır SQL dökümü — en hızlısı
 
-Ay Parçası'nda en hızlı yol buydu. Yerelde geçici bir MySQL kurup şemayı ve
-veriyi dökün, phpMyAdmin'den içe aktarın.
+Proje kökündeki **`kibriswebtasarimci-kurulum.sql`** (140 KB) şemayı ve tüm
+içeriği taşır. Migration ve seed hiç çalıştırmadan tek adımda kurar.
 
-Bu projede yerel veritabanı **SQLite** olduğu için önce MySQL'e taşımak
-gerekir; (a) ya da (b) çalışıyorsa buna gerek yok.
+1. cPanel → **phpMyAdmin** → soldan `kibr4830_kwt` veritabanını seçin
+2. **Import** sekmesi → **Choose File** → dosyayı seçin → **Go**
+3. 25 tablo ve tüm içerik yüklenir
 
-phpMyAdmin'e SQL yapıştırırken:
+Döküm şunları içeriyor:
 
-- `--` yorum satırı kullanmayın, `/* */` kullanın (satır sonları kayboluyor)
-- `information_schema` sorgusu koymayın — `#1044` verip tüm import'u iptal eder
+| | |
+|---|---|
+| Şema | 25 tablo (`migrations` dahil, "hepsi çalıştı" işaretli) |
+| İçerik | 15 sektör, 12 şehir, 3 ofis, 7 paket, 7 hizmet, 16 ek modül, 11 SSS, 3 blog yazısı, 25 ayar |
+| Demo | 4 örnek iş, 6 örnek marka |
+| Yönetici | 1 hesap — **şifresi bu döküm için taze üretildi** |
+
+Dökümü üretirken alınan önlemler:
+
+- Yönetici şifresi **yeniden üretildi**. Yereldeki hash depo geçmişinde açık
+  olan eski şifreye aitti; canlıya taşımak panele davetiye olurdu
+- `migrations` tablosu dolu geliyor → sonraki deploy'da migration'lar
+  "zaten çalıştı" sayılır, tekrar denenmez
+- `SET FOREIGN_KEY_CHECKS = 0` ile başlıyor → tablo sırası sorun çıkarmaz
+- `--` yorum satırı **yok**, `/* */` kullanıldı (satır sonu kaybı tuzağı)
+- `information_schema` sorgusu **yok** (`#1044` ile import iptali tuzağı)
+- Oturum, önbellek ve kuyruk tabloları boş — canlıda kendiliğinden dolar
+
+> Bu dosya `.gitignore`'da: içinde yönetici parola hash'i var, depoya
+> girmemeli.
 
 ---
 
