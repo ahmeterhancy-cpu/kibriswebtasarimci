@@ -110,11 +110,20 @@ MAIL_FROM_NAME="${APP_NAME}"
 > Laravel'in varsayılanı `127.0.0.1`; cPanel geleneği `localhost`. Biri
 > çalışmazsa diğerini deneyin.
 
-**`APP_KEY`** için yerelde şunu çalıştırıp çıktıyı yapıştırın:
+**`APP_KEY` boş bırakın.** Deploy sunucuda üretiyor:
 
-```bash
-php artisan key:generate --show
+```dotenv
+APP_KEY=
 ```
+
+`.cpanel.yml` her dağıtımda `.env`'e bakıyor; anahtar yoksa `key:generate`
+çalıştırıyor, varsa dokunmuyor. Böylece anahtar hiçbir yerde açıkta dolaşmıyor
+ve her dağıtımda yeniden üretilmiyor — üretilse tüm oturumlar ve şifrelenmiş
+veriler geçersiz olurdu.
+
+> **`APP_KEY` boşken site 500 verir:**
+> `No application encryption key has been specified.`
+> Bu kurulumda tam olarak bu yaşandı.
 
 > `APP_DEBUG=true` bırakılırsa hata sayfalarında veritabanı şifresi dahil
 > her şey görünür. Canlıda **her zaman** `false`.

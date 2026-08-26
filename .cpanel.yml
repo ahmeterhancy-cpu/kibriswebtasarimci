@@ -63,6 +63,13 @@ deployment:
     - /bin/echo "----- composer -----" >> /home/kibr4830/deploy-son.log 2>&1
     - cd /home/kibr4830/public_html && ( /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction || /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction || /usr/bin/composer install --no-dev --optimize-autoloader --no-interaction || composer install --no-dev --optimize-autoloader --no-interaction || /bin/echo "composer bulunamadi, vendor elle yuklenmis olmali" ) >> /home/kibr4830/deploy-son.log 2>&1
 
+    # APP_KEY yoksa Laravel hic acilmaz (MissingAppKeyException -> 500).
+    # Anahtar SUNUCUDA uretilir, boylece hicbir yerde acikta dolasmaz.
+    # grep guard'i kritik: her dagitimda yeniden uretilse tum oturumlar ve
+    # sifrelenmis veriler gecersiz olurdu.
+    - /bin/echo "----- uygulama anahtari -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && ( /bin/grep -q "^APP_KEY=base64" .env && /bin/echo "APP_KEY zaten tanimli" || php artisan key:generate --force ) || /bin/echo "vendor yok, anahtar atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
+
     # vendor yoksa artisan hic calismaz. Guard olmadan deploy gunlugu
     # okunmaz fatal error yiginina donuyor.
     - /bin/echo "----- veritabani -----" >> /home/kibr4830/deploy-son.log 2>&1
