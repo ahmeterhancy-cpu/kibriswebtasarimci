@@ -25,10 +25,11 @@ RedirectMatch 404 (?i)^/(app|bootstrap|config|database|lang|resources|routes|tes
     RewriteEngine On
 
     # --- HTTPS zorunlu ---------------------------------------------------
-    # AutoSSL kurulduktan SONRA etkinleştirin. Sertifika yokken açarsanız
-    # site erişilemez hâle gelir.
-    # RewriteCond %{HTTPS} !=on
-    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Sertifika kuruldu (2026-10-05), yönlendirme açıldı.
+    # Açılmadığı sürece site hem http hem https üzerinden açılıyordu; arama
+    # motoru bunu İKİ AYRI SİTE sayar ve sinyalleri ikiye böler.
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # --- İstekleri public/ dizinine taşı ---------------------------------
     # Zaten public/ ile başlayan istekleri tekrar yönlendirme (sonsuz döngü).
