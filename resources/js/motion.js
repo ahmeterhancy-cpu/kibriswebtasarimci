@@ -288,26 +288,36 @@ function initScrollLinked() {
     const pane = wrap.querySelector('[data-hscroll-pane]');
     if (!rail || !pane) return;
 
-    let dist = 0;
+    let dist = 0, lead = 0;
 
     const resize = () => {
       if (scroll.vw < 900) {
         wrap.style.height = '';
         rail.style.transform = '';
         dist = 0;
+        lead = 0;
         return;
       }
       dist = Math.max(0, rail.scrollWidth - scroll.vw + 48);
-      wrap.style.height = (pane.offsetHeight + dist) + 'px';
+      // Bölüm ekrana yapıştığı anda şerit hemen kaymaya başlamasın: önce
+      // `lead` kadar yerinde dursun. Olmadığında başlık tepeye değer değmez
+      // ilk kart soldan kesilmeye başlıyor, bölüm hiç durağan görünmüyor.
+      // Bu pay sarmalayıcı yüksekliğine EKLENİYOR; yatay hız değişmiyor.
+      lead = Math.round(scroll.vh * parseFloat(wrap.dataset.hscrollLead || '0.5'));
+      wrap.style.height = (pane.offsetHeight + dist + lead) + 'px';
     };
 
     resize();
     window.addEventListener('resize', resize);
 
+    // progressOf yerine doğrudan pikselle çalışıyoruz: duraklama payı
+    // oransal ilerlemeye çevrilince ölçüm tazeliğine bağımlı oluyor.
     const item = track(wrap, 'pin', null);
     item.apply = () => {
       if (!dist) return;
-      rail.style.transform = `translate3d(${(-progressOf(item) * dist).toFixed(2)}px, 0, 0)`;
+      const yapiskan = clamp(scroll.y - item.top, 0, lead + dist);
+      const x = clamp(yapiskan - lead, 0, dist);
+      rail.style.transform = `translate3d(${(-x).toFixed(2)}px, 0, 0)`;
     };
   });
 
