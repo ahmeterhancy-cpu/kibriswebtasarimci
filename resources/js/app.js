@@ -63,23 +63,50 @@ function initAccordions() {
 
 function initDragScroll() {
     document.querySelectorAll('[data-drag-scroll]').forEach((el) => {
-        let down = false, startX = 0, startLeft = 0, moved = 0;
+        let id = null, startX = 0, startLeft = 0, moved = 0;
 
-        el.addEventListener('pointerdown', (e) => {
-            down = true; moved = 0;
-            startX = e.clientX;
-            startLeft = el.scrollLeft;
-            el.setPointerCapture(e.pointerId);
-        });
-        el.addEventListener('pointermove', (e) => {
-            if (!down) return;
+        // TUZAK: Burada eskiden pointerdown anında setPointerCapture çağrılıyordu.
+        // İşaretçi yakalaması sonraki `click` olayının hedefini de bu kaba taşıyor;
+        // o yüzden şeritteki kartların bağlantısı HİÇ açılmıyordu — tıklama linke
+        // değil kaba düşüyor, sayfa geçişi de "link yok" deyip çekiliyordu.
+        // Yakalamaya gerek de yok: pointermove/pointerup window üzerinden
+        // dinleniyor, imleç kabın dışına çıksa bile sürükleme sürüyor.
+
+        const move = (e) => {
+            if (e.pointerId !== id) return;
             const dx = e.clientX - startX;
             moved = Math.abs(dx);
+            if (moved <= 8) return;
             el.scrollLeft = startLeft - dx;
+        };
+
+        const end = (e) => {
+            if (e.pointerId !== id) return;
+            id = null;
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', end);
+            window.removeEventListener('pointercancel', end);
+        };
+
+        el.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 || e.pointerType === 'touch') return;
+            // Masaüstünde şerit overflow-visible: kaydırma kabı değil, pinli
+            // dönüşümle akıyor. Orada sürüklemeyi dinlemenin faydası yok.
+            const ox = getComputedStyle(el).overflowX;
+            if (ox !== 'auto' && ox !== 'scroll') return;
+
+            id = e.pointerId;
+            moved = 0;
+            startX = e.clientX;
+            startLeft = el.scrollLeft;
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', end);
+            window.addEventListener('pointercancel', end);
         });
-        const end = () => { down = false; };
-        el.addEventListener('pointerup', end);
-        el.addEventListener('pointercancel', end);
+
+        // Sürüklerken tarayıcı görseli "taşımaya" kalkmasın.
+        el.addEventListener('dragstart', (e) => { if (id !== null) e.preventDefault(); });
+
         // Sürükleme sonrası istemsiz tıklamayı engelle.
         el.addEventListener('click', (e) => {
             if (moved > 8) { e.preventDefault(); e.stopPropagation(); }
