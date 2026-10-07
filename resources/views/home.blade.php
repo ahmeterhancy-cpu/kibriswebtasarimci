@@ -1,7 +1,5 @@
 @php
     $isEn = app()->getLocale() === 'en';
-    $trailWorks = $works->filter(fn ($w) => filled($w->cover))->take(6);
-
     // Web kurulumunun gerçek adımları. "İçerik ve yapı" bilerek TASARIMDAN
     // ÖNCE: projeleri geciktiren şey neredeyse hiç kod değil, bekleyen metin
     // ve görsel. Bunu ikinci adıma almak müşteriye de takvimin nereye
@@ -39,20 +37,10 @@
     body-class="bg-white">
 
     {{-- ══════════════════════════════════════════════════════════════════
-         01 · HERO — dev tipografi + imleç izinde açılan iş görselleri
+         01 · HERO — dev tipografi
          ══════════════════════════════════════════════════════════════ --}}
     <section class="relative flex min-h-[100svh] flex-col justify-between overflow-hidden bg-[#F1F1EF] px-6 pb-8 pt-32 lg:px-12"
-             data-dots
-             @if ($trailWorks->isNotEmpty()) data-trail data-trail-gap="170" @endif>
-
-        {{-- İz için kaynak görseller (görünmez klonlanır) --}}
-        @if ($trailWorks->isNotEmpty())
-            <div class="hidden" aria-hidden="true">
-                @foreach ($trailWorks as $w)
-                    <img data-trail-src src="{{ asset('storage/'.$w->cover) }}" alt="">
-                @endforeach
-            </div>
-        @endif
+             data-dots>
 
         <div class="relative z-10 mx-auto w-full max-w-[1600px]">
             <p class="k-eyebrow k-reveal mb-7 text-[#0F0F0F]/60">

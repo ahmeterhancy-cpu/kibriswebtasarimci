@@ -754,30 +754,6 @@ body {
 }
 
 /* ==========================================================================
-   HERO GÖRSEL İZİ
-   ========================================================================== */
-
-.k-trail-img {
-    position: absolute;
-    width: clamp(140px, 13vw, 220px);
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    border-radius: 4px;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.7) rotate(var(--rot, 0deg));
-    transition:
-        opacity 0.5s var(--ease-out-expo),
-        transform 0.7s var(--ease-out-expo);
-}
-
-.k-trail-img.is-in {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(var(--rot, 0deg));
-}
-
-/* ==========================================================================
    İMLECİ TAKİP EDEN ÖNİZLEME KARTI
    ========================================================================== */
 

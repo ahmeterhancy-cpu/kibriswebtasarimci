@@ -17,10 +17,9 @@
      9  Magnetic öğeler
     10  Özel imleç
     11  Liste üstü gezinen görsel (hover follower)
-    12  Hero görsel izi (image trail)
-    13  Sayfa geçiş perdesi
-    14  Header davranışı
-    15  Kıbrıs saati
+    12  Sayfa geçiş perdesi
+    13  Header davranışı
+    14  Kıbrıs saati
    ========================================================================== */
 
 /* ── 1 ─ Ortam & Ticker ──────────────────────────────────────────────────── */
@@ -677,49 +676,7 @@ function initHoverFollower() {
   });
 }
 
-/* ── 12 ─ Hero görsel izi ────────────────────────────────────────────────── */
-/*
-   İmleç hero alanında gezindikçe arkasında iş görselleri bırakır ve söner.
-   Ödüllü ajans sitelerinin klasik hareketi; burada 40 satır saf JS.
-*/
-
-function initImageTrail() {
-  const stage = document.querySelector('[data-trail]');
-  if (!stage || !env.fine || env.reduced) return;
-
-  const sources = Array.from(stage.querySelectorAll('[data-trail-src]'));
-  if (!sources.length) return;
-
-  const gap = parseInt(stage.dataset.trailGap || '150', 10);
-  let last = { x: 0, y: 0 }, index = 0, primed = false;
-
-  stage.addEventListener('pointermove', (e) => {
-    const r = stage.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
-    if (!primed) { last = { x, y }; primed = true; return; }
-    if (Math.hypot(x - last.x, y - last.y) < gap) return;
-    last = { x, y };
-    spawn(x, y, e.movementX);
-  });
-
-  function spawn(x, y, mx) {
-    const src = sources[index % sources.length];
-    index++;
-    const node = src.cloneNode(true);
-    node.removeAttribute('data-trail-src');
-    node.className = 'k-trail-img';
-    node.style.left = x + 'px';
-    node.style.top = y + 'px';
-    node.style.setProperty('--rot', (clamp(mx * 0.25, -18, 18)).toFixed(2) + 'deg');
-    stage.appendChild(node);
-    // Girişi bir kare sonra tetikle ki geçiş çalışsın.
-    requestAnimationFrame(() => node.classList.add('is-in'));
-    setTimeout(() => node.classList.remove('is-in'), 520);
-    setTimeout(() => node.remove(), 1200);
-  }
-}
-
-/* ── 13 ─ Sayfa geçiş perdesi ────────────────────────────────────────────── */
+/* ── 12 ─ Sayfa geçiş perdesi ────────────────────────────────────────────── */
 
 function initPageTransition() {
   const curtain = document.getElementById('k-curtain');
@@ -747,7 +704,7 @@ function initPageTransition() {
   window.addEventListener('pageshow', (e) => { if (e.persisted) curtain.classList.remove('is-cover'); });
 }
 
-/* ── 14 ─ Header davranışı ───────────────────────────────────────────────── */
+/* ── 13 ─ Header davranışı ───────────────────────────────────────────────── */
 
 function initHeader() {
   const header = document.getElementById('k-header');
@@ -777,7 +734,6 @@ function boot() {
   initMagnetic();
   initCursor();
   initHoverFollower();
-  initImageTrail();
   initPageTransition();
   initHeader();
 
