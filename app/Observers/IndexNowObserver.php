@@ -2,11 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\BlogPost;
-use App\Models\Location;
-use App\Models\Sector;
-use App\Models\Service;
-use App\Models\Work;
+use App\Models\SlugHistory;
+use App\Support\ContentRoutes;
 use App\Support\IndexNow;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,27 +21,13 @@ use Illuminate\Database\Eloquent\Model;
 class IndexNowObserver
 {
     /**
-     * Model sınıfı => [detay rotası, liste rotası, rota parametresi].
-     * Rota adları TR; EN sürümü başına 'en.' eklenerek bulunuyor.
-     *
-     * @var array<class-string, array{0: string, 1: string, 2: string}>
-     */
-    private const MAP = [
-        Service::class => ['services.show', 'services.index', 'service'],
-        Work::class => ['works.show', 'works.index', 'work'],
-        Sector::class => ['sectors.show', 'sectors.index', 'sector'],
-        Location::class => ['locations.show', 'locations.index', 'location'],
-        BlogPost::class => ['blog.show', 'blog.index', 'post'],
-    ];
-
-    /**
      * Gözlenecek model sınıfları.
      *
      * @return array<int, class-string>
      */
     public static function models(): array
     {
-        return array_keys(self::MAP);
+        return ContentRoutes::models();
     }
 
     public function created(Model $model): void
@@ -59,9 +42,29 @@ class IndexNowObserver
      */
     public function updated(Model $model): void
     {
-        if ($model->wasChanged()) {
-            IndexNow::ping($this->urlsFor($model));
+        if (! $model->wasChanged()) {
+            return;
         }
+
+        // Adres değiştiyse eskisini sakla: o adrese verilmiş dış bağlantılar
+        // 404'e düşmesin, 301 ile yenisine taşınsın.
+        if ($model->wasChanged('slug')) {
+            $eski = $model->getOriginal('slug');
+
+            if (filled($eski) && $eski !== $model->slug) {
+                SlugHistory::updateOrCreate(
+                    ['model_type' => $model::class, 'slug' => $eski],
+                    ['model_id' => $model->getKey()],
+                );
+
+                // Kayıt eski adresine geri dönmüşse o satır artık yanlış.
+                SlugHistory::where('model_type', $model::class)
+                    ->where('slug', $model->slug)
+                    ->delete();
+            }
+        }
+
+        IndexNow::ping($this->urlsFor($model));
     }
 
     public function deleted(Model $model): void
@@ -72,7 +75,7 @@ class IndexNowObserver
     /** @return array<int, string> */
     private function urlsFor(Model $model): array
     {
-        $entry = self::MAP[$model::class] ?? null;
+        $entry = ContentRoutes::for($model::class);
 
         if ($entry === null) {
             return [];

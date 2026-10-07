@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Middleware\MaintenanceMode;
+use App\Http\Middleware\SetLocale;
+use App\Models\SlugHistory;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,15 +22,22 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'locale' => \App\Http\Middleware\SetLocale::class,
+            'locale' => SetLocale::class,
         ]);
 
         $middleware->web(append: [
-            \App\Http\Middleware\MaintenanceMode::class,
+            MaintenanceMode::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        // Eski adrese gelen istek 404 yerine 301 ile yenisine gitsin.
+        // Kaydın adresi panelden değiştirilmişse dışarıdan verilmiş
+        // bağlantılar ve arama motorundaki birikim böyle korunuyor.
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            return SlugHistory::redirectFor($request);
+        });
     })->create();
