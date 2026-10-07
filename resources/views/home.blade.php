@@ -247,7 +247,7 @@
                         @foreach ($works as $work)
                             <a href="{{ $r('works.show', ['work' => $work->slug]) }}"
                                data-cursor="drag" data-cursor-label="{{ __('site.common.view_project') }}"
-                               class="group block w-[78vw] shrink-0 sm:w-[52vw] lg:w-[34vw]">
+                               class="group block w-[78vw] shrink-0 sm:w-[46vw] lg:w-[30vw] xl:w-[26vw]">
                                 <div class="k-img-hover relative aspect-[4/3] overflow-hidden rounded-lg bg-[#EDEDEB]">
                                     @if ($work->cover)
                                         <img src="{{ asset('storage/'.$work->cover) }}" alt="{{ $work->t('title') }}"
