@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Works\Schemas;
 
+use App\Filament\Support\SlugField;
 use App\Models\Category;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -14,7 +15,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class WorkForm
 {
@@ -29,26 +29,13 @@ class WorkForm
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                            // Slug yalnızca yeni kayıtta otomatik dolar; yayındaki
-                            // adresler düzenleme sırasında kendiliğinden değişmesin.
-                            if ($operation === 'create' && filled($state)) {
-                                $set('slug', Str::slug($state, '-', 'tr'));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugField::titleHook()),
 
-                    TextInput::make('slug')
-                        ->label('Adres (slug)')
-                        ->required()
-                        ->maxLength(190)
-                        ->unique(ignoreRecord: true)
-                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                        ->helperText('Sayfa adresi: /isler/<slug>.'),
+                    SlugField::make(
+                        'Adres (slug)',
+                        'Sayfa adresi: /isler/<slug>. Proje adını değiştirirseniz adres de değişir.',
+                    ),
+                    SlugField::lock(),
 
                     Textarea::make('summary')->label('Özet')->rows(2)->maxLength(500),
 

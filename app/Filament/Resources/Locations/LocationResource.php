@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Locations;
 use App\Filament\Resources\Locations\Pages\CreateLocation;
 use App\Filament\Resources\Locations\Pages\EditLocation;
 use App\Filament\Resources\Locations\Pages\ListLocations;
+use App\Filament\Support\SlugField;
 use App\Models\Location;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -26,7 +27,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use UnitEnum;
 
 class LocationResource extends Resource
@@ -58,24 +58,13 @@ class LocationResource extends Resource
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                            if ($operation === 'create' && filled($state)) {
-                                $set('slug', Str::slug($state, '-', 'tr'));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugField::titleHook()),
 
-                    TextInput::make('slug')
-                        ->label('Adres (slug)')
-                        ->required()
-                        ->maxLength(190)
-                        ->unique(ignoreRecord: true)
-                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                        ->helperText('Sayfa adresi: /web-tasarim/<slug>.'),
+                    SlugField::make(
+                        'Adres (slug)',
+                        'Sayfa adresi: /web-tasarim/<slug>. Şehir adını değiştirirseniz adres de değişir.',
+                    ),
+                    SlugField::lock(),
 
                     TextInput::make('headline')
                         ->label('Sayfa başlığı (H1)')

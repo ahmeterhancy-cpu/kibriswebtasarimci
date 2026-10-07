@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BlogPosts\Schemas;
 
+use App\Filament\Support\SlugField;
 use App\Models\Category;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -14,7 +15,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class BlogPostForm
 {
@@ -29,24 +29,13 @@ class BlogPostForm
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                            if ($operation === 'create' && filled($state)) {
-                                $set('slug', Str::slug($state, '-', 'tr'));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugField::titleHook()),
 
-                    TextInput::make('slug')
-                        ->label('Adres (slug)')
-                        ->required()
-                        ->maxLength(190)
-                        ->unique(ignoreRecord: true)
-                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                        ->helperText('Sayfa adresi: /blog/<slug>. Yayındaysa değiştirmeyin — bağlantılar kırılır.'),
+                    SlugField::make(
+                        'Adres (slug)',
+                        'Sayfa adresi: /blog/<slug>. Başlığı değiştirirseniz adres de değişir — yayındaki bir yazıda bağlantılar kırılır.',
+                    ),
+                    SlugField::lock(),
 
                     Textarea::make('excerpt')
                         ->label('Özet')

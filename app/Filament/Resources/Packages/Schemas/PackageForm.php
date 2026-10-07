@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Packages\Schemas;
 
+use App\Filament\Support\SlugField;
 use App\Models\Addon;
 use App\Models\Package;
 use Filament\Forms\Components\CheckboxList;
@@ -14,7 +15,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class PackageForm
 {
@@ -38,24 +38,13 @@ class PackageForm
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                            if ($operation === 'create' && filled($state)) {
-                                $set('slug', Str::slug($state, '-', 'tr'));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugField::titleHook()),
 
-                    TextInput::make('slug')
-                        ->label('Kod (slug)')
-                        ->required()
-                        ->maxLength(190)
-                        ->unique(ignoreRecord: true)
-                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                        ->helperText('Teklif sihirbazı bu kodu kullanır: /teklif-al?paket=<slug>.'),
+                    SlugField::make(
+                        'Kod (slug)',
+                        'Teklif sihirbazı bu kodu kullanır: /teklif-al?paket=<slug>.',
+                    ),
+                    SlugField::lock(),
 
                     Textarea::make('tagline')->label('Tek cümlelik tanım')->rows(2)->maxLength(500),
 

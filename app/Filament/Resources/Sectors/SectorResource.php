@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Sectors;
 use App\Filament\Resources\Sectors\Pages\CreateSector;
 use App\Filament\Resources\Sectors\Pages\EditSector;
 use App\Filament\Resources\Sectors\Pages\ListSectors;
+use App\Filament\Support\SlugField;
 use App\Models\Sector;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -24,7 +25,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use UnitEnum;
 
 class SectorResource extends Resource
@@ -56,7 +56,7 @@ class SectorResource extends Resource
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, $set, $operation) => $operation === 'create' ? $set('slug', Str::slug($state)) : null)
+                        ->afterStateUpdated(SlugField::titleHook())
                         ->placeholder('Otel & Konaklama'),
 
                     TextInput::make('headline')
@@ -102,18 +102,11 @@ class SectorResource extends Resource
                     ])->columns(2),
 
                     Section::make('Yayın')->schema([
-                        TextInput::make('slug')
-                            ->label('Adres (slug)')
-                            ->required()
-                            ->maxLength(190)
-                            ->unique(ignoreRecord: true)
-                            // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                            // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                            // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                            ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                            ->helperText('/sektorler/otel-ve-konaklama — yayındaki bir sayfanın adresini değiştirmek bağlantıları kırar.'),
+                        SlugField::make(
+                            'Adres (slug)',
+                            '/sektorler/otel-ve-konaklama — sektör adını değiştirirseniz adres de değişir, yayındaki bağlantılar kırılır.',
+                        ),
+                        SlugField::lock(),
                         TextInput::make('icon')
                             ->label('Simge')
                             ->maxLength(8)

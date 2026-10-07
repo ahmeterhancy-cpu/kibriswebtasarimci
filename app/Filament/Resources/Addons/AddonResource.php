@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Addons;
 use App\Filament\Resources\Addons\Pages\CreateAddon;
 use App\Filament\Resources\Addons\Pages\EditAddon;
 use App\Filament\Resources\Addons\Pages\ListAddons;
+use App\Filament\Support\SlugField;
 use App\Models\Addon;
 use App\Models\Package;
 use BackedEnum;
@@ -22,7 +23,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use UnitEnum;
 
 class AddonResource extends Resource
@@ -54,26 +54,15 @@ class AddonResource extends Resource
                         ->required()
                         ->maxLength(190)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                            if ($operation === 'create' && filled($state)) {
-                                $set('slug', Str::slug($state, '-', 'tr'));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugField::titleHook()),
 
                     TextInput::make('name_en')->label('Name (EN)')->maxLength(190),
 
-                    TextInput::make('slug')
-                        ->label('Kod (slug)')
-                        ->required()
-                        ->maxLength(190)
-                        ->unique(ignoreRecord: true)
-                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                        ->live(onBlur: true)
-                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                        ->helperText('Gelen teklif taleplerinde bu kod görünür. Yayındaysa değiştirmeyin.'),
+                    SlugField::make(
+                        'Kod (slug)',
+                        'Gelen teklif taleplerinde bu kod görünür. Yayındaysa değiştirmeyin.',
+                    ),
+                    SlugField::lock(),
 
                     TextInput::make('price')
                         ->label('Fiyat')

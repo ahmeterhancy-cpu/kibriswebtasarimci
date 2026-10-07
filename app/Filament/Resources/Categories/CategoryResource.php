@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Categories;
 use App\Filament\Resources\Categories\Pages\CreateCategory;
 use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\Categories\Pages\ListCategories;
+use App\Filament\Support\SlugField;
 use App\Models\Category;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -18,7 +19,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use UnitEnum;
 
 class CategoryResource extends Resource
@@ -47,26 +47,15 @@ class CategoryResource extends Resource
                 ->required()
                 ->maxLength(190)
                 ->live(onBlur: true)
-                ->afterStateUpdated(function (?string $state, callable $set, string $operation) {
-                    if ($operation === 'create' && filled($state)) {
-                        $set('slug', Str::slug($state, '-', 'tr'));
-                    }
-                }),
+                ->afterStateUpdated(SlugField::titleHook()),
 
             TextInput::make('name_en')->label('Name (EN)')->maxLength(190),
 
-            TextInput::make('slug')
-                ->label('Adres (slug)')
-                ->required()
-                ->maxLength(190)
-                ->unique(ignoreRecord: true)
-                // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
-                // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
-                // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
-                ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
-                ->helperText('Filtre bağlantılarında kullanılır: ?kategori=<slug>.'),
+            SlugField::make(
+                'Adres (slug)',
+                'Filtre bağlantılarında kullanılır: ?kategori=<slug>.',
+            ),
+            SlugField::lock(),
 
             Select::make('type')
                 ->label('Nerede kullanılacak')

@@ -69,10 +69,36 @@ class SlugKaydetmeTest extends TestCase
         $work = $this->work();
 
         Livewire::test(EditWork::class, ['record' => $work->getRouteKey()])
-            ->fillForm(['title' => 'Yalnızca başlık değişti'])
+            ->fillForm(['summary' => 'Yalnızca özet değişti'])
             ->call('save')
             ->assertHasNoFormErrors()
             ->assertNoRedirect();
+    }
+
+    public function test_baslik_degisince_adres_de_degisir(): void
+    {
+        $work = $this->work();
+
+        Livewire::test(EditWork::class, ['record' => $work->getRouteKey()])
+            ->fillForm(['title' => 'NPCYP Psikiyatri Merkezi'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('npcyp-psikiyatri-merkezi', $work->fresh()->slug);
+    }
+
+    public function test_adres_elle_yazilmissa_baslik_uzerine_yazmaz(): void
+    {
+        $work = $this->work();
+
+        Livewire::test(EditWork::class, ['record' => $work->getRouteKey()])
+            // Önce adres elle yazılıyor: alan kilitleniyor.
+            ->fillForm(['slug' => 'elle-yazilmis-adres'])
+            ->fillForm(['title' => 'Bambaşka bir başlık'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('elle-yazilmis-adres', $work->fresh()->slug);
     }
 
     public function test_farkli_yazilmis_ayni_slug_benzersizlige_takilir(): void
