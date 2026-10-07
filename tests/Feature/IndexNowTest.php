@@ -8,6 +8,7 @@ use App\Support\IndexNow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
@@ -124,6 +125,24 @@ class IndexNowTest extends TestCase
 
         $this->assertTrue($work->exists);
         $this->assertDatabaseHas('works', ['slug' => 'ornek-is']);
+    }
+
+    /**
+     * Bing arayüzünde IndexNow bildirimlerini gösteren bir ekran yok;
+     * bildirimin gittiğini anlamanın tek yolu bu log satırı. Sessizce
+     * kaybolursa canlıda kör kalırız.
+     */
+    public function test_basarili_bildirim_loga_yazilir(): void
+    {
+        Http::fake();
+        Log::spy();
+
+        IndexNow::ping(['https://ornek.test/a', 'https://ornek.test/b']);
+
+        Log::shouldHaveReceived('info')
+            ->withArgs(fn (string $mesaj, array $baglam) => str_contains($mesaj, 'IndexNow')
+                && $baglam['adres_sayisi'] === 2)
+            ->once();
     }
 
     public function test_gonderilen_govde_indexnow_bicimine_uyar(): void

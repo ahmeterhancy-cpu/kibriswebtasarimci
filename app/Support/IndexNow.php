@@ -79,6 +79,15 @@ final class IndexNow
             return false;
         }
 
+        // Başarı da loglanıyor. Bing Webmaster arayüzünde IndexNow
+        // bildirimlerini gösteren bir ekran YOK — "URL Gönderimi" listesi
+        // yalnızca elle gönderilenleri sayıyor. Dolayısıyla bu satır,
+        // bildirimin gidip gitmediğini anlamanın tek yolu.
+        Log::info('IndexNow bildirimi gönderildi', [
+            'adres_sayisi' => count($urls),
+            'adresler' => array_slice($urls, 0, 20),
+        ]);
+
         return true;
     }
 }
