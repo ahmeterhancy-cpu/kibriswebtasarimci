@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use App\Observers\IndexNowObserver;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
         // Paylaşımlı MySQL/MariaDB'de indeks 1000 bayt ile sınırlı.
         // 191 × 4 (utf8mb4) = 764 bayt < 1000 → `#1071` hatası çıkmaz.
         Builder::defaultStringLength(191);
+
+        // İçerik değişince Bing/Yandex'e haber ver. Anahtar yoksa ya da
+        // üretimde değilsek IndexNow kendini kapatıyor, gözlemci boşa çalışır.
+        foreach (IndexNowObserver::models() as $model) {
+            $model::observe(IndexNowObserver::class);
+        }
 
         // @setting('contact_email', 'info@…')
         Blade::directive('setting', fn ($expression) => "<?php echo e(\\App\\Models\\Setting::get({$expression})); ?>");

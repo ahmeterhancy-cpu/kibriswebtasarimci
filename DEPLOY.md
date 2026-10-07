@@ -293,6 +293,27 @@ Sertifika yokken açarsanız site erişilemez hâle gelir.
       (bu adres kapatılmamalı, panel görselleri buradan servis edilir)
 - [ ] Google Search Console doğrulaması + sitemap gönderimi
 - [ ] Google Business Profile adresi ile sitedeki adres birebir aynı
+- [ ] `alanadi.com/<indexnow-anahtari>.txt` açılıyor ve içinde anahtarın
+      kendisi yazıyor. Anahtar `config/services.php` içinde; bu dosya
+      kaybolursa IndexNow bildirimleri sessizce reddedilir
+- [ ] `php artisan indexnow:ping --dry` gerçek alan adını listeliyor
+
+### IndexNow
+
+İçerik değişince Bing ve Yandex'e anında haber veriliyor; tarayıcının
+uğramasını beklemek gerekmiyor. Bing ChatGPT'nin web aramasını beslediği
+için bu bildirim yapay zekâ sonuçlarına da yansıyor.
+
+Çalışması için iki şey gerekli, ikisi de depoda hazır:
+
+1. `public/<anahtar>.txt` — içinde yalnızca anahtarın kendisi
+2. `config/services.php` içindeki `indexnow.key`
+
+Üretimde kendiliğinden açık (`APP_ENV=production`). Kapatmak için `.env`'e
+`INDEXNOW_ENABLED=false` yazın. Toplu bildirim: `php artisan indexnow:ping`.
+
+Bildirim gönderilemezse kayıt işlemi **etkilenmez** — hata yalnızca
+`storage/logs/laravel.log` dosyasına yazılır.
 
 ---
 

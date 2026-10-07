@@ -28,6 +28,25 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | IndexNow
+    |--------------------------------------------------------------------------
+    |
+    | İçerik değişince Bing/Yandex'e anında haber veren bildirim. Anahtar
+    | sitenin kökünde `<anahtar>.txt` dosyasında DURMALI (public/ içinde,
+    | depoya dahil) — dosya olmadan bildirim reddedilir.
+    |
+    | Varsayılan olarak yalnızca üretimde açık: yerelde çalışırken localhost
+    | adreslerini arama motoruna bildirmenin anlamı yok.
+    |
+    */
+
+    'indexnow' => [
+        'key' => env('INDEXNOW_KEY', 'b5afd8046cce653332f1b76d243e300d'),
+        'enabled' => env('INDEXNOW_ENABLED', env('APP_ENV') === 'production'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
