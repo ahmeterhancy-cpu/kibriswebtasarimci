@@ -106,6 +106,14 @@
 
                 <div class="mt-14">{{ $posts->links() }}</div>
             @endif
+
+            {{-- Blog listesi siteye geri hiç bağ vermiyordu. --}}
+            <p class="k-reveal mt-16 max-w-2xl text-sm leading-relaxed text-[#0F0F0F]/55">
+                {{ $isEn ? 'Writing about it is one thing. See what we' : 'Yazmak bir yana;' }}
+                <a href="{{ $r('services.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'actually build' : 'ne yaptığımıza' }}</a>
+                {{ $isEn ? 'and how it changes' : 've bunun' }}
+                <a href="{{ $r('sectors.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'by industry' : 'sektöre göre nasıl değiştiğine' }}</a>{{ $isEn ? '.' : ' bakın.' }}
+            </p>
         </div>
     </section>
 

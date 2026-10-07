@@ -144,14 +144,39 @@
     @if ($locations->isNotEmpty())
         <section class="bg-[#F4F4F2] px-6 py-14 lg:px-12 lg:py-20">
             <div class="mx-auto max-w-[1280px]">
-                <p class="k-eyebrow k-reveal mb-6 text-[#0F0F0F]/45">
-                    {{ $isEn ? 'Where we work' : 'Nerelerde çalışıyoruz' }}
-                </p>
+                {{-- Baslik, tum sehirler sayfasina baglantidir: /web-tasarim sayfasina
+                     baska hicbir yerden bag gelmiyordu, Google oraya ulasmakta
+                     zorlaniyordu. --}}
+                <a href="{{ $r('locations.index') }}"
+                   class="k-eyebrow k-reveal k-link k-link-in mb-6 inline-block text-[#0F0F0F]/45 transition-colors duration-300 hover:text-[#E30613]">
+                    {{ $isEn ? 'Where we work' : 'Nerelerde çalışıyoruz' }} →
+                </a>
                 <div class="flex flex-wrap gap-2.5">
                     @foreach ($locations as $location)
                         <a href="{{ $r('locations.show', ['location' => $location->slug]) }}"
                            class="k-btn k-btn--ghost !px-5 !py-2.5 !text-[0.66rem]">
                             <span>{{ $location->t('name') }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- Sektörden hizmetlere: bu sayfaya gelen ziyaretçi "ne yapıyorsunuz"
+         sorusunun cevabını hizmet sayfalarında buluyor. Bu bağlantı yoktu. --}}
+    @if ($services->isNotEmpty())
+        <section class="bg-white px-6 py-14 lg:px-12 lg:py-20">
+            <div class="mx-auto max-w-[1280px]">
+                <a href="{{ $r('services.index') }}"
+                   class="k-eyebrow k-reveal k-link k-link-in mb-6 inline-block text-[#0F0F0F]/45 transition-colors duration-300 hover:text-[#E30613]">
+                    {{ $isEn ? 'Services we provide' : 'Verdiğimiz hizmetler' }} →
+                </a>
+                <div class="flex flex-wrap gap-x-7 gap-y-3">
+                    @foreach ($services as $service)
+                        <a href="{{ $r('services.show', ['service' => $service->slug]) }}"
+                           class="k-link k-link-in text-sm text-[#0F0F0F]/70 transition-colors duration-300 hover:text-[#E30613]">
+                            {{ $service->t('title') }}
                         </a>
                     @endforeach
                 </div>

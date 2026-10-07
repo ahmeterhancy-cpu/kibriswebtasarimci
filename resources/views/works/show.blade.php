@@ -119,6 +119,15 @@
                         <span>{{ __('site.common.back_to_works') }}</span>
                     </a>
                 </div>
+
+                {{-- Proje sayfasından hizmet ve sektör sayfalarına. --}}
+                <p class="k-reveal mt-10 text-sm text-[#0F0F0F]/55" data-delay="100">
+                    {{ $isEn ? 'Want something like this? Start with our' : 'Benzerini istiyorsanız' }}
+                    <a href="{{ $r('services.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'services' : 'hizmetlerimizden' }}</a>
+                    {{ $isEn ? 'or' : 'ya da' }}
+                    <a href="{{ $r('sectors.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'your industry' : 'kendi sektörünüzden' }}</a>
+                    {{ $isEn ? '.' : 'başlayın.' }}
+                </p>
             </div>
         </section>
     @endif

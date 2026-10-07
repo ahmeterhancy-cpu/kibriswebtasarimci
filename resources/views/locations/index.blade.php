@@ -81,4 +81,30 @@
         </section>
     @endforeach
 
+    {{-- Şehir sayfaları bilerek genel; ayrışan içerik sektörlerde. Bu bölüm
+         ziyaretçiyi oraya taşıyor ve iki listeyi birbirine bağlıyor. --}}
+    <section class="bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-24 k-dark">
+        <div class="mx-auto max-w-[1280px]">
+            <h2 class="k-display-sm k-reveal" style="color:#ffffff;">
+                {{ $isEn ? 'Looking for your' : 'Kendi' }}
+                <span class="k-hl">{{ $isEn ? 'industry?' : 'sektörünüz mü?' }}</span>
+            </h2>
+            <p class="k-reveal mt-5 max-w-xl leading-relaxed" style="color:rgba(255,255,255,0.6);" data-delay="100">
+                {{ $isEn
+                    ? 'Where you are changes very little. What changes everything is what your business does — that is where our pages differ.'
+                    : 'Nerede olduğunuz çok az şeyi değiştiriyor. Her şeyi değiştiren, işinizin ne olduğu — sayfalarımız da orada ayrışıyor.' }}
+            </p>
+            <div class="mt-9 flex flex-wrap items-center gap-8">
+                <a href="{{ $r('sectors.index') }}" class="k-reveal k-btn k-btn--light" data-delay="200">
+                    <span style="color:inherit;">{{ $isEn ? 'Industries' : 'Sektörler' }}</span>
+                    <span class="k-btn__arrow" aria-hidden="true">→</span>
+                </a>
+                <a href="{{ $r('services.index') }}"
+                   class="k-reveal k-link text-sm font-semibold" style="color:rgba(255,255,255,0.7);" data-delay="300">
+                    {{ $isEn ? 'All services' : 'Tüm hizmetler' }}
+                </a>
+            </div>
+        </div>
+    </section>
+
 </x-app-layout>

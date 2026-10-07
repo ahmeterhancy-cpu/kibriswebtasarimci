@@ -91,6 +91,34 @@
         </div>
     </section>
 
+    {{-- Hizmetten sektörlere ve şehirlere. Hizmet sayfaları site içinde
+         en çok bağlantı alan ama en az bağlantı VEREN sayfalardı; sektör ve
+         şehir sayfaları buradan hiç bağ almıyordu. --}}
+    @if ($sectors->isNotEmpty())
+        <section class="bg-white px-6 py-14 lg:px-12 lg:py-20">
+            <div class="mx-auto max-w-[1280px]">
+                <a href="{{ $r('sectors.index') }}"
+                   class="k-eyebrow k-reveal k-link k-link-in mb-6 inline-block text-[#0F0F0F]/45 transition-colors duration-300 hover:text-[#E30613]">
+                    {{ $isEn ? 'This service by industry' : 'Bu hizmeti sektörlere göre görün' }} →
+                </a>
+                <div class="flex flex-wrap gap-x-7 gap-y-3">
+                    @foreach ($sectors as $sector)
+                        <a href="{{ $r('sectors.show', ['sector' => $sector->slug]) }}"
+                           class="k-link k-link-in text-sm text-[#0F0F0F]/70 transition-colors duration-300 hover:text-[#E30613]">
+                            {{ $sector->icon }} {{ $sector->t('name') }}
+                        </a>
+                    @endforeach
+                </div>
+
+                <p class="k-reveal mt-10 text-sm text-[#0F0F0F]/55" data-delay="100">
+                    {{ $isEn ? 'We deliver this service across' : 'Bu hizmeti' }}
+                    <a href="{{ $r('locations.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'Northern Cyprus and Türkiye' : 'Kuzey Kıbrıs ve Türkiye genelinde' }}</a>
+                    {{ $isEn ? '.' : 'veriyoruz.' }}
+                </p>
+            </div>
+        </section>
+    @endif
+
     {{-- Diğer hizmetler --}}
     @if ($others->isNotEmpty())
         <section class="bg-[#F4F4F2] px-6 py-16 lg:px-12 lg:py-24">

@@ -96,4 +96,16 @@
         </section>
     @endif
 
+    {{-- Hizmet listesinden sektör ve şehir listelerine. --}}
+    <section class="bg-white px-6 py-14 lg:px-12 lg:py-20">
+        <div class="mx-auto max-w-[1280px]">
+            <p class="k-reveal max-w-2xl text-sm leading-relaxed text-[#0F0F0F]/55">
+                {{ $isEn ? 'The same service looks different depending on the business. See it' : 'Aynı hizmet, işe göre farklı görünür.' }}
+                <a href="{{ $r('sectors.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'by industry' : 'Sektörlere göre' }}</a>
+                {{ $isEn ? ', or see the' : 've' }}
+                <a href="{{ $r('locations.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'cities we work in' : 'hizmet verdiğimiz şehirlere' }}</a>{{ $isEn ? '.' : ' bakın.' }}
+            </p>
+        </div>
+    </section>
+
 </x-app-layout>

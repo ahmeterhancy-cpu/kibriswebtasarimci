@@ -84,4 +84,16 @@
         </div>
     </section>
 
+    {{-- İşler sayfası hiçbir hizmet ya da sektör sayfasına bağ vermiyordu. --}}
+    <section class="bg-[#F4F4F2] px-6 py-14 lg:px-12 lg:py-20">
+        <div class="mx-auto max-w-[1280px]">
+            <p class="k-reveal max-w-2xl text-sm leading-relaxed text-[#0F0F0F]/55">
+                {{ $isEn ? 'Wondering what goes into one of these? Start with the' : 'Bu işlerin içinde ne var diye merak ettiyseniz' }}
+                <a href="{{ $r('services.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'services' : 'hizmetlerimize' }}</a>
+                {{ $isEn ? 'or find' : 'ya da' }}
+                <a href="{{ $r('sectors.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'your own industry' : 'kendi sektörünüze' }}</a>{{ $isEn ? '.' : ' bakın.' }}
+            </p>
+        </div>
+    </section>
+
 </x-app-layout>

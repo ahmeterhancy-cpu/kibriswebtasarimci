@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Package;
 use App\Models\Sector;
+use App\Models\Service;
 use Illuminate\Contracts\View\View;
 
 class SectorController extends Controller
@@ -26,6 +27,7 @@ class SectorController extends Controller
             'packages' => Package::active()->projects()->get(),
             // Sektör × şehir çapraz bağlantısı: "bu işi nerelerde yapıyoruz".
             'locations' => Location::active()->get(),
+            'services' => Service::active()->get(),
         ]);
     }
 }

@@ -76,6 +76,13 @@
                     <span>{{ $isEn ? 'Talk it through' : 'Önce konuşalım' }}</span>
                 </a>
             </div>
+
+            {{-- Sektör listesinden şehir listesine. İki liste birbirine
+                 bağlı değildi; /web-tasarim sayfası neredeyse hiç bağ almıyordu. --}}
+            <p class="k-reveal mt-12 text-sm text-[#0F0F0F]/55" data-delay="300">
+                {{ $isEn ? 'Working outside Cyprus? See' : 'Kıbrıs dışındaysanız' }}
+                <a href="{{ $r('locations.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'the cities we work in' : 'hizmet verdiğimiz şehirlere' }}</a>{{ $isEn ? '.' : ' bakın.' }}
+            </p>
         </div>
     </section>
 

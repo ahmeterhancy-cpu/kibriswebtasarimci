@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use App\Models\Sector;
 use App\Models\Service;
 use App\Models\Work;
 use Illuminate\Contracts\View\View;
@@ -24,6 +25,7 @@ class ServiceController extends Controller
         return view('services.show', [
             'service' => $service,
             'others' => Service::active()->whereKeyNot($service->getKey())->take(4)->get(),
+            'sectors' => Sector::active()->get(),
             'works' => Work::active()->take(3)->get(),
         ]);
     }

@@ -96,6 +96,24 @@
         </div>
     </article>
 
+    {{-- Yazıdan hizmete. Blog sitenin en çok sayfası olan bölümü ama hiçbir
+         hizmet ya da sektör sayfasına bağ vermiyordu; okunan yazı okurla
+         kaldı, siteye dönmedi. --}}
+    <section class="bg-white px-6 pb-16 lg:px-12 lg:pb-20">
+        <div class="mx-auto max-w-[760px]">
+            <div class="k-reveal rounded-2xl border border-[#0F0F0F]/12 p-7 lg:p-9">
+                <p class="text-base leading-relaxed text-[#0F0F0F]/70">
+                    {{ $isEn
+                        ? 'This is what we actually do for a living. See the'
+                        : 'Bu yazdıklarımızı işimizde uyguluyoruz.' }}
+                    <a href="{{ $r('services.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'services' : 'Hizmetlerimize' }}</a>
+                    {{ $isEn ? 'we offer, or go straight to' : 'ya da doğrudan' }}
+                    <a href="{{ $r('sectors.index') }}" class="k-link font-semibold text-[#0F0F0F] hover:text-[#E30613]">{{ $isEn ? 'your industry' : 'sektörünüze' }}</a>{{ $isEn ? '.' : ' göz atın.' }}
+                </p>
+            </div>
+        </div>
+    </section>
+
     @if ($related->isNotEmpty())
         <section class="bg-[#F4F4F2] px-6 py-16 lg:px-12 lg:py-24">
             <div class="mx-auto max-w-[1280px]">
