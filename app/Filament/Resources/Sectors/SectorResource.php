@@ -12,8 +12,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -107,6 +107,12 @@ class SectorResource extends Resource
                             ->required()
                             ->maxLength(190)
                             ->unique(ignoreRecord: true)
+                            // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
+                            // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
+                            // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
+                            ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
                             ->helperText('/sektorler/otel-ve-konaklama — yayındaki bir sayfanın adresini değiştirmek bağlantıları kırar.'),
                         TextInput::make('icon')
                             ->label('Simge')

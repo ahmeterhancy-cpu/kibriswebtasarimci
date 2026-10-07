@@ -13,8 +13,8 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -69,6 +69,12 @@ class LocationResource extends Resource
                         ->required()
                         ->maxLength(190)
                         ->unique(ignoreRecord: true)
+                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
+                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
+                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
                         ->helperText('Sayfa adresi: /web-tasarim/<slug>.'),
 
                     TextInput::make('headline')

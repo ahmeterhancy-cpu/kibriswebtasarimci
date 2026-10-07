@@ -60,6 +60,12 @@ class CategoryResource extends Resource
                 ->required()
                 ->maxLength(190)
                 ->unique(ignoreRecord: true)
+                // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
+                // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
+                // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
+                ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
                 ->helperText('Filtre bağlantılarında kullanılır: ?kategori=<slug>.'),
 
             Select::make('type')

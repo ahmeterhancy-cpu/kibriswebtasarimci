@@ -12,8 +12,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -67,6 +67,12 @@ class AddonResource extends Resource
                         ->required()
                         ->maxLength(190)
                         ->unique(ignoreRecord: true)
+                        // Alandan çıkınca adres biçimine çevir: "NP-CYP" gibi büyük harfli
+                        // bir slug sunucuda 404 verir. Benzersizlik denetimi de böylece ham
+                        // metni değil kaydedilecek değeri görür; dehydrate emniyet kemeri.
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug((string) $state, '-', 'tr') ?: $state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::slug((string) $state, '-', 'tr') ?: (string) $state)
                         ->helperText('Gelen teklif taleplerinde bu kod görünür. Yayındaysa değiştirmeyin.'),
 
                     TextInput::make('price')
@@ -90,9 +96,9 @@ class AddonResource extends Resource
                         ->columnSpanFull()
                         ->bulkToggleable(),
 
-                Toggle::make('is_active')->label('Yayında')->default(true),
-                TextInput::make('sort_order')->label('Sıra')->numeric()->default(0),
-            ])->columns(2),
+                    Toggle::make('is_active')->label('Yayında')->default(true),
+                    TextInput::make('sort_order')->label('Sıra')->numeric()->default(0),
+                ])->columns(2),
         ]);
     }
 
