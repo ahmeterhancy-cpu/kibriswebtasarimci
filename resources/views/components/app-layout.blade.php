@@ -21,7 +21,14 @@
 
     $pageTitle = $seoTitle ? $seoTitle.' — '.$siteName : $siteName.($isEn ? ' — Web Design in Cyprus' : ' — Kıbrıs Web Tasarım');
     $pageDescription = $seoDescription ?: $site('site_description', $defaultDescription);
-    $canonicalUrl = $canonical ?: url()->current();
+    // TUZAK: Sunucu ayni siteyi hem kibriswebtasarimci.com hem
+    // www.kibriswebtasarimci.com adresinden servis ediyordu ve url()->current()
+    // isteğin geldiği adresi döndürdüğü için kanonik etiket de www'lu çıkıyordu.
+    // Arama motoru bunu İKİ AYRI SİTE sayıp sinyalleri ikiye bölüyor —
+    // Google'ın dizininde her iki sürüm de vardı. Asıl çözüm .htaccess'teki
+    // 301; buradaki temizlik ikinci savunma hattı.
+    $canonicalUrl = preg_replace('#^(https?://)www\.#i', '$1', $canonical ?: url()->current());
+    $alternateUrl = $alternateUrl ? preg_replace('#^(https?://)www\.#i', '$1', $alternateUrl) : $alternateUrl;
 
     $ogSetting = $site('og_image');
     $ogUrl = $ogImage

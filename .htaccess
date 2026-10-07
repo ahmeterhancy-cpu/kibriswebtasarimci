@@ -24,6 +24,14 @@ RedirectMatch 404 (?i)^/(app|bootstrap|config|database|lang|resources|routes|tes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # --- Tek ana makine: www yok -----------------------------------------
+    # Site hem www'lu hem www'suz adresten aciliyordu; Google ikisini de
+    # dizine aldi ve ayni sayfalar iki ayri URL olarak yarisiyordu.
+    # sitemap.xml www'suz uretiyor, dogru adres o. Bu kural HTTPS
+    # kuralindan ONCE: http://www -> https://(www'suz) tek adimda gitsin.
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ https://%1%{REQUEST_URI} [L,R=301]
+
     # --- HTTPS zorunlu ---------------------------------------------------
     # Sertifika kuruldu (2026-10-05), yönlendirme açıldı.
     # Açılmadığı sürece site hem http hem https üzerinden açılıyordu; arama

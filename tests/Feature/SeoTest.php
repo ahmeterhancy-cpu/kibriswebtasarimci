@@ -42,6 +42,24 @@ class SeoTest extends TestCase
         }, $matches[1]);
     }
 
+    /**
+     * www'lu adresten gelen istek de www'suz kanonik gostermeli.
+     *
+     * Sunucu ayni siteyi iki ana makineden servis ediyordu; url()->current()
+     * istegin geldigi adresi dondurdugu icin kanonik de www'lu cikiyor ve
+     * Google ayni sayfayi iki ayri URL olarak diziniyordu. Asil cozum
+     * .htaccess'teki 301, bu test ikinci savunma hattini bekliyor.
+     */
+    public function test_www_adresinden_gelen_istekte_kanonik_wwwsuz_olur(): void
+    {
+        $html = $this->get('http://www.localhost/')->assertOk()->getContent();
+
+        preg_match('#<link rel="canonical" href="([^"]+)"#', $html, $m);
+
+        $this->assertNotEmpty($m, 'Kanonik etiket yok.');
+        $this->assertStringNotContainsString('//www.', $m[1]);
+    }
+
     public function test_ana_sayfa_acilir_ve_kanonik_adresi_vardir(): void
     {
         $this->get('/')
