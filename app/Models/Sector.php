@@ -20,6 +20,8 @@ class Sector extends Model
             'needs_en' => 'array',
             'features' => 'array',
             'features_en' => 'array',
+            'faq' => 'array',
+            'faq_en' => 'array',
             'is_active' => 'boolean',
         ];
     }

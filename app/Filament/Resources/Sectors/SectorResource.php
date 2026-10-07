@@ -11,6 +11,7 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -79,6 +80,18 @@ class SectorResource extends Resource
                         ->label('Tipik kapsam')
                         ->helperText('Yan sütunda modül listesi. Bu sektörde genelde ne yapılıyor.'),
 
+                    Repeater::make('faq')
+                        ->label('Sık sorulanlar')
+                        ->schema([
+                            TextInput::make('q')->label('Soru')->required()->maxLength(190),
+                            Textarea::make('a')->label('Cevap')->required()->rows(3)->maxLength(600),
+                        ])
+                        ->itemLabel(fn (array $state): ?string => $state['q'] ?? null)
+                        ->collapsed()
+                        ->defaultItems(0)
+                        ->addActionLabel('Soru ekle')
+                        ->helperText('Sayfada açılır liste olarak çıkar ve arama motoruna FAQPage olarak bildirilir — sonuç sayfasında açılır cevap kutusu şansı verir. HER SEKTÖRE AYNI SORULARI YAZMAYIN; tekrar eden SSS blokları görmezden geliniyor. Teklif istemeden önce bu sektörden gerçekten sorulan şeyleri yazın.'),
+
                     RichEditor::make('body')
                         ->label('Uzun metin')
                         ->helperText('Sayfanın gövdesi. BAŞKA SEKTÖRDEN KOPYALAMAYIN — sektör sayfalarının tüm değeri birbirinden gerçekten farklı olmasından geliyor. Uydurma referans, müşteri sayısı ya da "sektör lideri" iddiası yazmayın.'),
@@ -90,6 +103,16 @@ class SectorResource extends Resource
                     Textarea::make('intro_en')->label('Intro')->rows(2)->maxLength(600),
                     TagsInput::make('needs_en')->label('What the site must solve'),
                     TagsInput::make('features_en')->label('Typical scope'),
+                    Repeater::make('faq_en')
+                        ->label('FAQ')
+                        ->schema([
+                            TextInput::make('q')->label('Question')->required()->maxLength(190),
+                            Textarea::make('a')->label('Answer')->required()->rows(3)->maxLength(600),
+                        ])
+                        ->itemLabel(fn (array $state): ?string => $state['q'] ?? null)
+                        ->collapsed()
+                        ->defaultItems(0)
+                        ->addActionLabel('Add question'),
                     RichEditor::make('body_en')->label('Body'),
                 ])->columns(1),
 

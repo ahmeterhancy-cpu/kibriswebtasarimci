@@ -3,6 +3,12 @@
     $heading = $sector->t('headline') ?: $sector->t('name');
     $needs = (array) $sector->t('needs');
     $features = (array) $sector->t('features');
+
+    // Soru/cevap çiftleri; ikisi birden dolu olmayan satırlar atılıyor
+    // (panelde yarım bırakılmış bir satır yapısal veriyi geçersiz yapardı).
+    $faq = collect((array) $sector->t('faq'))
+        ->filter(fn ($item) => filled($item['q'] ?? null) && filled($item['a'] ?? null))
+        ->values();
 @endphp
 
 <x-app-layout
@@ -44,6 +50,26 @@
                 echo json_encode($service, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             @endphp
         </script>
+
+        {{-- FAQPage: arama sonucunda açılır cevap kutusu şansı.
+             Yalnızca sayfada GERÇEKTEN görünen sorular bildiriliyor —
+             gizli SSS işaretlemesi Google'ın el ile ceza verdiği şeylerden. --}}
+        @if ($faq->isNotEmpty())
+        <script type="application/ld+json">
+            @php
+                echo json_encode([
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    'mainEntity' => $faq->map(fn ($item) => [
+                        '@type' => 'Question',
+                        'name' => $item['q'],
+                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+                    ])->all(),
+                ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            @endphp
+        </script>
+        @endif
+
         <script type="application/ld+json">
             @php
                 echo json_encode([
@@ -157,6 +183,41 @@
                            class="k-btn k-btn--ghost !px-5 !py-2.5 !text-[0.66rem]">
                             <span>{{ $location->t('name') }}</span>
                         </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- Sektöre özel sık sorulanlar. Yukarıdaki FAQPage işaretlemesi bu
+         listeyi bildiriyor; ikisi birbirinden ayrılmamalı — sayfada
+         görünmeyen soruyu işaretlemek Google'ın el ile ceza verdiği şey. --}}
+    @if ($faq->isNotEmpty())
+        <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
+            <div class="mx-auto grid max-w-[1280px] grid-cols-1 gap-12 lg:grid-cols-12">
+                <div class="lg:col-span-4">
+                    <p class="k-eyebrow k-reveal mb-5 text-[#0F0F0F]/45">{{ __('site.common.faq') }}</p>
+                    <h2 class="k-display-sm text-[#0F0F0F]" data-split data-split-step="0.05">
+                        {{ $isEn ? 'Before you' : 'Teklif almadan' }}<br>{{ $isEn ? 'ask.' : 'önce.' }}
+                    </h2>
+                </div>
+
+                <div class="lg:col-span-8" data-acc="single">
+                    @foreach ($faq as $i => $item)
+                        <div class="k-acc k-reveal border-t border-[#0F0F0F]/12 last:border-b" data-delay="{{ min(($i + 1) * 100, 400) }}">
+                            <h3>
+                                <button type="button" data-acc-trigger aria-expanded="false"
+                                        class="flex w-full items-start justify-between gap-6 py-6 text-left">
+                                    <span class="text-lg font-bold tracking-tight">{{ $item['q'] }}</span>
+                                    <span class="k-acc__sign mt-1 shrink-0 text-xl text-[#E30613]" aria-hidden="true">+</span>
+                                </button>
+                            </h3>
+                            <div class="k-acc__body">
+                                <div>
+                                    <p class="max-w-2xl pb-6 leading-relaxed text-[#0F0F0F]/65">{{ $item['a'] }}</p>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </div>

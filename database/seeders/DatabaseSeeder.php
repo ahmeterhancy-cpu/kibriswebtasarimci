@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             PackageSeeder::class,
             AddonSeeder::class,
             SectorSeeder::class,
+            // Sektör kayıtları kurulduktan SONRA: slug'a göre güncelliyor.
+            SectorFaqSeeder::class,
             // Ofisler şehirlerden ÖNCE: şehir kayıtları ofise bağlanıyor.
             OfficeSeeder::class,
             LocationSeeder::class,
