@@ -12,7 +12,7 @@
 @endphp
 
 {{-- Tam ekran mobil menü: perde clip-path ile aşağıdan açılır, satırlar sırayla gelir. --}}
-<div class="k-menu lg:hidden" id="k-menu">
+<div class="k-menu xl:hidden" id="k-menu">
     {{-- Menünün kendi üst çubuğu: header koyu perdenin altında gizlenir,
          dolayısıyla açık marka ve kapatma düğmesi burada tekrar edilir. --}}
     <div class="absolute inset-x-0 top-0 flex items-center justify-between px-6 py-5">

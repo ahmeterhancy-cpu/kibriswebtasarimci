@@ -1,5 +1,6 @@
 @php
     $nav = [
+        ['route' => 'home', 'label' => __('site.nav.home')],
         ['route' => 'services.index', 'label' => __('site.nav.services')],
         ['route' => 'sectors.index', 'label' => __('site.nav.sectors')],
         ['route' => 'works.index', 'label' => __('site.nav.works')],
@@ -15,7 +16,12 @@
 
         @include('layouts.partials.brand')
 
-        <nav class="hidden items-center gap-9 lg:flex" aria-label="{{ __('site.nav.menu') }}">
+        {{-- Ana Sayfa ile birlikte 7 bağlantı var. Marka adı uzun olduğu için
+             bu menü 1024px'de artık sığmıyordu: logo ile ilk bağlantı arasında
+             7 piksel kalıyordu. Masaüstü menüsü bu yüzden xl'den (1280px)
+             itibaren gösteriliyor; altında tam ekran menü devreye giriyor —
+             orada zaten Ana Sayfa ve Teklif Al da var. --}}
+        <nav class="hidden items-center gap-9 xl:flex" aria-label="{{ __('site.nav.menu') }}">
             @foreach ($nav as $item)
                 @php
                     $href = $r($item['route']);
@@ -45,7 +51,7 @@
             </a>
 
             <button type="button" data-menu-toggle aria-expanded="false" aria-controls="k-menu"
-                    class="k-burger relative z-[901] -mr-1 p-2 text-[#0F0F0F] lg:hidden"
+                    class="k-burger relative z-[901] -mr-1 p-2 text-[#0F0F0F] xl:hidden"
                     aria-label="{{ __('site.nav.menu') }}">
                 <span></span><span></span><span></span>
             </button>
