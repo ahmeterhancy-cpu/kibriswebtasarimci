@@ -317,12 +317,14 @@
                              class="k-reveal sticky rounded-2xl border border-white/12 bg-[#141414] p-7 lg:p-10"
                              style="top: calc(14vh + {{ $i * 14 }}px);"
                              data-delay="{{ min(($i + 1) * 100, 400) }}">
-                        <div class="flex flex-col gap-5 md:flex-row md:items-start md:gap-10">
+                        {{-- Masaüstünde üç sütun: numara | başlık | açıklama.
+                             Başlıkla açıklama alt alta durduğunda metin max-w-2xl'de
+                             kesiliyor ve kartın sağında yarım ekran boşluk kalıyordu. --}}
+                        <div class="flex flex-col gap-4 md:flex-row md:items-start md:gap-10 lg:gap-16">
                             <span class="k-display-xs shrink-0 text-[#E30613]">{{ $no }}</span>
-                            <div class="min-w-0">
-                                <h3 class="text-2xl font-black tracking-tight lg:text-3xl" style="color:#ffffff;">{{ $title }}</h3>
-                                <p class="mt-3 max-w-2xl leading-relaxed" style="color:rgba(255,255,255,0.6);">{{ $text }}</p>
-                            </div>
+                            <h3 class="text-2xl font-black tracking-tight md:w-52 md:shrink-0 lg:w-80 lg:text-3xl"
+                                style="color:#ffffff;">{{ $title }}</h3>
+                            <p class="min-w-0 max-w-3xl leading-relaxed md:pt-1" style="color:rgba(255,255,255,0.6);">{{ $text }}</p>
                         </div>
                     </article>
                 @endforeach
