@@ -18,6 +18,9 @@ class Work extends Model
         return [
             'gallery' => 'array',
             'tags' => 'array',
+            // Sütun duruyor ama hiçbir yerde gösterilmiyor: proje
+            // sayfasındaki "Sonuçlar" bölümü ve paneldeki alan kaldırıldı.
+            // Eski kayıtların verisi kaybolmasın diye cast bırakıldı.
             'metrics' => 'array',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',

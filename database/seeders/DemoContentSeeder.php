@@ -39,10 +39,6 @@ class DemoContentSeeder extends Seeder
                 'summary' => 'Bu bir örnek kayıttır. Gerçek vaka çalışmanızı admin panelinden ekleyin.',
                 'summary_en' => 'This is a sample record. Add your real case study from the admin panel.',
                 'tags' => ['Kurumsal Web', 'UI/UX', 'SEO'],
-                'metrics' => [
-                    ['label' => 'Sayfa hızı', 'label_en' => 'Page speed', 'value' => '98/100'],
-                    ['label' => 'Teslim', 'label_en' => 'Delivery', 'value' => '10 gün'],
-                ],
                 'is_featured' => true,
                 'sort_order' => 1,
             ],
@@ -56,9 +52,6 @@ class DemoContentSeeder extends Seeder
                 'summary' => 'Bu bir örnek kayıttır. Gerçek vaka çalışmanızı admin panelinden ekleyin.',
                 'summary_en' => 'This is a sample record. Add your real case study from the admin panel.',
                 'tags' => ['E-Ticaret', 'Ödeme Entegrasyonu'],
-                'metrics' => [
-                    ['label' => 'Ürün', 'label_en' => 'Products', 'value' => '1.200+'],
-                ],
                 'is_featured' => true,
                 'sort_order' => 2,
             ],

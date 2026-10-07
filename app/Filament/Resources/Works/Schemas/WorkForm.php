@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Works\Schemas;
 use App\Filament\Support\SlugField;
 use App\Models\Category;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -68,19 +67,6 @@ class WorkForm
                         ->label('Kapsam etiketleri')
                         ->placeholder('Kurumsal Web, SEO…')
                         ->columnSpanFull(),
-
-                    Repeater::make('metrics')
-                        ->label('Sonuç rakamları')
-                        ->schema([
-                            TextInput::make('value')->label('Değer')->placeholder('%180')->required(),
-                            TextInput::make('label')->label('Etiket (TR)')->placeholder('Trafik artışı')->required(),
-                            TextInput::make('label_en')->label('Label (EN)')->placeholder('Traffic growth'),
-                        ])
-                        ->columns(3)
-                        ->defaultItems(0)
-                        ->addActionLabel('Rakam ekle')
-                        ->columnSpanFull()
-                        ->helperText('Boş bırakılırsa proje sayfasında sonuç bölümü gösterilmez.'),
                 ])->columns(2),
 
                 Tab::make('Görseller')->schema([

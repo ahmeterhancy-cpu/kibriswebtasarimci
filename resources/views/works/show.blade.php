@@ -80,25 +80,6 @@
         </div>
     </section>
 
-    {{-- Sonuçlar --}}
-    @if (filled($work->metrics))
-        <section class="k-dark bg-[#0F0F0F] px-6 py-16 lg:px-12 lg:py-24">
-            <div class="mx-auto max-w-[1280px]">
-                <p class="k-eyebrow k-reveal mb-10" style="color:rgba(255,255,255,0.4);">{{ $isEn ? 'Results' : 'Sonuçlar' }}</p>
-                <dl class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ((array) $work->metrics as $i => $metric)
-                        <div class="k-reveal" data-delay="{{ min(($i + 1) * 100, 400) }}">
-                            <dd class="k-display-xs" style="color:#E30613;">{{ $metric['value'] ?? '' }}</dd>
-                            <dt class="mt-2 text-sm" style="color:rgba(255,255,255,0.55);">
-                                {{ $isEn ? ($metric['label_en'] ?? $metric['label'] ?? '') : ($metric['label'] ?? '') }}
-                            </dt>
-                        </div>
-                    @endforeach
-                </dl>
-            </div>
-        </section>
-    @endif
-
     {{-- Vaka metni --}}
     @if (filled($work->t('body')))
         <section class="bg-white px-6 py-16 lg:px-12 lg:py-24">
