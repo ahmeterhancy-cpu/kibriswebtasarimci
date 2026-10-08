@@ -17,9 +17,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Sütun sütun kontrol: migrate yarıda ölmüşse ikinci çalıştırma
+        // "duplicate column" ile patlamasın.
         Schema::table('sectors', function (Blueprint $table) {
-            $table->json('faq')->nullable()->after('features_en');
-            $table->json('faq_en')->nullable()->after('faq');
+            if (! Schema::hasColumn('sectors', 'faq')) {
+                $table->json('faq')->nullable()->after('features_en');
+            }
+
+            if (! Schema::hasColumn('sectors', 'faq_en')) {
+                $table->json('faq_en')->nullable()->after('faq');
+            }
         });
     }
 

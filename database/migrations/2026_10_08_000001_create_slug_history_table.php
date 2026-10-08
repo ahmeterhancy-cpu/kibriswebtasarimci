@@ -15,6 +15,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Paylaşımlı sunucuda migrate yarıda ölebiliyor: MySQL'de DDL
+        // işlemsel olmadığı için tablo oluşup `migrations` kaydı
+        // yazılmayabiliyor. Sonraki çalıştırma "already exists" ile
+        // patlamasın diye kontrol ediyoruz.
+        if (Schema::hasTable('slug_history')) {
+            return;
+        }
+
         Schema::create('slug_history', function (Blueprint $table) {
             $table->id();
             $table->string('model_type', 191);

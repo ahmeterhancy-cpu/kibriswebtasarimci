@@ -73,7 +73,15 @@ class SetupController extends Controller
             }
         }
 
-        foreach (['storage:link', 'config:cache', 'route:cache', 'view:cache'] as $command) {
+        // Önbellekleme YALNIZCA üretimde. `config:cache` o anki
+        // yapılandırmayı diske sabitliyor; üretim dışı bir ortamda
+        // çalıştığında (ör. test) bellek içi veritabanını işaret eden bir
+        // config.php bırakıp sonraki her çalıştırmayı bozuyor.
+        $commands = app()->isProduction()
+            ? ['storage:link', 'config:cache', 'route:cache', 'view:cache']
+            : ['storage:link'];
+
+        foreach ($commands as $command) {
             try {
                 Artisan::call($command);
                 $steps[$command] = trim(Artisan::output()) ?: 'tamam';
