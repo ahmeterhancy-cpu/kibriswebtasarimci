@@ -72,11 +72,18 @@ deployment:
 
     # vendor yoksa artisan hic calismaz. Guard olmadan deploy gunlugu
     # okunmaz fatal error yiginina donuyor.
+    # SIRA ONEMLI: optimize:clear GOCTEN ONCE. Aksi halde migrate, bir onceki
+    # dagitimdan kalan onbellekli yapilandirmayla calisiyor; .env degistiyse
+    # yanlis veritabanina baglanabiliyor.
+    - /bin/echo "----- onbellek temizligi -----" >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan optimize:clear || /bin/echo "vendor yok, onbellek atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
+
     - /bin/echo "----- veritabani -----" >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan migrate --force || /bin/echo "vendor yok, migrate atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan migrate --force --no-interaction || /bin/echo "MIGRATE BASARISIZ ya da vendor yok" ) >> /home/kibr4830/deploy-son.log 2>&1
+    # Gocun gercekten islendigini gunlukte gormek icin: bekleyen kalirsa burada gorunur.
+    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan migrate:status || /bin/true ) >> /home/kibr4830/deploy-son.log 2>&1
 
     - /bin/echo "----- onbellek -----" >> /home/kibr4830/deploy-son.log 2>&1
-    - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan optimize:clear || /bin/echo "vendor yok, onbellek atlandi" ) >> /home/kibr4830/deploy-son.log 2>&1
     - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan optimize || /bin/true ) >> /home/kibr4830/deploy-son.log 2>&1
     - cd /home/kibr4830/public_html && ( [ -f vendor/autoload.php ] && php artisan storage:link || /bin/true ) >> /home/kibr4830/deploy-son.log 2>&1
 

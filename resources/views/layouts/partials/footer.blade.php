@@ -194,7 +194,10 @@
             <p>© {{ now()->year }} {{ $site('site_name', 'Kıbrıs Web Tasarımcı') }}. {{ $isEn ? 'All rights reserved.' : 'Tüm hakları saklıdır.' }}</p>
             <p>
                 {{ $isEn ? 'A' : '' }}
-                <a href="https://www.amesisdijital.com" target="_blank" rel="noopener"
+                {{-- amesisdijital.com yalnizca amesis.com.tr adresine yonlendiren
+                     bir sayfa; dogrudan hedefe baglaniyoruz. Yonlendirme adimi
+                     hem ziyaretciyi bekletiyor hem baglanti degerini zayiflatiyor. --}}
+                <a href="https://amesis.com.tr" target="_blank" rel="noopener"
                    class="k-link k-link-in transition-colors duration-300 hover:text-[#E30613]" style="color:rgba(255,255,255,0.6);">Amesis 360°</a>
                 {{ $isEn ? 'studio.' : 'kuruluşudur.' }}
             </p>
