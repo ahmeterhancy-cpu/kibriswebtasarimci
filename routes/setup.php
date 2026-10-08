@@ -19,10 +19,15 @@ use Illuminate\Support\Facades\Route;
 |   1. .env'e ekleyin:   SETUP_TOKEN=uzun-rastgele-bir-dize
 |   2. Tarayıcıda açın:  https://alanadi.com/kurulum/uzun-rastgele-bir-dize
 |   3. Bitince .env'den SETUP_TOKEN satırını SİLİN.
+|
+| TEK BİR İÇERİK GÖREVİ ÇALIŞTIRMAK
+|   https://alanadi.com/kurulum/<token>/<gorev>
+|   Kurulu bir sitede yalnızca o görevi çalıştırır, başka içeriğe
+|   dokunmaz. Tanımlı görevler SetupController::JOBS içinde.
 */
 
 if (! config('app.setup_token')) {
     return;
 }
 
-Route::get('/kurulum/{given}', SetupController::class);
+Route::get('/kurulum/{given}/{job?}', SetupController::class);

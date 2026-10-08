@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Database\Seeders\SectorFaqSeeder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
@@ -20,11 +21,30 @@ use Illuminate\Support\Facades\Schema;
  */
 class SetupController extends Controller
 {
-    public function __invoke(string $given): Response
+    /**
+     * Kurulu bir sitede tek başına çalıştırılabilen görevler.
+     *
+     * Buraya yalnızca VAR OLAN İÇERİĞİ SİLMEYEN, tekrar çalıştırıldığında
+     * aynı sonucu veren seeder'lar girer. Liste bilerek dar: token sızsa
+     * bile çalıştırılabilecek şeyin sınırı burası.
+     *
+     * @var array<string, class-string>
+     */
+    public const JOBS = [
+        // Sektör sayfalarının sık sorulanları. Yalnızca faq sütunlarını
+        // slug'a göre günceller; kayıt oluşturmaz, silmez.
+        'sss' => SectorFaqSeeder::class,
+    ];
+
+    public function __invoke(string $given, ?string $job = null): Response
     {
         $token = config('app.setup_token');
 
         abort_unless($token && hash_equals($token, $given), 404);
+
+        if ($job !== null) {
+            return $this->runJob($job);
+        }
 
         $steps = [];
         $alreadyInstalled = false;
@@ -75,6 +95,47 @@ class SetupController extends Controller
         $body .= "2. /admin adresinden giriş yapıp şifreyi değiştirin.\n";
 
         return $this->render($body);
+    }
+
+    /** Tek bir içerik görevi: kurulu siteyi bozmadan çalıştırılır. */
+    private function runJob(string $job): Response
+    {
+        $seeder = self::JOBS[$job] ?? null;
+
+        if ($seeder === null) {
+            return $this->render(implode(PHP_EOL, [
+                'Tanımsız görev: '.$job,
+                '',
+                'Tanımlı olanlar: '.implode(', ', array_keys(self::JOBS)),
+            ]), 404);
+        }
+
+        // Bu görev YALNIZCA veri yazıyor. Bilerek ne migrate çalıştırıyor
+        // ne de önbellek tazeliyor:
+        //   - göç, dağıtımın (.cpanel.yml) ve ana kurulum adresinin işi
+        //   - config/route/view önbelleği veriyle ilgisiz; bir web isteği
+        //     içinde `config:cache` çalıştırmak o anki yapılandırmayı diske
+        //     sabitler. Testte bu, bellek içi veritabanını işaret eden bir
+        //     config.php bırakıp sonraki her çalıştırmada tabloları düşürdü.
+        //
+        // Seeder konsol katmanından değil doğrudan çağrılıyor; bir web
+        // isteğinin içinde Artisan'a ihtiyaç yok.
+        try {
+            app($seeder)->setContainer(app())->__invoke();
+            $output = $seeder.' çalıştırıldı.';
+        } catch (\Throwable $e) {
+            return $this->render(implode(PHP_EOL, ['GÖREV HATASI', '', $e->getMessage()]), 500);
+        }
+
+        return $this->render(implode(PHP_EOL, [
+            'GÖREV TAMAMLANDI: '.$job,
+            str_repeat('=', 60),
+            '',
+            $output ?: 'çıktı yok',
+            '',
+            str_repeat('=', 60),
+            'Bittiğinde .env dosyasından SETUP_TOKEN satırını SİLİN.',
+        ]));
     }
 
     private function render(string $body, int $status = 200): Response
