@@ -110,17 +110,20 @@ class SetupController extends Controller
             ]), 404);
         }
 
-        // Bu görev YALNIZCA veri yazıyor. Bilerek ne migrate çalıştırıyor
-        // ne de önbellek tazeliyor:
-        //   - göç, dağıtımın (.cpanel.yml) ve ana kurulum adresinin işi
-        //   - config/route/view önbelleği veriyle ilgisiz; bir web isteği
-        //     içinde `config:cache` çalıştırmak o anki yapılandırmayı diske
-        //     sabitler. Testte bu, bellek içi veritabanını işaret eden bir
-        //     config.php bırakıp sonraki her çalıştırmada tabloları düşürdü.
+        // Göç önce çalışıyor: seeder'ın yazacağı sütun henüz yoksa görev
+        // "Unknown column" ile patlıyor. Dağıtımdaki migrate adımına
+        // güvenmiyoruz — sunucuda sessizce atlanabiliyor.
         //
-        // Seeder konsol katmanından değil doğrudan çağrılıyor; bir web
-        // isteğinin içinde Artisan'a ihtiyaç yok.
+        // Önbellek BİLEREK tazelenmiyor: veriyle ilgisi yok ve bir web
+        // isteği içinde `config:cache` o anki yapılandırmayı diske
+        // sabitliyor. Testte bu, bellek içi veritabanını işaret eden bir
+        // config.php bırakıp sonraki her koşuda tabloları düşürdü.
+        //
+        // Seeder konsol katmanından değil doğrudan çağrılıyor.
         try {
+            Artisan::call('migrate', ['--force' => true]);
+            $migrate = trim(Artisan::output());
+
             app($seeder)->setContainer(app())->__invoke();
             $output = $seeder.' çalıştırıldı.';
         } catch (\Throwable $e) {
@@ -131,6 +134,10 @@ class SetupController extends Controller
             'GÖREV TAMAMLANDI: '.$job,
             str_repeat('=', 60),
             '',
+            'GÖÇ',
+            $migrate ?: 'değişiklik yok',
+            '',
+            'GÖREV',
             $output ?: 'çıktı yok',
             '',
             str_repeat('=', 60),
